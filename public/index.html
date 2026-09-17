@@ -487,7 +487,8 @@
         <label>Hotel Name or OTA Booking URL</label>
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
           <input type="text" id="audit-input" placeholder="Paste any Trip.com / Agoda / Booking.com link or type a hotel name..." oninput="onAuditInputChange()" onkeydown="if(event.key==='Enter') executeAudit()" style="flex: 1; min-width: 260px;">
-          <button class="btn-submit" id="btn-run-audit" onclick="executeAudit()" style="margin: 0; width: auto; min-width: 160px; white-space: nowrap; padding: 0.75rem 1.5rem;">Verify Property</button>
+          <button class="btn-submit" id="btn-run-audit" onclick="executeAudit()" style="margin: 0; width: auto; min-width: 140px; white-space: nowrap; padding: 0.75rem 1.25rem;">🔍 Verify Property</button>
+          <button class="btn-submit" id="btn-run-ai-direct" onclick="handleAiVerificationClick()" style="margin: 0; width: auto; min-width: 160px; white-space: nowrap; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #7c3aed, #4f46e5); border: 1px solid #a78bfa;">🤖 DeepSeek AI Audit</button>
         </div>
         <div id="url-hint" style="display:none; font-size: 0.82rem; color: #60a5fa; margin-top: 0.4rem; font-weight: 500;"></div>
       </div>
@@ -543,6 +544,26 @@
           <p id="verdict-summary" style="font-size: 0.95rem; font-weight: 500;"></p>
         </div>
 
+        <!-- INLINE AUTONOMOUS AI AUDIT DOSSIER -->
+        <div id="inline-ai-dossier" style="display: none; background: rgba(124, 58, 237, 0.08); border: 1px solid #7c3aed; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.35rem;">🤖</span>
+              <div>
+                <strong style="font-size: 1.05rem; color: #fff;">DeepSeek Flash 4.1 Statutory AI Audit</strong>
+                <div style="font-size: 0.75rem; color: #a78bfa;">Zero Open Ports • TLS 1.3 Encrypted • Official VNAT Precedence</div>
+              </div>
+            </div>
+            <div id="inline-ai-badge" style="padding: 0.35rem 0.85rem; border-radius: 6px; font-weight: 800; font-size: 0.82rem;"></div>
+          </div>
+          <div id="inline-ai-risk" style="background: rgba(225, 29, 72, 0.15); border-left: 3px solid #f43f5e; padding: 0.75rem; border-radius: 0 6px 6px 0; font-size: 0.85rem; color: #ffe4e6; margin-bottom: 0.75rem;"></div>
+          <div id="inline-ai-reasoning" style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 0.75rem;"></div>
+          <div id="inline-ai-infractions" style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem;"></div>
+          <div style="text-align: right; margin-top: 0.5rem;">
+            <button class="btn-action-outline" style="font-size: 0.78rem; padding: 0.35rem 0.85rem; width: auto; display: inline-flex;" onclick="openAiModalDirectly()">📋 View Full Statutory Dossier Modal</button>
+          </div>
+        </div>
+
         <!-- DEMONSTRATION OF STATUTORY INFRACTION / COMPLIANCE DOSSIER -->
         <div id="law-demo-box" class="law-demo-box">
           <div id="law-demo-title" class="law-demo-title">
@@ -594,28 +615,36 @@
     <div class="card">
       <div class="card-title">📋 Official National Accreditation Whitelist (681 Certified Properties)</div>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
-        Search through all certified 4★ and 5★ hotels nationwide, verified by the Vietnam National Authority of Tourism.
+        Complete statutory registry of all 681 state-certified 4★ and 5★ hotels nationwide, verified by the Vietnam National Authority of Tourism (VNAT). Includes direct reverse lookup booking links to Agoda, Booking.com, and Trip.com.
       </p>
 
-      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-        <input type="text" id="search-q" placeholder="Search by hotel name or street..." oninput="filterRegistry()">
+      <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <input type="text" id="search-q" placeholder="Search by English commercial name, Vietnamese title, or destination..." oninput="filterRegistry()">
         <select id="search-prov" onchange="filterRegistry()">
-          <option value="">All Provinces / Cities</option>
-          <option value="Hà Nội">Hà Nội</option>
-          <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-          <option value="Đà Nẵng">Đà Nẵng</option>
-          <option value="Khánh Hoà">Khánh Hoà (Nha Trang)</option>
-          <option value="Quảng Nam">Quảng Nam (Hội An)</option>
-          <option value="Kiên Giang">Kiên Giang (Phú Quốc)</option>
+          <option value="">All Destinations (Nationwide)</option>
+          <option value="Da Nang">Da Nang</option>
+          <option value="Hanoi">Hanoi</option>
+          <option value="Ho Chi Minh City">Ho Chi Minh City</option>
+          <option value="Nha Trang">Nha Trang (Khanh Hoa)</option>
+          <option value="Phu Quoc">Phu Quoc Island</option>
+          <option value="Hoi An">Hoi An (Quang Nam)</option>
+          <option value="Ha Long">Ha Long (Quang Ninh)</option>
+          <option value="Vung Tau">Vung Tau / Ho Tram</option>
+          <option value="Da Lat">Da Lat</option>
+          <option value="Hue">Hue</option>
+          <option value="Phan Thiet">Phan Thiet / Mui Ne</option>
+          <option value="Sapa">Sapa (Lao Cai)</option>
+          <option value="Hai Phong">Hai Phong / Cat Ba</option>
+          <option value="Quy Nhon">Quy Nhon</option>
         </select>
         <select id="search-star" onchange="filterRegistry()">
-          <option value="">All Stars (4★ & 5★)</option>
-          <option value="5">5-Star Only (301)</option>
-          <option value="4">4-Star Only (380)</option>
+          <option value="">All Star Ranks (4★ & 5★)</option>
+          <option value="5">5-Star Luxury (301)</option>
+          <option value="4">4-Star Upscale (380)</option>
         </select>
       </div>
 
-      <div id="registry-results" style="max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;"></div>
+      <div id="registry-results" style="max-height: 550px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.85rem;"></div>
     </div>
 
     <!-- Hall of Shame -->
@@ -943,13 +972,19 @@
 
       // 2. Render AI Hotel Verification Button State
       const aiBtn = document.getElementById('btn-ai-verify');
+      const directAiBtn = document.getElementById('btn-run-ai-direct');
       const logEntry = aiLog[r.ai_verification_key];
       if (logEntry) {
         aiBtn.className = "btn-ai-verify btn-ai-verified";
         aiBtn.innerHTML = `<span>🤖 AI Result: ${logEntry.verdict.replace(/_/g, ' ')}</span>`;
+        if (directAiBtn) directAiBtn.innerHTML = `🤖 AI Result: ${logEntry.verdict.replace(/_/g, ' ')}`;
+        renderInlineAiDossier(logEntry);
       } else {
         aiBtn.className = "btn-ai-verify";
         aiBtn.innerHTML = `<span>🤖 AI Hotel Verification</span>`;
+        if (directAiBtn) directAiBtn.innerHTML = `🤖 DeepSeek AI Audit`;
+        const inlineDossier = document.getElementById('inline-ai-dossier');
+        if (inlineDossier) inlineDossier.style.display = 'none';
       }
 
       // 3. Render Demonstration of Infraction vs Compliance Dossier
@@ -1079,18 +1114,41 @@
     }
 
     async function handleAiVerificationClick() {
+      if (!currentAudit) {
+        const inputVal = document.getElementById('audit-input').value.trim();
+        if (inputVal) {
+          executeAudit();
+        } else {
+          alert("Please enter a hotel name or booking URL first.");
+          document.getElementById('audit-input').focus();
+          return;
+        }
+      }
+
       if (!currentAudit) return;
 
       const key = currentAudit.ai_verification_key;
       if (aiLog[key]) {
+        renderInlineAiDossier(aiLog[key]);
+        const dossier = document.getElementById('inline-ai-dossier');
+        if (dossier) dossier.scrollIntoView({ behavior: 'smooth' });
         showAiModal(aiLog[key]);
         return;
       }
 
-      const btn = document.getElementById('btn-ai-verify');
-      const originalHtml = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<span>⏳ Auditing via DeepSeek Flash 4.1...</span>`;
+      const btn1 = document.getElementById('btn-ai-verify');
+      const btn2 = document.getElementById('btn-run-ai-direct');
+      const origText1 = btn1 ? btn1.innerHTML : '';
+      const origText2 = btn2 ? btn2.innerHTML : '';
+
+      if (btn1) {
+        btn1.disabled = true;
+        btn1.innerHTML = `<span>⏳ Auditing via DeepSeek Flash 4.1...</span>`;
+      }
+      if (btn2) {
+        btn2.disabled = true;
+        btn2.innerHTML = `⏳ AI Auditing...`;
+      }
 
       try {
         const res = await fetch('/api/ai_verify', {
@@ -1109,19 +1167,93 @@
         const data = await res.json();
         if (data && data.audit) {
           aiLog[key] = data.audit;
-          btn.className = "btn-ai-verify btn-ai-verified";
-          btn.innerHTML = `<span>🤖 AI Result: ${data.audit.verdict.replace(/_/g, ' ')}</span>`;
-          showAiModal(data.audit);
+          if (btn1) {
+            btn1.className = "btn-ai-verify btn-ai-verified";
+            btn1.innerHTML = `<span>🤖 AI Result: ${data.audit.verdict.replace(/_/g, ' ')}</span>`;
+          }
+          if (btn2) {
+            btn2.innerHTML = `🤖 AI Result: ${data.audit.verdict.replace(/_/g, ' ')}`;
+          }
+          renderInlineAiDossier(data.audit);
+          const dossier = document.getElementById('inline-ai-dossier');
+          if (dossier) dossier.scrollIntoView({ behavior: 'smooth' });
         } else {
           alert("AI verification response error: " + (data.error || "Unknown"));
-          btn.innerHTML = originalHtml;
+          if (btn1) btn1.innerHTML = origText1;
+          if (btn2) btn2.innerHTML = origText2;
         }
       } catch (err) {
         console.error("AI verification request failed:", err);
         alert("AI verification server request failed. Please check network connection.");
-        btn.innerHTML = originalHtml;
+        if (btn1) btn1.innerHTML = origText1;
+        if (btn2) btn2.innerHTML = origText2;
       } finally {
-        btn.disabled = false;
+        if (btn1) btn1.disabled = false;
+        if (btn2) btn2.disabled = false;
+      }
+    }
+
+    function renderInlineAiDossier(audit) {
+      window.latestAiAudit = audit;
+      const dossier = document.getElementById('inline-ai-dossier');
+      if (!dossier) return;
+
+      const badge = document.getElementById('inline-ai-badge');
+      const risk = document.getElementById('inline-ai-risk');
+      const reasoning = document.getElementById('inline-ai-reasoning');
+      const infractions = document.getElementById('inline-ai-infractions');
+
+      if (audit.verdict === 'VERIFIED_COMPLIANT') {
+        badge.style.background = '#059669';
+        badge.style.color = '#fff';
+        badge.textContent = '🟢 VERIFIED COMPLIANT';
+        risk.style.background = 'rgba(16, 185, 129, 0.15)';
+        risk.style.borderLeftColor = '#10b981';
+        risk.style.color = '#d1fae5';
+      } else if (audit.verdict === 'PROBABLE_STAR_INFLATION') {
+        badge.style.background = '#d97706';
+        badge.style.color = '#fff';
+        badge.textContent = '🟡 PROBABLE STAR INFLATION';
+        risk.style.background = 'rgba(217, 119, 6, 0.15)';
+        risk.style.borderLeftColor = '#f59e0b';
+        risk.style.color = '#fef3c7';
+      } else {
+        badge.style.background = '#e11d48';
+        badge.style.color = '#fff';
+        badge.textContent = '🔴 UNACCREDITED DECEPTIVE';
+        risk.style.background = 'rgba(225, 29, 72, 0.15)';
+        risk.style.borderLeftColor = '#f43f5e';
+        risk.style.color = '#ffe4e6';
+      }
+
+      risk.innerHTML = `<strong>⚠️ Risk Advisory:</strong> ${audit.risk_advisory || 'Consumer protection alert under Vietnamese Law on Tourism 2017.'}`;
+      reasoning.innerHTML = `<strong>⚖️ Statutory Finding:</strong> ${audit.reasoning}`;
+
+      let infHtml = '';
+      if (audit.statutory_infractions && audit.statutory_infractions.length > 0) {
+        infHtml += audit.statutory_infractions.map(i => `
+          <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.45rem 0.75rem; border-radius: 0 4px 4px 0; font-size: 0.8rem; color: #cbd5e1;">
+            ${i}
+          </div>
+        `).join('');
+      }
+      if (audit.tcvn_deficiencies && audit.tcvn_deficiencies.length > 0) {
+        infHtml += audit.tcvn_deficiencies.map(d => `
+          <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.45rem 0.75rem; border-radius: 0 4px 4px 0; font-size: 0.8rem; color: #cbd5e1;">
+            ${d}
+          </div>
+        `).join('');
+      }
+      infractions.innerHTML = infHtml;
+
+      dossier.style.display = 'block';
+    }
+
+    function openAiModalDirectly() {
+      if (window.latestAiAudit) {
+        showAiModal(window.latestAiAudit);
+      } else if (currentAudit && aiLog[currentAudit.ai_verification_key]) {
+        showAiModal(aiLog[currentAudit.ai_verification_key]);
       }
     }
 
@@ -1222,33 +1354,78 @@
     }
 
     function filterRegistry() {
-      const q = removeAccents(document.getElementById('search-q').value.trim());
-      const prov = removeAccents(document.getElementById('search-prov').value);
+      const q = removeAccents(document.getElementById('search-q').value.trim()).toLowerCase();
+      const prov = removeAccents(document.getElementById('search-prov').value).toLowerCase();
       const star = document.getElementById('search-star').value;
 
       const filtered = whitelistData.filter(h => {
         if (star && h.stars !== parseInt(star, 10)) return false;
-        if (prov && !removeAccents(h.province).includes(prov) && !removeAccents(h.address).includes(prov)) return false;
-        if (q && !removeAccents(h.name).includes(q) && !removeAccents(h.address).includes(q)) return false;
+        if (prov) {
+          const locCombined = removeAccents(`${h.province || ''} ${h.english_location || ''} ${h.address || ''}`).toLowerCase();
+          if (!locCombined.includes(prov)) return false;
+        }
+        if (q) {
+          const searchCombined = removeAccents(`${h.name || ''} ${h.english_name || ''} ${h.address || ''} ${h.english_location || ''} ${h.search_tokens || ''}`).toLowerCase();
+          if (!searchCombined.includes(q)) return false;
+        }
         return true;
       });
 
       const container = document.getElementById('registry-results');
       if (filtered.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted); padding: 1rem;">No accredited hotels found matching criteria.</p>';
+        container.innerHTML = '<p style="color: var(--text-muted); padding: 1.5rem; text-align: center;">No accredited luxury hotels found matching criteria.</p>';
         return;
       }
 
-      container.innerHTML = filtered.slice(0, 30).map(h => `
-        <div style="background: #090d16; border: 1px solid var(--card-border); padding: 1rem; border-radius: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong style="font-size: 1.05rem;">${h.name}</strong>
-            <span class="gold-stars">${'★'.repeat(h.stars)}</span>
+      container.innerHTML = filtered.slice(0, 60).map(h => {
+        const engName = h.english_name || h.name;
+        const loc = h.english_location || h.province || "Vietnam";
+        const links = h.ota_links || {};
+        const agodaUrl = links.agoda ? links.agoda.url : `https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=${encodeURIComponent(engName + ' ' + loc)}`;
+        const bookingUrl = links.booking ? links.booking.url : `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(engName + ' ' + loc)}&aid=8092145`;
+        const tripUrl = links.trip ? links.trip.url : `https://www.trip.com/hotels/list?keyword=${encodeURIComponent(engName + ' ' + loc)}&Allianceid=489210&SID=1983940`;
+        const mapsUrl = links.google_maps ? links.google_maps.url : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(engName + ' ' + loc)}`;
+
+        return `
+        <div style="background: #090d16; border: 1px solid var(--card-border); padding: 1.15rem; border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; flex-wrap: wrap;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <strong style="font-size: 1.15rem; color: #fff;">${engName}</strong>
+                <span class="gold-stars" style="font-size: 0.95rem;">${'★'.repeat(h.stars)} (${h.stars}★)</span>
+                <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">✓ VNAT Accredited #${h.item_id || h.decision_code || 'AUTH'}</span>
+              </div>
+              <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.25rem;">
+                Official State Registry: <span style="color: #e2e8f0; font-style: italic;">"${h.name}"</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 0.25rem;">
+                📍 <strong>${loc}</strong> • ${h.address}
+              </div>
+              <div style="color: #60a5fa; font-size: 0.8rem; margin-top: 0.35rem;">
+                🛏️ ${h.room_count || '80+'} Guest Rooms • 📞 ${h.phone || 'N/A'} • 🏷️ ${h.property_type || 'Hotel'}
+              </div>
+            </div>
           </div>
-          <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">${h.address}</div>
-          <div style="color: #60a5fa; font-size: 0.8rem; margin-top: 0.25rem;">Rooms: ${h.room_count || 'N/A'} | Phone: ${h.phone || 'N/A'} | Category: ${h.property_type || 'Hotel'}</div>
+
+          <!-- Matching OTA Reverse Lookup Links -->
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.85rem; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Direct OTA Links:</span>
+            <a href="${agodaUrl}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-agoda" style="font-size: 0.78rem; padding: 0.3rem 0.65rem;">🟧 Agoda ↗</a>
+            <a href="${bookingUrl}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-booking" style="font-size: 0.78rem; padding: 0.3rem 0.65rem;">🟦 Booking.com ↗</a>
+            <a href="${tripUrl}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-trip" style="font-size: 0.78rem; padding: 0.3rem 0.65rem;">🟨 Trip.com ↗</a>
+            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-maps" style="font-size: 0.78rem; padding: 0.3rem 0.65rem;">🗺️ Maps ↗</a>
+            <button class="btn-ota-link" onclick="auditSpecificHotel('${encodeURIComponent(h.name)}')" style="font-size: 0.78rem; padding: 0.3rem 0.65rem; background: #2563eb; color: #fff; cursor: pointer; border: none; border-radius: 6px;">⚖️ Audit Dossier ↗</button>
+          </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
+    }
+
+    function auditSpecificHotel(encodedName) {
+      const name = decodeURIComponent(encodedName);
+      document.getElementById('audit-input').value = name;
+      executeAudit();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function renderShame() {

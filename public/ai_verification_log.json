@@ -38,5 +38,45 @@
     "tcvn_deficiencies": [],
     "risk_advisory": "NO RISK: Officially certified luxury hotel authenticated against Vietnam National Authority of Tourism registry.",
     "reasoning": "Identity authenticated against official VNAT Accreditation #1981 (\"Khách sạn nghỉ dưỡng Furama Đà Nẵng\"). Certified as 5 Stars under Article 50 of Vietnam's Law on Tourism 2017."
+  },
+  "agoda-diamond-beach-hotel-da-nang": {
+    "listing_key": "agoda-diamond-beach-hotel-da-nang",
+    "hotel_name": "Diamond Beach Hotel Da Nang",
+    "claimed_stars": 5,
+    "platform": "Agoda",
+    "url": "",
+    "city": "Da Nang",
+    "verified_at": "2026-09-17T15:55:05.632Z",
+    "model": "nous-deepseek-flash-4.1",
+    "verdict": "UNACCREDITED_DECEPTIVE_LISTING",
+    "confidence": 0.95,
+    "statutory_infractions": [
+      "Luật Du lịch 2017 - Điều 50, Khoản 3: Thẩm quyền thẩm định, công nhận hạng 4 sao và 5 sao thuộc về Cục Du lịch Quốc gia Việt Nam.",
+      "Luật Du lịch 2017 - Điều 9, Khoản 8: Nghiêm cấm quảng cáo cơ sở lưu trú khi chưa có quyết định công nhận của cơ quan nhà nước có thẩm quyền.",
+      "Nghị định 45/2019/NĐ-CP (sửa đổi NĐ 129/2021/NĐ-CP): Xử phạt hành chính và buộc tháo dỡ biển hiệu, biểu trưng sao trái phép."
+    ],
+    "tcvn_deficiencies": [
+      "Missing official VNAT statutory classification decision in national database (csdl.vietnamtourism.gov.vn).",
+      "Property appears to be an unaccredited private hotel, serviced apartment, or villa marketing self-proclaimed stars.",
+      "Absence of state-audited luxury compliance for safety, backup emergency generator, and service protocols."
+    ],
+    "risk_advisory": "HIGH RISK: Property claims 5 stars on Agoda but does NOT hold statutory accreditation in the official 681-entity national registry. Amenities and safety standards are unverified.",
+    "reasoning": "Statutory verification audit of 'Diamond Beach Hotel Da Nang' (Da Nang) confirms absence from the closed registry of 681 certified luxury hotels in Vietnam. Display of 5 stars on Agoda represents an unauthorized commercial claim violating the state statutory monopoly on star titles under Article 50 of the Law on Tourism 2017."
+  },
+  "booking-com-furama-resort-danang": {
+    "listing_key": "booking-com-furama-resort-danang",
+    "hotel_name": "Furama Resort Danang",
+    "claimed_stars": 5,
+    "platform": "Booking.com",
+    "url": "",
+    "city": "Da Nang",
+    "verified_at": "2026-09-17T15:55:09.737Z",
+    "model": "nous-deepseek-flash-4.1 (VNAT Statutory Precedence)",
+    "verdict": "VERIFIED_COMPLIANT",
+    "confidence": 1,
+    "statutory_infractions": [],
+    "tcvn_deficiencies": [],
+    "risk_advisory": "NO RISK: Officially certified luxury hotel authenticated against Vietnam National Authority of Tourism registry.",
+    "reasoning": "Identity authenticated against official VNAT Accreditation #1981 (\"Khách sạn nghỉ dưỡng Furama Đà Nẵng\"). Certified as 5 Stars under Article 50 of Vietnam's Law on Tourism 2017."
   }
 }

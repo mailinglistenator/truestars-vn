@@ -216,9 +216,13 @@ class TrueStarsMatcher {
     this.hotels = hotelsList.map(h => ({
       ...h,
       name_norm: removeAccents(h.name),
-      prov_norm: removeAccents(h.province),
-      addr_norm: removeAccents(h.address),
-      tokens: extractCoreTokens(h.name)
+      english_name: h.english_name || "",
+      english_norm: removeAccents(h.english_name || ""),
+      english_location: h.english_location || "",
+      prov_norm: removeAccents(`${h.province || ""} ${h.english_location || ""}`),
+      addr_norm: removeAccents(h.address || ""),
+      tokens: extractCoreTokens(`${h.name} ${h.english_name || ""}`),
+      ota_links: h.ota_links || null
     }));
 
     // Build Inverted Aggregator Identity Maps for O(1) matching
@@ -498,6 +502,9 @@ class TrueStarsMatcher {
     const inputTokens = extractCoreTokens(hotelName);
     const normProv = removeAccents(province);
 
+    const GEO_KEYS = ["ha noi", "da nang", "sai gon", "ho chi minh", "nha trang", "phu quoc", "hoi an", "ha long", "hue", "vung tau", "da lat", "hai phong", "quy nhon", "can tho", "sapa", "lao cai"];
+    const inputGeos = GEO_KEYS.filter(g => inputNorm.includes(g));
+
     const scored = [];
 
     for (const h of this.hotels) {
@@ -509,15 +516,26 @@ class TrueStarsMatcher {
       }
 
       const candNorm = h.name_norm;
+      const engNorm = h.english_norm || "";
       const candTokens = h.tokens;
+      const candGeo = `${h.prov_norm} ${h.addr_norm}`;
 
-      if (inputNorm && candNorm.includes(inputNorm)) {
-        const score = Math.max(0.85, inputNorm.length / candNorm.length);
-        scored.push({ hotel: h, score: Math.round(score * 1000) / 1000 });
-        continue;
+      let geoConflict = false;
+      if (inputGeos.length > 0) {
+        const candHasGeo = inputGeos.some(g => candGeo.includes(g));
+        if (!candHasGeo) geoConflict = true;
       }
 
-      const seqScore = sequenceRatio(inputNorm, candNorm);
+      if (inputNorm && (candNorm.includes(inputNorm) || (engNorm && engNorm.includes(inputNorm)))) {
+        let score = Math.max(0.85, inputNorm.length / Math.min(candNorm.length, engNorm.length || 999));
+        if (geoConflict) score -= 0.35;
+        if (score >= threshold) {
+          scored.push({ hotel: h, score: Math.round(score * 1000) / 1000 });
+          continue;
+        }
+      }
+
+      const seqScore = Math.max(sequenceRatio(inputNorm, candNorm), engNorm ? sequenceRatio(inputNorm, engNorm) : 0);
       let tokenScore = 0.0;
       if (inputTokens.size > 0 && candTokens.size > 0) {
         let intersection = 0;
@@ -528,7 +546,9 @@ class TrueStarsMatcher {
         tokenScore = intersection / union;
       }
 
-      const finalScore = (seqScore * 0.40) + (tokenScore * 0.60);
+      let finalScore = (seqScore * 0.35) + (tokenScore * 0.65);
+      if (geoConflict) finalScore -= 0.35;
+
       if (finalScore >= threshold) {
         scored.push({ hotel: h, score: Math.round(finalScore * 1000) / 1000 });
       }
@@ -553,8 +573,38 @@ const AFFILIATE_CONFIG = {
  * Generates direct outbound deep-links to OTAs and Google Maps with affiliate monetization tags
  */
 function generateOtaLinks({ name, city = "", matchedHotel = null, originalUrl = "", otaPlatform = "" }) {
-  const targetName = matchedHotel ? matchedHotel.name : name;
-  const targetCity = (matchedHotel ? matchedHotel.province : city) || "Vietnam";
+  if (matchedHotel && matchedHotel.ota_links) {
+    const ml = matchedHotel.ota_links;
+    let agodaUrl = ml.agoda ? ml.agoda.url : "";
+    let bookingUrl = ml.booking ? ml.booking.url : "";
+    let tripUrl = ml.trip ? ml.trip.url : "";
+    let mapsUrl = ml.google_maps ? ml.google_maps.url : "";
+
+    if (originalUrl) {
+      try {
+        if (otaPlatform === "Agoda") {
+          agodaUrl = originalUrl.includes('?') ? `${originalUrl}&cid=${AFFILIATE_CONFIG.agoda_cid}` : `${originalUrl}?cid=${AFFILIATE_CONFIG.agoda_cid}`;
+        } else if (otaPlatform === "Booking.com") {
+          bookingUrl = originalUrl.includes('?') ? `${originalUrl}&aid=${AFFILIATE_CONFIG.booking_aid}` : `${originalUrl}?aid=${AFFILIATE_CONFIG.booking_aid}`;
+        } else if (otaPlatform === "Trip.com") {
+          tripUrl = originalUrl.includes('?') ? `${originalUrl}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}` : `${originalUrl}?Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
+        }
+      } catch (e) {}
+    }
+
+    return {
+      agoda: { name: "Agoda", url: agodaUrl, badge: "🟧 View on Agoda ↗" },
+      booking: { name: "Booking.com", url: bookingUrl, badge: "🟦 View on Booking.com ↗" },
+      trip: { name: "Trip.com", url: tripUrl, badge: "🟨 View on Trip.com ↗" },
+      google_maps: { name: "Google Maps", url: mapsUrl, badge: "🗺️ Google Maps ↗" }
+    };
+  }
+
+  // Fallback for unaccredited properties - use clean English name & location
+  const cleanName = removeAccents(name).replace(/^(khach san|khu nghi duong|can ho du lich|biet thu)\s+/gi, "").trim();
+  const cleanCity = removeAccents(city).replace(/^(thanh pho|tinh)\s+/gi, "").trim();
+  const targetName = cleanName || name;
+  const targetCity = cleanCity || city || "Vietnam";
   const searchQuery = encodeURIComponent(`${targetName} ${targetCity}`.trim());
 
   let agodaUrl = `https://www.agoda.com/partners/partnersearch.aspx?cid=${AFFILIATE_CONFIG.agoda_cid}&hl=en-us&pcs=1&text=${searchQuery}`;
@@ -565,44 +615,20 @@ function generateOtaLinks({ name, city = "", matchedHotel = null, originalUrl = 
   if (originalUrl) {
     try {
       if (otaPlatform === "Agoda") {
-        agodaUrl = originalUrl.includes('?') 
-          ? `${originalUrl}&cid=${AFFILIATE_CONFIG.agoda_cid}` 
-          : `${originalUrl}?cid=${AFFILIATE_CONFIG.agoda_cid}`;
+        agodaUrl = originalUrl.includes('?') ? `${originalUrl}&cid=${AFFILIATE_CONFIG.agoda_cid}` : `${originalUrl}?cid=${AFFILIATE_CONFIG.agoda_cid}`;
       } else if (otaPlatform === "Booking.com") {
-        bookingUrl = originalUrl.includes('?') 
-          ? `${originalUrl}&aid=${AFFILIATE_CONFIG.booking_aid}` 
-          : `${originalUrl}?aid=${AFFILIATE_CONFIG.booking_aid}`;
+        bookingUrl = originalUrl.includes('?') ? `${originalUrl}&aid=${AFFILIATE_CONFIG.booking_aid}` : `${originalUrl}?aid=${AFFILIATE_CONFIG.booking_aid}`;
       } else if (otaPlatform === "Trip.com") {
-        tripUrl = originalUrl.includes('?') 
-          ? `${originalUrl}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}` 
-          : `${originalUrl}?Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
+        tripUrl = originalUrl.includes('?') ? `${originalUrl}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}` : `${originalUrl}?Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
       }
-    } catch (e) {
-      // ignore parsing error, default to query search
-    }
+    } catch (e) {}
   }
 
   return {
-    agoda: {
-      name: "Agoda",
-      url: agodaUrl,
-      badge: "🟧 View on Agoda ↗"
-    },
-    booking: {
-      name: "Booking.com",
-      url: bookingUrl,
-      badge: "🟦 View on Booking.com ↗"
-    },
-    trip: {
-      name: "Trip.com",
-      url: tripUrl,
-      badge: "🟨 View on Trip.com ↗"
-    },
-    google_maps: {
-      name: "Google Maps",
-      url: mapsUrl,
-      badge: "🗺️ Google Maps ↗"
-    }
+    agoda: { name: "Agoda", url: agodaUrl, badge: "🟧 View on Agoda ↗" },
+    booking: { name: "Booking.com", url: bookingUrl, badge: "🟦 View on Booking.com ↗" },
+    trip: { name: "Trip.com", url: tripUrl, badge: "🟨 View on Trip.com ↗" },
+    google_maps: { name: "Google Maps", url: mapsUrl, badge: "🗺️ Google Maps ↗" }
   };
 }
 
