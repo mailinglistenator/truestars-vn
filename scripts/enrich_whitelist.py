@@ -119,7 +119,9 @@ KNOWN_NAMES = {
     2800: "Anantara Mui Ne Resort",
     2801: "The Cliff Resort & Residences Phan Thiet",
     2802: "Victoria Phan Thiet Beach Resort & Spa",
-    2803: "Centara Mirage Resort Mui Ne"
+    2803: "Centara Mirage Resort Mui Ne",
+    8088: "Meliá Vinpearl Danang Riverfront",
+    7960: "Vinpearl Landmark 81, Autograph Collection"
 }
 
 def get_english_location(h):

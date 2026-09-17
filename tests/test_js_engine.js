@@ -82,6 +82,20 @@ const testCases = [
     dorm: false,
     expected: "UNACCREDITED_HOTEL",
     expectViolation: true
+  },
+  {
+    url: "https://www.booking.com/hotel/vn/melia-vinpearl-danang-riverfont.html",
+    stars: 5,
+    dorm: false,
+    expected: "VERIFIED_LEGITIMATE",
+    expectViolation: false
+  },
+  {
+    name: "Melia Vinpearl Danang Riverfront",
+    stars: 5,
+    dorm: false,
+    expected: "VERIFIED_LEGITIMATE",
+    expectViolation: false
   }
 ];
 

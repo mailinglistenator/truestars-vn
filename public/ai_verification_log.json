@@ -170,5 +170,24 @@
     ],
     "risk_advisory": "HIGH RISK: Property claims 5 stars on Agoda but does NOT hold statutory accreditation in the official 681-entity national registry. Amenities and safety standards are unverified.",
     "reasoning": "Statutory verification audit of 'Fake Luxury Da Nang Villa' (Da Nang) confirms absence from the closed registry of 681 certified luxury hotels in Vietnam. Display of 5 stars on Agoda represents an unauthorized commercial claim violating the state statutory monopoly on star titles under Article 50 of the Law on Tourism 2017."
+  },
+  "https-www-booking-com-hotel-vn-melia-vinpearl-danang-riverfont-html-label-brave-nonbrand-organic-trigger-f3f828ac-4c6a-4b54-8e46-e2779b841553-sid-0f8a0dfbce15504a916e65471e40d6ff-aid-2405612-ucfs-1-arphpl-1-dest-id-3712125-dest-type-city-group-adults-2-req-adults-2-no-rooms-1-group-children-0-req-children-0-hpos-1-hapos-1-sr-order-popularity-srpvid-a7e702db61ac1baab27648f3a976fc9b-srepoch-1789665665-from-searchresults": {
+    "listing_key": "https-www-booking-com-hotel-vn-melia-vinpearl-danang-riverfont-html-label-brave-nonbrand-organic-trigger-f3f828ac-4c6a-4b54-8e46-e2779b841553-sid-0f8a0dfbce15504a916e65471e40d6ff-aid-2405612-ucfs-1-arphpl-1-dest-id-3712125-dest-type-city-group-adults-2-req-adults-2-no-rooms-1-group-children-0-req-children-0-hpos-1-hapos-1-sr-order-popularity-srpvid-a7e702db61ac1baab27648f3a976fc9b-srepoch-1789665665-from-searchresults",
+    "hotel_name": "Melia Vinpearl Danang Riverfont",
+    "claimed_stars": 5,
+    "platform": "Booking.com",
+    "url": "https://www.booking.com/hotel/vn/melia-vinpearl-danang-riverfont.html?label=brave_nonbrand_organic_trigger_f3f828ac-4c6a-4b54-8e46-e2779b841553&sid=0f8a0dfbce15504a916e65471e40d6ff&aid=2405612&ucfs=1&arphpl=1&dest_id=-3712125&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=a7e702db61ac1baab27648f3a976fc9b&srepoch=1789665665&from=searchresults",
+    "city": "Thành phố Đà Nẵng",
+    "verified_at": "2026-09-17T17:26:09.847Z",
+    "model": "nous-deepseek-flash-4.1 (VNAT Statutory Precedence)",
+    "verdict": "VERIFIED_COMPLIANT",
+    "confidence": 1,
+    "concise_summary": "This is an officially accredited 5-star hotel. It is certified in the Vietnamese government registry under \"Khu căn hộ du lịch Vinpearl Condotel Riverfront Danang\" (Accreditation #8088), and is commercially marketed on Booking.com as \"Melia Vinpearl Danang Riverfont\". Its 5-star rating is legally authentic under Vietnamese law.",
+    "refund_advisory": "No refund required: Property is fully compliant with statutory luxury standards under Article 50 of Vietnam's Law on Tourism 2017 and authenticated against official government registry records.",
+    "investigation_findings": "AI investigated the official VNAT registry and confirmed that this listing at 341 Trần Hưng Đạo, Quận Sơn Trà, Thành phố Đà Nẵng corresponds to official Accreditation #8088. The commercial branding on Booking.com represents an authenticated international management contract for the certified property.",
+    "statutory_infractions": [],
+    "tcvn_deficiencies": [],
+    "risk_advisory": "NO RISK: Officially certified luxury hotel authenticated against Vietnam National Authority of Tourism registry.",
+    "reasoning": "Identity authenticated against official VNAT Accreditation #8088 (\"Khu căn hộ du lịch Vinpearl Condotel Riverfront Danang\"). Certified as 5 Stars under Article 50 of Vietnam's Law on Tourism 2017."
   }
 }

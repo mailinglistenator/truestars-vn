@@ -299,25 +299,27 @@ module.exports = async (req, res) => {
   let finalRecord;
   if (statutoryMatch) {
     const h = statutoryMatch.matched_hotel;
-    const officialLegalName = h ? h.name : hotelName;
-    const commercialName = h ? (h.commercial_name || h.english_name || hotelName) : hotelName;
+    const officialLegalName = h ? h.name : (hotelName || "Officially Certified Hotel");
+    const resolvedPlatform = (platform && platform !== "Direct Input") ? platform : (statutoryMatch.ota_platform || "OTA Platform");
+    const commercialName = (h && (h.commercial_name || h.english_name)) ? (h.commercial_name || h.english_name) : (statutoryMatch.property_name || hotelName || officialLegalName);
+    const resolvedHotelName = hotelName || commercialName;
     const itemId = h ? (h.item_id || h.decision_code || 'AUTH') : 'AUTH';
     const officialStars = statutoryMatch.official_stars || 5;
 
     finalRecord = {
       listing_key: listingKey,
-      hotel_name: hotelName,
+      hotel_name: resolvedHotelName,
       claimed_stars: claimedStars,
-      platform: platform,
+      platform: resolvedPlatform,
       url: url,
-      city: city,
+      city: city || (h ? h.province : ""),
       verified_at: new Date().toISOString(),
       model: "nous-deepseek-flash-4.1 (VNAT Statutory Precedence)",
       verdict: "VERIFIED_COMPLIANT",
       confidence: 1.0,
-      concise_summary: `This is an officially accredited ${officialStars}-star hotel. It is certified in the Vietnamese government registry under "${officialLegalName}" (Accreditation #${itemId}), and is commercially marketed on ${platform} as "${commercialName}". Its ${officialStars}-star rating is legally authentic under Vietnamese law.`,
+      concise_summary: `This is an officially accredited ${officialStars}-star hotel. It is certified in the Vietnamese government registry under "${officialLegalName}" (Accreditation #${itemId}), and is commercially marketed on ${resolvedPlatform} as "${commercialName}". Its ${officialStars}-star rating is legally authentic under Vietnamese law.`,
       refund_advisory: `No refund required: Property is fully compliant with statutory luxury standards under Article 50 of Vietnam's Law on Tourism 2017 and authenticated against official government registry records.`,
-      investigation_findings: `AI investigated the official VNAT registry and confirmed that this listing at ${h ? h.address : (city || 'Vietnam')} corresponds to official Accreditation #${itemId}. The commercial branding on ${platform} represents an authenticated international management contract for the certified property.`,
+      investigation_findings: `AI investigated the official VNAT registry and confirmed that this listing at ${h ? h.address : (city || 'Vietnam')} corresponds to official Accreditation #${itemId}. The commercial branding on ${resolvedPlatform} represents an authenticated international management contract for the certified property.`,
       statutory_infractions: [],
       tcvn_deficiencies: [],
       risk_advisory: "NO RISK: Officially certified luxury hotel authenticated against Vietnam National Authority of Tourism registry.",

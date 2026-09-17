@@ -150,5 +150,62 @@
     "booking_slugs": [
       "park-hyatt-saigon"
     ]
+  },
+  "8088": {
+    "commercial_name": "Meliá Vinpearl Danang Riverfront",
+    "former_name": "Vinpearl Condotel Riverfront Danang",
+    "direct_agoda_url": "https://www.agoda.com/melia-vinpearl-danang-riverfront/hotel/da-nang-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/melia-vinpearl-danang-riverfont.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/da-nang-hotel-detail-56747585/melia-vinpearl-danang-riverfront/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Meli%C3%A1+Vinpearl+Danang+Riverfront/",
+    "trip_ids": [
+      "56747585"
+    ],
+    "trip_slugs": [
+      "melia-vinpearl-danang-riverfront",
+      "melia-vinpearl-danang-riverfont",
+      "vinpearl-condotel-riverfront-danang"
+    ],
+    "agoda_slugs": [
+      "melia-vinpearl-danang-riverfront",
+      "melia-vinpearl-danang-riverfont",
+      "melia-vinpearl-condotel-riverfront-danang",
+      "vinpearl-condotel-riverfront-danang"
+    ],
+    "agoda_ids": [
+      "2982855"
+    ],
+    "booking_slugs": [
+      "melia-vinpearl-danang-riverfont",
+      "melia-vinpearl-danang-riverfront",
+      "melia-vinpearl-condotel-riverfront-danang",
+      "vinpearl-condotel-riverfront-danang"
+    ]
+  },
+  "7960": {
+    "commercial_name": "Vinpearl Landmark 81, Autograph Collection",
+    "former_name": "Khách sạn Vinpearl Luxury Landmark 81",
+    "direct_agoda_url": "https://www.agoda.com/vinpearl-landmark-81-autograph-collection/hotel/ho-chi-minh-city-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/vinpearl-landmark-81-autograph-collection.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/ho-chi-minh-city-hotel-detail-37638063/vinpearl-landmark-81-autograph-collection/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Vinpearl+Landmark+81,+Autograph+Collection/",
+    "trip_ids": [
+      "37638063"
+    ],
+    "trip_slugs": [
+      "vinpearl-landmark-81-autograph-collection",
+      "vinpearl-luxury-landmark-81"
+    ],
+    "agoda_slugs": [
+      "vinpearl-landmark-81-autograph-collection",
+      "vinpearl-luxury-landmark-81"
+    ],
+    "agoda_ids": [
+      "5858607"
+    ],
+    "booking_slugs": [
+      "vinpearl-landmark-81-autograph-collection",
+      "vinpearl-luxury-landmark-81"
+    ]
   }
 }
