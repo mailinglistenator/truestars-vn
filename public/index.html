@@ -1232,7 +1232,7 @@
           claimed_stars: currentAudit.claimed_stars,
           platform: currentAudit.ota_platform,
           url: currentAudit.original_url,
-          city: currentAudit.province || "",
+          city: (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : (currentAudit.matched_hotel ? currentAudit.matched_hotel.province : "") || "",
           has_dorm: currentAudit.has_dorm,
           force: true
         })

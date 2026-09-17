@@ -77,6 +77,81 @@ function sequenceRatio(s1, s2) {
 }
 
 /**
+ * Automatically infer Vietnamese administrative destination/province from text, slugs, or URLs
+ */
+function inferCityFromText(text) {
+  if (!text) return "";
+  let s = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  s = s.replace(/[đĐ]/g, "d").replace(/[^a-z0-9\s]/g, " ");
+
+  // Da Nang
+  if (/\b(da\s*nang|danang|non\s*nuoc|nonnuoc|son\s*tra|sontra|my\s*khe|mykhe|han\s*river|ngu\s*hanh\s*son|ba\s*na)\b/.test(s)) {
+    return "Thành phố Đà Nẵng";
+  }
+  // Khanh Hoa / Nha Trang / Cam Ranh
+  if (/\b(nha\s*trang|nhatrang|cam\s*ranh|camranh|khanh\s*hoa|hon\s*tre|bai\s*dai)\b/.test(s)) {
+    return "Tỉnh Khánh Hòa";
+  }
+  // Kien Giang / Phu Quoc
+  if (/\b(phu\s*quoc|phuquoc|kien\s*giang|duong\s*dong|an\s*thoi)\b/.test(s)) {
+    return "Tỉnh Kiên Giang";
+  }
+  // Quang Nam / Hoi An
+  if (/\b(hoi\s*an|hoian|quang\s*nam|dien\s*ban|an\s*bang|cua\s*dai)\b/.test(s)) {
+    return "Tỉnh Quảng Nam";
+  }
+  // Ha Noi
+  if (/\b(ha\s*noi|hanoi|tay\s*ho|hoan\s*kiem|ba\s*dinh|cau\s*giay|dong\s*da|hai\s*ba\s*trung)\b/.test(s)) {
+    return "Thành phố Hà Nội";
+  }
+  // Ho Chi Minh City / Saigon
+  if (/\b(ho\s*chi\s*minh|saigon|sai\s*gon|tphcm|hcmc|district\s*1|quan\s*1|quan\s*3|ben\s*nghe|ben\s*thanh|thu\s*duc)\b/.test(s)) {
+    return "Thành phố Hồ Chí Minh";
+  }
+  // Quang Ninh / Ha Long
+  if (/\b(ha\s*long|halong|quang\s*ninh|bai\s*chay|tuan\s*chau|van\s*don)\b/.test(s)) {
+    return "Tỉnh Quảng Ninh";
+  }
+  // Lam Dong / Da Lat
+  if (/\b(da\s*lat|dalat|lam\s*dong|tuyen\s*lam)\b/.test(s)) {
+    return "Tỉnh Lâm Đồng";
+  }
+  // Thua Thien Hue
+  if (/\b(hue|thua\s*thien|lang\s*co)\b/.test(s)) {
+    return "Tỉnh Thừa Thiên Huế";
+  }
+  // Ba Ria - Vung Tau
+  if (/\b(vung\s*tau|vungtau|ba\s*ria|con\s*dao|xuyen\s*moc|ho\s*tram)\b/.test(s)) {
+    return "Tỉnh Bà Rịa - Vũng Tàu";
+  }
+  // Binh Dinh / Quy Nhon
+  if (/\b(quy\s*nhon|quynhon|binh\s*dinh)\b/.test(s)) {
+    return "Tỉnh Bình Định";
+  }
+  // Binh Thuan / Phan Thiet / Mui Ne
+  if (/\b(phan\s*thiet|phanthiet|mui\s*ne|muine|binh\s*thuan)\b/.test(s)) {
+    return "Tỉnh Bình Thuận";
+  }
+  // Lao Cai / Sa Pa
+  if (/\b(sa\s*pa|sapa|lao\s*cai)\b/.test(s)) {
+    return "Tỉnh Lào Cai";
+  }
+  // Can Tho
+  if (/\b(can\s*tho|cantho|ninh\s*kieu)\b/.test(s)) {
+    return "Thành phố Cần Thơ";
+  }
+  // Hai Phong
+  if (/\b(hai\s*phong|haiphong|cat\s*ba|catba|do\s*son)\b/.test(s)) {
+    return "Thành phố Hải Phòng";
+  }
+  // Ninh Binh
+  if (/\b(ninh\s*binh|ninhbinh|tam\s*coc|trang\s*an)\b/.test(s)) {
+    return "Tỉnh Ninh Bình";
+  }
+  return "";
+}
+
+/**
  * Smart OTA URL Parser: Extracts platform, hotelId, canonical slug, city, and clean display name
  */
 function parseOtaUrl(rawInput) {
@@ -182,6 +257,8 @@ function parseOtaUrl(rawInput) {
         .split(" ")
         .map(w => w.charAt(0).toUpperCase() + w.slice(1))
         .join(" ");
+    } else {
+      city = inferCityFromText(`${extractedName} ${otaSlug} ${url.pathname}`);
     }
 
     return {
@@ -301,6 +378,10 @@ class TrueStarsMatcher {
       if ((otaPlatform === "Direct Input" || !otaPlatform) && parsed.platform) otaPlatform = parsed.platform;
       if (!name && parsed.name) name = parsed.name;
       if (!province && parsed.city) province = parsed.city;
+    }
+
+    if (!province) {
+      province = inferCityFromText(`${name} ${originalUrl} ${otaSlug}`);
     }
 
     // 1. DETERMINISTIC AGGREGATOR IDENTITY LOOKUP (Zero False Positives)
@@ -501,6 +582,7 @@ class TrueStarsMatcher {
       claimed_stars: effectiveClaimedStars,
       official_stars: officialStars,
       has_dorm: effectiveHasDorm,
+      province: province || (matchedHotel ? matchedHotel.province : ""),
       ota_platform: otaPlatform,
       original_url: originalUrl,
       ota_id: otaId,
@@ -735,7 +817,7 @@ async function triggerAiVerification(propertyData) {
         claimed_stars: propertyData.claimed_stars || propertyData.claimedStars || 5,
         platform: propertyData.ota_platform || propertyData.platform || "Direct Input",
         url: propertyData.original_url || propertyData.url || "",
-        city: propertyData.province || propertyData.city || "",
+        city: propertyData.province || propertyData.city || (propertyData.matched_hotel ? propertyData.matched_hotel.province : "") || "",
         has_dorm: Boolean(propertyData.has_dorm || propertyData.hasDorm),
         force: true
       })
@@ -948,6 +1030,7 @@ if (typeof module !== 'undefined' && module.exports) {
     removeAccents,
     extractCoreTokens,
     sequenceRatio,
+    inferCityFromText,
     parseOtaUrl,
     generatePlatformNotice,
     generateRefundDemandLetter,

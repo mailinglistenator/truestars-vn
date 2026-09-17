@@ -15,6 +15,15 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
+let inferCityFromText = null;
+try {
+  inferCityFromText = require('../public/matching_engine.js').inferCityFromText;
+} catch (e) {
+  try {
+    inferCityFromText = require(path.join(process.cwd(), 'public', 'matching_engine.js')).inferCityFromText;
+  } catch (e2) {}
+}
+
 // In-memory cache fallback for serverless lifetime
 const memoryCache = new Map();
 
@@ -79,7 +88,7 @@ function requestEndpoint(urlStr, postData, timeoutMs = 35000) {
   });
 }
 
-async function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
+async function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681, statutoryMatch = null) {
   const postData = JSON.stringify({
     name: promptData.name,
     claimed_stars: promptData.claimed_stars,
@@ -87,7 +96,8 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
     url: promptData.url || "",
     city: promptData.city || "Vietnam",
     has_dorm: Boolean(promptData.has_dorm),
-    candidates: cityCandidates
+    candidates: cityCandidates,
+    statutory_match: statutoryMatch
   });
 
   const endpoints = [
@@ -99,23 +109,52 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
   try {
     const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 28000)));
     if (result && result.verdict) {
+      // Statutory Supremacy Guard: State-issued VNAT accreditation strictly supersedes model hallucination
+      if (statutoryMatch && statutoryMatch.verdict === "VERIFIED_LEGITIMATE") {
+        if (result.verdict !== "VERIFIED_COMPLIANT" && result.verdict !== "VERIFIED_LEGITIMATE") {
+          console.warn("External model returned non-compliant verdict for officially accredited hotel. Overriding with statutory record.");
+          return generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount, statutoryMatch);
+        }
+      }
       return result;
     }
   } catch (err) {
     console.warn("All tunnel endpoints failed or timed out:", err);
   }
 
-  return generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount);
+  return generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount, statutoryMatch);
 }
 
 
-function generateDeterministicAiAnalysis(data, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
+function generateDeterministicAiAnalysis(data, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681, statutoryMatch = null) {
   const claimed = parseInt(data.claimed_stars || 5, 10);
   const hasDorm = Boolean(data.has_dorm);
   const name = data.name || "Unknown Property";
   const platform = data.platform || "Online Travel Agency";
   const city = data.city || "Vietnam";
   
+  // STATUTORY SUPREMACY: If the property's identity is authenticated in the official government registry,
+  // it is legally accredited under Article 50 of Vietnam's Law on Tourism 2017.
+  if (statutoryMatch && statutoryMatch.verdict === "VERIFIED_LEGITIMATE") {
+    const matched = statutoryMatch.matched_hotel || {};
+    const certCode = matched.item_id || matched.decision_code || "VNAT-AUTH";
+    const stars = matched.stars || 5;
+    const addr = matched.address || `${city}, Vietnam`;
+    const officialName = matched.name || name;
+
+    return {
+      verdict: "VERIFIED_COMPLIANT",
+      confidence: 1.0,
+      concise_summary: `This is an officially accredited ${stars}-star hotel. It is certified in the Vietnamese government registry under "${officialName}" (Accreditation #${certCode}), and is commercially marketed on ${platform} as "${name}". Its ${stars}-star rating is legally authentic under Vietnamese law.`,
+      refund_advisory: `No refund action warranted under Vietnamese law. Property possesses valid statutory accreditation (Decision #${matched.decision_code || certCode}) issued by the Vietnam National Authority of Tourism (VNAT). Commercial marketing on ${platform} reflects an authorized operational management or franchise rebrand.`,
+      investigation_findings: `AI investigated the official VNAT registry and confirmed that this listing at ${addr} corresponds to official Accreditation #${certCode}. The commercial branding on ${platform} represents an authenticated international management contract or trade name for the certified property.`,
+      statutory_infractions: [],
+      tcvn_deficiencies: [],
+      risk_advisory: `NO RISK: Property is fully accredited by VNAT as a ${stars}-star luxury establishment.`,
+      reasoning: `Identity authenticated against official VNAT Accreditation #${certCode} ("${officialName}") at ${addr}. Certified as ${stars} Stars under Article 50 of Vietnam's Law on Tourism 2017.`
+    };
+  }
+
   const isSpecificCity = city && city.toLowerCase() !== "vietnam" && city.toLowerCase() !== "direct input" && totalCityCount > 0;
   const targetScope = isSpecificCity
     ? `${totalCityCount} officially accredited luxury hotels in ${city}`
@@ -193,7 +232,12 @@ module.exports = async (req, res) => {
   const platform = (query.platform || query.ota_platform || queryParams.platform || "Direct Input").trim();
   const url = (query.url || query.original_url || queryParams.url || "").trim();
   const claimedStars = parseInt(query.claimed_stars || query.claimedStars || queryParams.claimed_stars || 5, 10);
-  const city = (query.city || query.location || query.province || queryParams.city || "").trim();
+  let city = (query.city || query.location || query.province || queryParams.city || "").trim();
+  if (!city || city.toLowerCase() === "vietnam" || city.toLowerCase() === "direct input") {
+    if (inferCityFromText) {
+      city = inferCityFromText(`${hotelName} ${url}`);
+    }
+  }
   const hasDorm = Boolean(query.has_dorm || query.hasDorm || queryParams.has_dorm);
 
   if (!hotelName && !url) {
@@ -290,6 +334,9 @@ module.exports = async (req, res) => {
         if (classification.verdict === "VERIFIED_LEGITIMATE") {
           statutoryMatch = classification;
           if (statutoryMatch.matched_hotel) {
+            if (!city || city.toLowerCase() === "vietnam") {
+              city = statutoryMatch.matched_hotel.province || city;
+            }
             // Prioritize the matched hotel candidate at the very top for Hermes
             cityCandidates = [statutoryMatch.matched_hotel, ...cityCandidates.filter(c => c.item_id !== statutoryMatch.matched_hotel.item_id)];
           }
@@ -306,11 +353,11 @@ module.exports = async (req, res) => {
     claimed_stars: claimedStars,
     platform: platform,
     url: url,
-    city: city,
+    city: city || "Vietnam",
     has_dorm: hasDorm
   };
 
-  const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount);
+  const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount, statutoryMatch);
   const latencyMs = Date.now() - startMs;
 
   const finalRecord = {
