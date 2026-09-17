@@ -35,22 +35,10 @@ function loadLog() {
   return {};
 }
 
-function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
-  return new Promise((resolve) => {
-    const tunnelUrl = process.env.HERMES_TUNNEL_URL || "https://204-168-160-204.sslip.io/api/verify";
-
+function requestEndpoint(urlStr, postData, timeoutMs = 35000) {
+  return new Promise((resolve, reject) => {
     try {
-      const parsedUrl = new URL(tunnelUrl);
-      const postData = JSON.stringify({
-        name: promptData.name,
-        claimed_stars: promptData.claimed_stars,
-        platform: promptData.platform || "Direct Input",
-        url: promptData.url || "",
-        city: promptData.city || "Vietnam",
-        has_dorm: Boolean(promptData.has_dorm),
-        candidates: cityCandidates
-      });
-
+      const parsedUrl = new URL(urlStr);
       const req = https.request({
         hostname: parsedUrl.hostname,
         port: parsedUrl.port || 443,
@@ -60,43 +48,66 @@ function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, 
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(postData)
         },
-        timeout: 45000
+        timeout: timeoutMs
       }, (res) => {
         let body = '';
         res.on('data', chunk => body += chunk);
         res.on('end', () => {
-          try {
-            if (res.statusCode === 200) {
-              const parsed = JSON.parse(body);
-              return resolve(parsed);
+          if (res.statusCode === 200) {
+            try {
+              resolve(JSON.parse(body));
+            } catch (e) {
+              reject(e);
             }
-            console.error(`Hermes VPS returned status ${res.statusCode}: ${body}`);
-            resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
-          } catch (e) {
-            console.error("Failed to parse Hermes response:", e);
-            resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
+          } else {
+            reject(new Error(`Status ${res.statusCode}: ${body}`));
           }
         });
       });
 
-      req.on('error', (err) => {
-        console.error("Hermes tunnel request error:", err);
-        resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
-      });
-
+      req.on('error', reject);
       req.on('timeout', () => {
         req.destroy();
-        console.error("Hermes tunnel request timed out");
-        resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
+        reject(new Error(`Timeout after ${timeoutMs}ms`));
       });
 
       req.write(postData);
       req.end();
     } catch (err) {
-      console.error("Error setting up Hermes request:", err);
-      resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
+      reject(err);
     }
   });
+}
+
+async function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
+  const postData = JSON.stringify({
+    name: promptData.name,
+    claimed_stars: promptData.claimed_stars,
+    platform: promptData.platform || "Direct Input",
+    url: promptData.url || "",
+    city: promptData.city || "Vietnam",
+    has_dorm: Boolean(promptData.has_dorm),
+    candidates: cityCandidates
+  });
+
+  const endpoints = [
+    process.env.HERMES_TUNNEL_URL,
+    "https://imposed-named-external-equipped.trycloudflare.com/api/verify",
+    "https://204-168-160-204.sslip.io/api/verify"
+  ].filter(Boolean);
+
+  for (const url of endpoints) {
+    try {
+      const result = await requestEndpoint(url, postData, 35000);
+      if (result && result.verdict) {
+        return result;
+      }
+    } catch (err) {
+      console.warn(`Tunnel endpoint ${url} failed: ${err.message}. Trying next endpoint...`);
+    }
+  }
+
+  return generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount);
 }
 
 
@@ -167,13 +178,25 @@ module.exports = async (req, res) => {
     return res.status(200).end();
   }
 
-  const query = req.method === 'POST' ? (req.body || {}) : req.query;
-  const hotelName = (query.name || query.hotelName || query.propertyName || query.property_name || query.hotel_name || "").trim();
-  const platform = (query.platform || query.ota_platform || "Direct Input").trim();
-  const url = (query.url || query.original_url || "").trim();
-  const claimedStars = parseInt(query.claimed_stars || query.claimedStars || 5, 10);
-  const city = (query.city || query.location || query.province || "").trim();
-  const hasDorm = Boolean(query.has_dorm || query.hasDorm);
+  let params = {};
+  if (req.method === 'POST') {
+    if (typeof req.body === 'string') {
+      try { params = JSON.parse(req.body); } catch(e) { params = {}; }
+    } else if (req.body && typeof req.body === 'object') {
+      params = req.body;
+    }
+  } else {
+    params = req.query || {};
+  }
+  const query = params;
+  const queryParams = req.query || {};
+
+  const hotelName = (query.name || query.hotelName || query.propertyName || query.property_name || query.hotel_name || queryParams.name || "").trim();
+  const platform = (query.platform || query.ota_platform || queryParams.platform || "Direct Input").trim();
+  const url = (query.url || query.original_url || queryParams.url || "").trim();
+  const claimedStars = parseInt(query.claimed_stars || query.claimedStars || queryParams.claimed_stars || 5, 10);
+  const city = (query.city || query.location || query.province || queryParams.city || "").trim();
+  const hasDorm = Boolean(query.has_dorm || query.hasDorm || queryParams.has_dorm);
 
   if (!hotelName && !url) {
     return res.status(400).json({ error: "Property name or URL is required." });
@@ -181,7 +204,7 @@ module.exports = async (req, res) => {
 
   const listingKey = normalizeKey(url || `${platform}-${hotelName}`);
 
-  const force = Boolean(query.force || query.live || query.refresh);
+  const force = Boolean(query.force || query.live || query.refresh || queryParams.force || queryParams.live || queryParams.refresh);
   const startMs = Date.now();
 
   // 1. Check in-memory / permanent log cache only if NOT forced
