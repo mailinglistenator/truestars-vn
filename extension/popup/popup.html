@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrueStars VN</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <div class="brand">
+        <span class="logo">🛡️</span>
+        <div>
+          <div class="title">TrueStars VN</div>
+          <div class="subtitle">Hotel Star Rating Watchdog</div>
+        </div>
+      </div>
+      <div class="status-indicator">
+        <span class="status-dot"></span> Active
+      </div>
+    </header>
+
+    <!-- Active Tab Audit Section -->
+    <section class="section-card" id="tab-audit-section">
+      <div class="section-title">Current Tab Property</div>
+      <div id="tab-hotel-name" class="hotel-name">Checking page...</div>
+      <div id="tab-audit-result" class="audit-verdict">
+        <span class="placeholder-text">Browse an Agoda, Booking, or Trip.com hotel page to see instant verification.</span>
+      </div>
+    </section>
+
+    <!-- Quick Search Registry -->
+    <section class="section-card">
+      <div class="section-title">Search Official Whitelist (681 Hotels)</div>
+      <input type="text" id="popup-search-input" class="search-input" placeholder="Type hotel name (e.g. Metropole, Daewoo)...">
+      <div id="popup-search-results" class="search-results-list"></div>
+    </section>
+
+    <!-- Stats Footer -->
+    <footer class="popup-footer">
+      <div class="stat-pills">
+        <span class="pill">301 Official 5★</span>
+        <span class="pill">380 Official 4★</span>
+      </div>
+      <a href="https://csdl.vietnamtourism.gov.vn" target="_blank" class="footer-link">VNAT Registry</a>
+    </footer>
+  </div>
+  <script src="../engine/matcher.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "TrueStars VN — Hotel Star Rating Watchdog",
+  "version": "1.0.0",
+  "description": "Exposes unaccredited 4★ and 5★ hotel listings on Agoda, Booking.com, and Trip.com using official Vietnam government records.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "TrueStars VN Watchdog",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.agoda.com/*",
+    "*://*.booking.com/*",
+    "*://*.trip.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.agoda.com/*",
+        "*://*.booking.com/*",
+        "*://*.trip.com/*"
+      ],
+      "js": [
+        "engine/matcher.js",
+        "content/badge.js",
+        "content/agoda.js",
+        "content/booking.js",
+        "content/trip.js"
+      ],
+      "css": [
+        "content/badge.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "data/vnat_whitelist.json",
+        "icons/icon-16.png",
+        "icons/icon-48.png",
+        "icons/icon-128.png"
+      ],
+      "matches": [
+        "*://*.agoda.com/*",
+        "*://*.booking.com/*",
+        "*://*.trip.com/*"
+      ]
+    }
+  ]
+}
