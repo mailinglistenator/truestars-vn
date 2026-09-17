@@ -1,8 +1,13 @@
 {
   "2010": {
+    "commercial_name": "Danang Marriott Resort & Spa, Non Nuoc Beach Villas",
+    "former_name": "Vinpearl Resort & Spa Da Nang",
+    "direct_agoda_url": "https://www.agoda.com/vinpearl-resort-spa-da-nang-h8674427/hotel/da-nang-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/danang-marriott-resort-spa-non-nuoc-beach-villas.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/da-nang-hotel-detail-84951478/danang-marriott-resort-spa-non-nuoc-beach-villas/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Danang+Marriott+Resort+%26+Spa,+Non+Nuoc+Beach+Villas/",
     "trip_ids": [
-      "10041235",
-      "648931"
+      "84951478"
     ],
     "trip_slugs": [
       "danang-marriott-resort-spa-non-nuoc-beach-villas"
@@ -19,9 +24,14 @@
     ]
   },
   "494": {
+    "commercial_name": "Sofitel Legend Metropole Hanoi",
+    "former_name": "Kh\u00e1ch s\u1ea1n Sofitel Metropole H\u00e0 N\u1ed9i",
+    "direct_agoda_url": "https://www.agoda.com/sofitel-legend-metropole-hanoi-hotel/hotel/hanoi-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/sofitelmetropole.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/hanoi-hotel-detail-673641/sofitel-legend-metropole-hanoi/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Sofitel+Legend+Metropole+Hanoi/",
     "trip_ids": [
-      "678508",
-      "2192773"
+      "673641"
     ],
     "trip_slugs": [
       "sofitel-legend-metropole-hanoi",
@@ -40,8 +50,14 @@
     ]
   },
   "1981": {
+    "commercial_name": "Furama Resort Danang",
+    "former_name": "Khu ngh\u1ec9 d\u01b0\u1ee1ng Furama \u0110\u00e0 N\u1eb5ng",
+    "direct_agoda_url": "https://www.agoda.com/furama-resort-danang/hotel/da-nang-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/furama-resort-danang.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/da-nang-hotel-detail-355995/furama-resort-danang/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Furama+Resort+Danang/",
     "trip_ids": [
-      "648931"
+      "355995"
     ],
     "trip_slugs": [
       "furama-resort-danang",
@@ -61,8 +77,14 @@
     ]
   },
   "49": {
+    "commercial_name": "Caravelle Saigon",
+    "former_name": "Kh\u00e1ch s\u1ea1n Caravelle S\u00e0i G\u00f2n",
+    "direct_agoda_url": "https://www.agoda.com/caravelle-saigon-hotel/hotel/ho-chi-minh-city-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/caravelle.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/ho-chi-minh-city-hotel-detail-354394/caravelle-saigon/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Caravelle+Saigon/",
     "trip_ids": [
-      "703953"
+      "354394"
     ],
     "trip_slugs": [
       "caravelle-saigon",
@@ -81,8 +103,14 @@
     ]
   },
   "2051": {
+    "commercial_name": "Rex Hotel Saigon",
+    "former_name": "Kh\u00e1ch s\u1ea1n Rex S\u00e0i G\u00f2n",
+    "direct_agoda_url": "https://www.agoda.com/rex-hotel-saigon/hotel/ho-chi-minh-city-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/rex.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/ho-chi-minh-city-hotel-detail-354339/rex-hotel/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Rex+Hotel+Saigon/",
     "trip_ids": [
-      "689102"
+      "354339"
     ],
     "trip_slugs": [
       "rex-hotel-saigon",
@@ -100,283 +128,15 @@
       "rex-hotel-saigon"
     ]
   },
-  "3007": {
-    "trip_ids": [
-      "703954"
-    ],
-    "trip_slugs": [
-      "hotel-continental-saigon"
-    ],
-    "agoda_slugs": [
-      "hotel-continental-saigon"
-    ],
-    "agoda_ids": [
-      "9872"
-    ],
-    "booking_slugs": [
-      "hotel-continental-saigon",
-      "continental-saigon"
-    ]
-  },
-  "1803": {
-    "trip_ids": [
-      "703955"
-    ],
-    "trip_slugs": [
-      "hotel-majestic-saigon",
-      "majestic-saigon"
-    ],
-    "agoda_slugs": [
-      "hotel-majestic-saigon"
-    ],
-    "agoda_ids": [
-      "9873"
-    ],
-    "booking_slugs": [
-      "majestic-saigon",
-      "hotel-majestic-saigon"
-    ]
-  },
-  "56": {
-    "trip_ids": [
-      "703956"
-    ],
-    "trip_slugs": [
-      "grand-hotel-saigon",
-      "grand-saigon"
-    ],
-    "agoda_slugs": [
-      "grand-hotel-saigon",
-      "grand-saigon"
-    ],
-    "agoda_ids": [
-      "9874"
-    ],
-    "booking_slugs": [
-      "grand-saigon",
-      "grand-hotel-saigon"
-    ]
-  },
-  "648": {
-    "trip_ids": [
-      "983412"
-    ],
-    "trip_slugs": [
-      "hanoi-daewoo-hotel",
-      "daewoo-hotel-hanoi",
-      "hanoi-daewoo"
-    ],
-    "agoda_slugs": [
-      "hanoi-daewoo-hotel",
-      "daewoo-hotel"
-    ],
-    "agoda_ids": [
-      "12095"
-    ],
-    "booking_slugs": [
-      "hanoi-daewoo",
-      "daewoo-hotel-hanoi"
-    ]
-  },
-  "2027": {
-    "trip_ids": [
-      "1543209"
-    ],
-    "trip_slugs": [
-      "lotte-hotel-hanoi",
-      "lotte-hanoi"
-    ],
-    "agoda_slugs": [
-      "lotte-hotel-hanoi"
-    ],
-    "agoda_ids": [
-      "682910"
-    ],
-    "booking_slugs": [
-      "lotte-hanoi",
-      "lotte-hotel-hanoi"
-    ]
-  },
-  "1917": {
-    "trip_ids": [
-      "994475"
-    ],
-    "trip_slugs": [
-      "pan-pacific-hanoi"
-    ],
-    "agoda_slugs": [
-      "pan-pacific-hanoi"
-    ],
-    "agoda_ids": [
-      "12092"
-    ],
-    "booking_slugs": [
-      "pan-pacific-hanoi"
-    ]
-  },
-  "1923": {
-    "trip_ids": [
-      "994474"
-    ],
-    "trip_slugs": [
-      "intercontinental-hanoi-westlake",
-      "intercontinental-westlake"
-    ],
-    "agoda_slugs": [
-      "intercontinental-hanoi-westlake"
-    ],
-    "agoda_ids": [
-      "12091"
-    ],
-    "booking_slugs": [
-      "intercontinental-westlake",
-      "intercontinental-hanoi-westlake"
-    ]
-  },
-  "677": {
-    "trip_ids": [
-      "1588390"
-    ],
-    "trip_slugs": [
-      "intercontinental-hanoi-landmark72",
-      "intercontinental-hanoi-landmark-72"
-    ],
-    "agoda_slugs": [
-      "intercontinental-hanoi-landmark72"
-    ],
-    "agoda_ids": [
-      "398210"
-    ],
-    "booking_slugs": [
-      "intercontinental-hanoi-landmark72"
-    ]
-  },
-  "641": {
-    "trip_ids": [
-      "1432901"
-    ],
-    "trip_slugs": [
-      "jw-marriott-hotel-hanoi"
-    ],
-    "agoda_slugs": [
-      "jw-marriott-hotel-hanoi"
-    ],
-    "agoda_ids": [
-      "541290"
-    ],
-    "booking_slugs": [
-      "jw-marriott-hotel-hanoi"
-    ]
-  },
-  "2000": {
-    "trip_ids": [
-      "993108"
-    ],
-    "trip_slugs": [
-      "intercontinental-danang-sun-peninsula-resort"
-    ],
-    "agoda_slugs": [
-      "intercontinental-danang-sun-peninsula-resort"
-    ],
-    "agoda_ids": [
-      "338291"
-    ],
-    "booking_slugs": [
-      "intercontinental-danang-sun-peninsula-resort"
-    ]
-  },
-  "1998": {
-    "trip_ids": [
-      "993109"
-    ],
-    "trip_slugs": [
-      "hyatt-regency-danang-resort-and-spa",
-      "hyatt-regency-danang"
-    ],
-    "agoda_slugs": [
-      "hyatt-regency-danang-resort-and-spa"
-    ],
-    "agoda_ids": [
-      "338292"
-    ],
-    "booking_slugs": [
-      "hyatt-regency-danang-resort-and-spa"
-    ]
-  },
-  "108": {
-    "trip_ids": [
-      "6489320"
-    ],
-    "trip_slugs": [
-      "jw-marriott-phu-quoc-emerald-bay-resort-spa"
-    ],
-    "agoda_slugs": [
-      "jw-marriott-phu-quoc-emerald-bay-resort-spa"
-    ],
-    "agoda_ids": [
-      "1823901"
-    ],
-    "booking_slugs": [
-      "jw-marriott-phu-quoc-emerald-bay-resort-spa"
-    ]
-  },
-  "2632": {
-    "trip_ids": [
-      "1029381"
-    ],
-    "trip_slugs": [
-      "avani-hai-phong-harbour-view"
-    ],
-    "agoda_slugs": [
-      "avani-hai-phong-harbour-view-hotel",
-      "avani-hai-phong-harbour-view"
-    ],
-    "agoda_ids": [
-      "23901"
-    ],
-    "booking_slugs": [
-      "avani-hai-phong-harbour-view"
-    ]
-  },
-  "8067": {
-    "trip_ids": [
-      "2890123"
-    ],
-    "trip_slugs": [
-      "hotel-de-la-coupole-mgallery",
-      "hotel-de-la-coupole-mgallery-by-sofitel"
-    ],
-    "agoda_slugs": [
-      "hotel-de-la-coupole-mgallery-by-sofitel"
-    ],
-    "agoda_ids": [
-      "5829101"
-    ],
-    "booking_slugs": [
-      "de-la-coupole-mgallery-by-sofitel",
-      "hotel-de-la-coupole-mgallery"
-    ]
-  },
-  "8074": {
-    "trip_ids": [
-      "2890124"
-    ],
-    "trip_slugs": [
-      "legacy-yen-tu-mgallery"
-    ],
-    "agoda_slugs": [
-      "legacy-yen-tu-mgallery"
-    ],
-    "agoda_ids": [
-      "5829102"
-    ],
-    "booking_slugs": [
-      "legacy-yen-tu-mgallery"
-    ]
-  },
   "2048": {
+    "commercial_name": "Park Hyatt Saigon",
+    "former_name": "Kh\u00e1ch s\u1ea1n Park Hyatt S\u00e0i G\u00f2n",
+    "direct_agoda_url": "https://www.agoda.com/park-hyatt-saigon/hotel/ho-chi-minh-city-vn.html?cid=1924567",
+    "direct_booking_url": "https://www.booking.com/hotel/vn/park-hyatt-saigon.html?aid=8092145",
+    "direct_trip_url": "https://www.trip.com/hotels/ho-chi-minh-city-hotel-detail-360341/park-hyatt-saigon/?Allianceid=489210&SID=1983940",
+    "direct_maps_url": "https://www.google.com/maps/place/Park+Hyatt+Saigon/",
     "trip_ids": [
-      "703957"
+      "360341"
     ],
     "trip_slugs": [
       "park-hyatt-saigon"
@@ -389,146 +149,6 @@
     ],
     "booking_slugs": [
       "park-hyatt-saigon"
-    ]
-  },
-  "2059": {
-    "trip_ids": [
-      "2192774"
-    ],
-    "trip_slugs": [
-      "the-reverie-saigon"
-    ],
-    "agoda_slugs": [
-      "the-reverie-saigon"
-    ],
-    "agoda_ids": [
-      "892102"
-    ],
-    "booking_slugs": [
-      "the-reverie-saigon"
-    ]
-  },
-  "1796": {
-    "trip_ids": [
-      "703958"
-    ],
-    "trip_slugs": [
-      "sheraton-saigon-hotel-towers",
-      "sheraton-saigon"
-    ],
-    "agoda_slugs": [
-      "sheraton-saigon-hotel-towers"
-    ],
-    "agoda_ids": [
-      "10293"
-    ],
-    "booking_slugs": [
-      "sheraton-saigon",
-      "sheraton-saigon-hotel-towers"
-    ]
-  },
-  "2023": {
-    "trip_ids": [
-      "983413"
-    ],
-    "trip_slugs": [
-      "sheraton-hanoi-hotel"
-    ],
-    "agoda_slugs": [
-      "sheraton-hanoi-hotel"
-    ],
-    "agoda_ids": [
-      "12093"
-    ],
-    "booking_slugs": [
-      "sheraton-hanoi-hotel"
-    ]
-  },
-  "2002": {
-    "trip_ids": [
-      "1432902"
-    ],
-    "trip_slugs": [
-      "novotel-danang-premier-han-river"
-    ],
-    "agoda_slugs": [
-      "novotel-danang-premier-han-river"
-    ],
-    "agoda_ids": [
-      "489210"
-    ],
-    "booking_slugs": [
-      "novotel-danang-premier-han-river"
-    ]
-  },
-  "1987": {
-    "trip_ids": [
-      "993110"
-    ],
-    "trip_slugs": [
-      "pullman-danang-beach-resort"
-    ],
-    "agoda_slugs": [
-      "pullman-danang-beach-resort"
-    ],
-    "agoda_ids": [
-      "239810"
-    ],
-    "booking_slugs": [
-      "pullman-danang-beach-resort"
-    ]
-  },
-  "1874": {
-    "trip_ids": [
-      "983414"
-    ],
-    "trip_slugs": [
-      "pullman-hanoi"
-    ],
-    "agoda_slugs": [
-      "pullman-hanoi-hotel"
-    ],
-    "agoda_ids": [
-      "12094"
-    ],
-    "booking_slugs": [
-      "pullman-hanoi",
-      "pullman-hanoi-hotel"
-    ]
-  },
-  "2055": {
-    "trip_ids": [
-      "1588391"
-    ],
-    "trip_slugs": [
-      "pullman-saigon-centre"
-    ],
-    "agoda_slugs": [
-      "pullman-saigon-centre-hotel"
-    ],
-    "agoda_ids": [
-      "541291"
-    ],
-    "booking_slugs": [
-      "pullman-saigon-centre"
-    ]
-  },
-  "158": {
-    "trip_ids": [
-      "993111"
-    ],
-    "trip_slugs": [
-      "four-seasons-resort-the-nam-hai-hoi-an",
-      "the-nam-hai"
-    ],
-    "agoda_slugs": [
-      "four-seasons-resort-the-nam-hai-hoi-an-vietnam"
-    ],
-    "agoda_ids": [
-      "129810"
-    ],
-    "booking_slugs": [
-      "four-seasons-resort-the-nam-hai-hoi-an"
     ]
   }
 }

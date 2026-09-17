@@ -303,29 +303,38 @@ def generate_ota_links_for_hotel(h, eng_name, eng_loc, is_curated=False, curated
     q = urllib.parse.quote_plus(f"{eng_name} {eng_loc}".strip())
 
     # Agoda URL
-    if is_curated and curated_entry and curated_entry.get("agoda_ids"):
-        agoda_url = f"https://www.agoda.com/partners/partnersearch.aspx?cid={cid}&hl=en-us&pcs=1&hid={curated_entry['agoda_ids'][0]}"
+    if is_curated and curated_entry and curated_entry.get("direct_agoda_url"):
+        agoda_url = curated_entry["direct_agoda_url"]
     elif is_curated and curated_entry and curated_entry.get("agoda_slugs"):
         best_slug = curated_entry["agoda_slugs"][0]
         agoda_url = f"https://www.agoda.com/{best_slug}/hotel/vietnam.html?cid={cid}"
+    elif is_curated and curated_entry and curated_entry.get("agoda_ids"):
+        agoda_url = f"https://www.agoda.com/partners/partnersearch.aspx?cid={cid}&hl=en-us&pcs=1&hid={curated_entry['agoda_ids'][0]}"
     else:
         agoda_url = f"https://www.google.com/search?q=site%3Aagoda.com+{q}"
 
     # Booking.com URL
-    if is_curated and curated_entry and curated_entry.get("booking_slugs"):
+    if is_curated and curated_entry and curated_entry.get("direct_booking_url"):
+        booking_url = curated_entry["direct_booking_url"]
+    elif is_curated and curated_entry and curated_entry.get("booking_slugs"):
         booking_url = f"https://www.booking.com/hotel/vn/{curated_entry['booking_slugs'][0]}.html?aid={aid}"
     else:
         booking_url = f"https://www.booking.com/searchresults.html?ss={q}&aid={aid}"
 
     # Trip.com URL
-    if is_curated and curated_entry and curated_entry.get("trip_ids"):
+    if is_curated and curated_entry and curated_entry.get("direct_trip_url"):
+        trip_url = curated_entry["direct_trip_url"]
+    elif is_curated and curated_entry and curated_entry.get("trip_ids"):
         trip_url = f"https://www.trip.com/hotels/detail/?hotelId={curated_entry['trip_ids'][0]}&Allianceid={trip_aid}&SID={trip_sid}"
     else:
         trip_url = f"https://www.trip.com/hotels/list?keyword={q}&Allianceid={trip_aid}&SID={trip_sid}"
 
-    # Google Maps URL
-    maps_q = urllib.parse.quote_plus(f"{eng_name} {h.get('address', eng_loc)}".strip())
-    maps_url = f"https://www.google.com/maps/search/?api=1&query={maps_q}"
+    # Google Maps URL - DIRECT PLACE CARD (Never generic search list)
+    if is_curated and curated_entry and curated_entry.get("direct_maps_url"):
+        maps_url = curated_entry["direct_maps_url"]
+    else:
+        maps_q = urllib.parse.quote_plus(f"{eng_name} {h.get('address', eng_loc)}".strip())
+        maps_url = f"https://www.google.com/maps/place/{maps_q}/"
 
     return {
         "agoda": {
@@ -346,13 +355,14 @@ def generate_ota_links_for_hotel(h, eng_name, eng_loc, is_curated=False, curated
         "google_maps": {
             "name": "Google Maps",
             "url": maps_url,
-            "badge": "🗺️ Google Maps ↗"
+            "badge": "🗺️ Maps ↗"
         }
     }
 
 def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     wl_path = os.path.join(base_dir, "public", "vnat_whitelist.json")
+    data_wl_path = os.path.join(base_dir, "data", "vnat_whitelist.json")
     curated_path = os.path.join(base_dir, "data", "ota_curated_mappings.json")
 
     with open(wl_path, "r", encoding="utf-8") as f:
@@ -372,12 +382,19 @@ def main():
             if "ota_identities" not in h or not h["ota_identities"]:
                 h["ota_identities"] = {}
             for k, vals in c.items():
-                if vals:
+                if vals and isinstance(vals, list):
                     existing = h["ota_identities"].get(k, [])
                     h["ota_identities"][k] = list(set(existing + vals))
 
         eng_loc = get_english_location(h)
         eng_name = generate_english_name(h)
+        if is_curated and curated_entry:
+            if curated_entry.get("commercial_name"):
+                eng_name = curated_entry["commercial_name"]
+            if curated_entry.get("former_name"):
+                h["former_name"] = curated_entry["former_name"]
+            h["commercial_name"] = curated_entry.get("commercial_name", eng_name)
+
         ota_links = generate_ota_links_for_hotel(h, eng_name, eng_loc, is_curated=is_curated, curated_entry=curated_entry)
 
         h["english_name"] = eng_name
@@ -387,6 +404,10 @@ def main():
     # Write enriched list back to public and data
     with open(wl_path, "w", encoding="utf-8") as f:
         json.dump(whitelist, f, ensure_ascii=False, indent=2)
+
+    if os.path.exists(os.path.dirname(data_wl_path)):
+        with open(data_wl_path, "w", encoding="utf-8") as f:
+            json.dump(whitelist, f, ensure_ascii=False, indent=2)
 
     data_wl_path = os.path.join(base_dir, "data", "vnat_whitelist.json")
     with open(data_wl_path, "w", encoding="utf-8") as f:

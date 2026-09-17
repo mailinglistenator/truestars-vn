@@ -644,7 +644,7 @@ function generateOtaLinks({ name, city = "", matchedHotel = null, originalUrl = 
   let agodaUrl = `https://www.google.com/search?q=site%3Aagoda.com+${searchQuery}`;
   let bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}&aid=${AFFILIATE_CONFIG.booking_aid}`;
   let tripUrl = `https://www.trip.com/hotels/list?keyword=${searchQuery}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+  const mapsUrl = `https://www.google.com/maps/place/${searchQuery}/`;
 
   if (originalUrl) {
     try {

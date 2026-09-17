@@ -1379,6 +1379,26 @@
         risk.style.color = '#ffe4e6';
       }
 
+      if (audit.concise_summary) {
+        bullets.innerHTML = `
+          <div style="background: ${audit.verdict === 'VERIFIED_COMPLIANT' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(225, 29, 72, 0.18)'}; border-left: 4px solid ${audit.verdict === 'VERIFIED_COMPLIANT' ? '#10b981' : '#ef4444'}; padding: 1rem 1.15rem; border-radius: 0 8px 8px 0; margin-bottom: 0.5rem;">
+            <div style="font-size: 1.02rem; font-weight: 700; color: ${audit.verdict === 'VERIFIED_COMPLIANT' ? '#6ee7b7' : '#fca5a5'}; line-height: 1.45; margin-bottom: 0.4rem;">
+              ${audit.verdict === 'VERIFIED_COMPLIANT' ? '✅' : '🚨'} "${audit.concise_summary}"
+            </div>
+            ${audit.refund_advisory ? `
+              <div style="font-size: 0.88rem; color: ${audit.verdict === 'VERIFIED_COMPLIANT' ? '#a7f3d0' : '#fecdd3'}; line-height: 1.5; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                🛡️ <strong>Refund Guidance:</strong> ${audit.refund_advisory}
+              </div>
+            ` : ''}
+            ${audit.investigation_findings ? `
+              <div style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5; margin-top: 0.45rem;">
+                🔍 <strong>AI Registry Investigation:</strong> ${audit.investigation_findings}
+              </div>
+            ` : ''}
+          </div>
+        ` + bullets.innerHTML;
+      }
+
       risk.innerHTML = `<strong>⚠️ Risk Advisory:</strong> ${audit.risk_advisory || 'Consumer protection alert under Vietnamese Law on Tourism 2017.'}`;
       reasoning.innerHTML = `<strong>⚖️ Statutory Legal Analysis:</strong> ${audit.reasoning}`;
 
@@ -1538,7 +1558,7 @@
         const agodaUrl = links.agoda ? links.agoda.url : `https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=${encodeURIComponent(engName + ' ' + loc)}`;
         const bookingUrl = links.booking ? links.booking.url : `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(engName + ' ' + loc)}&aid=8092145`;
         const tripUrl = links.trip ? links.trip.url : `https://www.trip.com/hotels/list?keyword=${encodeURIComponent(engName + ' ' + loc)}&Allianceid=489210&SID=1983940`;
-        const mapsUrl = links.google_maps ? links.google_maps.url : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(engName + ' ' + loc)}`;
+        const mapsUrl = links.google_maps ? links.google_maps.url : `https://www.google.com/maps/place/${encodeURIComponent(engName + ' ' + (h.address || loc))}/`;
 
         return `
         <div style="background: #090d16; border: 1px solid var(--card-border); padding: 1.15rem; border-radius: 10px;">
@@ -1549,6 +1569,7 @@
                 <span class="gold-stars" style="font-size: 0.95rem;">${'★'.repeat(h.stars)} (${h.stars}★)</span>
                 <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">✓ VNAT Accredited #${h.item_id || h.decision_code || 'AUTH'}</span>
               </div>
+              ${h.former_name ? `<div style="color: #c4b5fd; font-size: 0.82rem; margin-top: 0.15rem; font-style: italic;">(Formerly ${h.former_name})</div>` : ''}
               <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.25rem;">
                 Official State Registry: <span style="color: #e2e8f0; font-style: italic;">"${h.name}"</span>
               </div>
