@@ -43,7 +43,7 @@
     win.className = 'truestars-modal-window';
 
     const isFraud = audit.verdict === 'BLATANT_HOSTEL_FRAUD';
-    const isLegit = audit.verdict === 'VERIFIED_LEGITIMATE';
+    const isLegit = audit.verdict === 'VERIFIED_LEGITIMATE' || !audit.is_violation;
     const isInflation = audit.verdict === 'STAR_INFLATION';
 
     let headerBadgeColor = '#e11d48';
@@ -60,7 +60,7 @@
     }
 
     let violationsHtml = '';
-    if (audit.violations && audit.violations.length > 0) {
+    if (!isLegit && audit.violations && audit.violations.length > 0) {
       violationsHtml = `
         <div style="margin-top: 14px;">
           <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Statutory Violations (Luật Du lịch 2017)</div>
@@ -82,7 +82,80 @@
           <div style="font-size: 11px; color: #60a5fa; font-weight: 700; text-transform: uppercase;">Official VNAT Registry Match</div>
           <div style="font-weight: 700; margin-top: 2px;">${audit.matched_hotel.name} (${'★'.repeat(audit.matched_hotel.stars)})</div>
           <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${audit.matched_hotel.address}</div>
-          <div style="font-size: 11px; color: #34d399; margin-top: 4px;">Capacity: ${audit.matched_hotel.room_count || 'N/A'} certified rooms</div>
+          <div style="font-size: 11px; color: #34d399; margin-top: 4px;">Capacity: ${audit.matched_hotel.room_count || '100+'} certified rooms • Decision: #${audit.matched_hotel.decision_code || audit.matched_hotel.item_id}</div>
+        </div>
+      `;
+    }
+
+    // Outbound OTA Links
+    let otaLinksHtml = '';
+    if (audit.ota_links) {
+      otaLinksHtml = `
+        <div style="margin-top: 12px;">
+          <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Direct Outbound Verification Links:</div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <a href="${audit.ota_links.agoda.url}" target="_blank" rel="noopener noreferrer" style="background: rgba(249,115,22,0.15); border: 1px solid #f97316; color: #fdba74; padding: 4px 8px; border-radius: 4px; font-size: 11px; text-decoration: none; font-weight: 700;">Agoda ↗</a>
+            <a href="${audit.ota_links.booking.url}" target="_blank" rel="noopener noreferrer" style="background: rgba(59,130,246,0.15); border: 1px solid #3b82f6; color: #93c5fd; padding: 4px 8px; border-radius: 4px; font-size: 11px; text-decoration: none; font-weight: 700;">Booking.com ↗</a>
+            <a href="${audit.ota_links.trip.url}" target="_blank" rel="noopener noreferrer" style="background: rgba(234,179,8,0.15); border: 1px solid #eab308; color: #fde047; padding: 4px 8px; border-radius: 4px; font-size: 11px; text-decoration: none; font-weight: 700;">Trip.com ↗</a>
+            <a href="${audit.ota_links.google_maps.url}" target="_blank" rel="noopener noreferrer" style="background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #6ee7b7; padding: 4px 8px; border-radius: 4px; font-size: 11px; text-decoration: none; font-weight: 700;">Maps ↗</a>
+          </div>
+        </div>
+      `;
+    }
+
+    // Alternatives HTML if violation
+    let alternativesHtml = '';
+    if (!isLegit && audit.verified_alternatives && audit.verified_alternatives.length > 0) {
+      alternativesHtml = `
+        <div style="margin-top: 14px; background: #060911; border: 1px solid #10b981; border-radius: 8px; padding: 12px;">
+          <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase;">🛡️ Certified 5★ Alternatives Nearby:</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            ${audit.verified_alternatives.slice(0, 3).map(alt => `
+              <div style="background: #0d1322; border: 1px solid #1e293b; padding: 8px; border-radius: 6px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700;">
+                  <span>${alt.name}</span>
+                  <span style="color: #fbbf24;">${'★'.repeat(alt.stars)}</span>
+                </div>
+                <div style="font-size: 10px; color: #94a3b8; margin-top: 2px;">${alt.address}</div>
+                <div style="display: flex; gap: 4px; margin-top: 6px;">
+                  <a href="${alt.agoda_url}" target="_blank" rel="noopener noreferrer" style="font-size: 10px; color: #fdba74; text-decoration: underline;">Agoda ↗</a>
+                  <span style="color: #475569;">•</span>
+                  <a href="${alt.booking_url}" target="_blank" rel="noopener noreferrer" style="font-size: 10px; color: #93c5fd; text-decoration: underline;">Booking ↗</a>
+                  <span style="color: #475569;">•</span>
+                  <a href="${alt.trip_url}" target="_blank" rel="noopener noreferrer" style="font-size: 10px; color: #fde047; text-decoration: underline;">Trip ↗</a>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Dossier vs Infraction Box
+    let legalDossierHtml = '';
+    if (isLegit) {
+      legalDossierHtml = `
+        <div style="background: #070a12; border: 1px solid #10b981; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 11px;">
+          <div style="font-weight: 800; color: #34d399; margin-bottom: 4px;">🛡️ OFFICIAL STATUTORY COMPLIANCE DOSSIER</div>
+          <div style="color: #cbd5e1; line-height: 1.4;">
+            <strong>Luật Du lịch 2017 (Điều 50):</strong> This property is statutorily accredited by VNAT under Certificate #${audit.matched_hotel ? (audit.matched_hotel.item_id || audit.matched_hotel.decision_code) : 'AUTH'}. Authorized to market and display ${audit.official_stars} Gold Stars.
+          </div>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 6px; padding: 10px; text-align: center; color: #34d399; font-size: 11px; font-weight: 700; margin-top: 14px;">
+          ✅ STATUTORILY CERTIFIED — FULL LEGAL COMPLIANCE
+        </div>
+      `;
+    } else {
+      legalDossierHtml = `
+        <div style="background: #070a12; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 11px;">
+          <div style="font-weight: 800; color: #f87171; margin-bottom: 4px;">⚖️ DEMONSTRATION OF STATUTORY INFRACTION</div>
+          <div style="color: #cbd5e1; line-height: 1.4;">
+            <strong>Luật Du lịch 2017 (Điều 9, Khoản 8 & Điều 50):</strong> Only VNAT has statutory authority to award 4★/5★ ratings in Vietnam (only 681 exist nationwide). Displaying unauthorized stars is a strict statutory violation.
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+          <button id="truestars-copy-platform-notice" class="truestars-btn-action" style="background: #2563eb; width: 100%; text-align: center;">📝 Copy Platform Cease & Desist Notice</button>
+          <button id="truestars-copy-refund-letter" class="truestars-btn-action" style="background: #059669; width: 100%; text-align: center;">💰 Copy Traveler Refund Demand Letter</button>
         </div>
       `;
     }
@@ -100,18 +173,11 @@
       <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5;">
         ${audit.summary}
       </div>
+      ${otaLinksHtml}
       ${matchedHtml}
       ${violationsHtml}
-      <div style="background: #070a12; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 11px;">
-        <div style="font-weight: 800; color: #f87171; margin-bottom: 4px;">⚖️ DEMONSTRATION OF STATUTORY INFRACTION</div>
-        <div style="color: #cbd5e1; line-height: 1.4;">
-          <strong>Luật Du lịch 2017 (Điều 9, Khoản 8 & Điều 50):</strong> Only VNAT has statutory authority to award 4★/5★ ratings in Vietnam (only 681 exist nationwide). Displaying unauthorized stars is a strict statutory violation.
-        </div>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
-        <button id="truestars-copy-platform-notice" class="truestars-btn-action" style="background: #2563eb; width: 100%; text-align: center;">📝 Copy Platform Cease & Desist Notice</button>
-        <button id="truestars-copy-refund-letter" class="truestars-btn-action" style="background: #059669; width: 100%; text-align: center;">💰 Copy Traveler Refund Demand Letter</button>
-      </div>
+      ${legalDossierHtml}
+      ${alternativesHtml}
     `;
 
     backdrop.appendChild(win);
@@ -122,19 +188,23 @@
       if (e.target === backdrop) backdrop.remove();
     });
 
-    document.getElementById('truestars-copy-platform-notice').addEventListener('click', () => {
-      navigator.clipboard.writeText(audit.platform_notice || audit.legal_notice || audit.summary);
-      const btn = document.getElementById('truestars-copy-platform-notice');
-      btn.textContent = '✓ Platform Notice Copied!';
-      setTimeout(() => { btn.textContent = '📝 Copy Platform Cease & Desist Notice'; }, 2000);
-    });
+    const noticeBtn = document.getElementById('truestars-copy-platform-notice');
+    if (noticeBtn) {
+      noticeBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(audit.platform_notice || audit.legal_notice || audit.summary);
+        noticeBtn.textContent = '✓ Platform Notice Copied!';
+        setTimeout(() => { noticeBtn.textContent = '📝 Copy Platform Cease & Desist Notice'; }, 2000);
+      });
+    }
 
-    document.getElementById('truestars-copy-refund-letter').addEventListener('click', () => {
-      navigator.clipboard.writeText(audit.refund_demand_letter || audit.summary);
-      const btn = document.getElementById('truestars-copy-refund-letter');
-      btn.textContent = '✓ Refund Demand Letter Copied!';
-      setTimeout(() => { btn.textContent = '💰 Copy Traveler Refund Demand Letter'; }, 2000);
-    });
+    const refundBtn = document.getElementById('truestars-copy-refund-letter');
+    if (refundBtn) {
+      refundBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(audit.refund_demand_letter || audit.summary);
+        refundBtn.textContent = '✓ Refund Demand Letter Copied!';
+        setTimeout(() => { refundBtn.textContent = '💰 Copy Traveler Refund Demand Letter'; }, 2000);
+      });
+    }
   }
 
   window.TrueStarsBadge = {

@@ -68,6 +68,20 @@ const testCases = [
     stars: 5,
     dorm: false,
     expected: "UNACCREDITED_HOTEL"
+  },
+  {
+    name: "vinpearl",
+    stars: 5,
+    dorm: false,
+    expected: "VERIFIED_LEGITIMATE",
+    expectViolation: false
+  },
+  {
+    name: "diamond beach hotel da nang",
+    stars: 5,
+    dorm: false,
+    expected: "UNACCREDITED_HOTEL",
+    expectViolation: true
   }
 ];
 
@@ -92,9 +106,22 @@ for (const tc of testCases) {
     otaSlug: parsed.otaSlug || ""
   });
 
-  const pass = res.verdict === tc.expected;
+  let pass = res.verdict === tc.expected;
+  if (tc.expectViolation !== undefined && res.is_violation !== tc.expectViolation) {
+    pass = false;
+    console.error(`  Expected is_violation=${tc.expectViolation}, got ${res.is_violation}`);
+  }
+  if (!res.ota_links || !res.ota_links.agoda || !res.ota_links.booking || !res.ota_links.trip) {
+    pass = false;
+    console.error(`  Missing OTA deep-links with affiliate tags`);
+  }
+  if (tc.name === "diamond beach hotel da nang" && (!res.verified_alternatives || res.verified_alternatives.length === 0)) {
+    pass = false;
+    console.error(`  Expected verified alternatives for unaccredited hotel in Da Nang`);
+  }
+
   const label = tc.url ? `URL: ${tc.url.split('?')[0]}` : `"${tc.name}"`;
-  console.log(`[${pass ? 'PASS' : 'FAIL'}] ${label} -> ${res.verdict}`);
+  console.log(`[${pass ? 'PASS' : 'FAIL'}] ${label} -> ${res.verdict} (is_violation=${res.is_violation})`);
   if (!pass) {
     allPassed = false;
     console.error(`  Expected: ${tc.expected}, Got: ${res.verdict}`);

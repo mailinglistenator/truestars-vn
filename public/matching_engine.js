@@ -369,7 +369,10 @@ class TrueStarsMatcher {
       });
     }
 
-    const platformNotice = generatePlatformNotice({
+    const isLegitimate = verdict === "VERIFIED_LEGITIMATE";
+    const isViolation = !isLegitimate;
+
+    const platformNotice = isViolation ? generatePlatformNotice({
       propertyName: name,
       claimedStars,
       officialStars,
@@ -380,15 +383,15 @@ class TrueStarsMatcher {
       matchedHotel,
       hasDorm,
       otaId
-    });
+    }) : "";
 
-    const refundDemandLetter = generateRefundDemandLetter({
+    const refundDemandLetter = isViolation ? generateRefundDemandLetter({
       propertyName: name,
       claimedStars,
       officialStars,
       otaPlatform,
       hasDorm
-    });
+    }) : "";
 
     const lawBreakingProof = generateDemonstrationOfLawBreaking({
       propertyName: name,
@@ -398,8 +401,21 @@ class TrueStarsMatcher {
       otaPlatform,
       matchedHotel,
       otaId,
-      matchType
+      matchType,
+      isLegitimate
     });
+
+    const otaLinks = generateOtaLinks({
+      name,
+      city: province,
+      matchedHotel,
+      originalUrl,
+      otaPlatform
+    });
+
+    const verifiedAlternatives = isViolation ? findVerifiedAlternatives(province || (matchedHotel ? matchedHotel.province : ""), this.hotels) : [];
+
+    const aiVerificationKey = (originalUrl || `${otaPlatform}-${name}`).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
     return {
       property_name: name,
@@ -412,6 +428,7 @@ class TrueStarsMatcher {
       ota_slug: otaSlug,
       verdict: verdict,
       severity: severity,
+      is_violation: isViolation,
       summary: summary,
       match_type: matchType,
       matched_hotel: matchedHotel ? {
@@ -427,7 +444,10 @@ class TrueStarsMatcher {
       violations: violations,
       law_breaking_proof: lawBreakingProof,
       platform_notice: platformNotice,
-      refund_demand_letter: refundDemandLetter
+      refund_demand_letter: refundDemandLetter,
+      ota_links: otaLinks,
+      verified_alternatives: verifiedAlternatives,
+      ai_verification_key: aiVerificationKey
     };
   }
 
@@ -479,26 +499,207 @@ class TrueStarsMatcher {
 }
 
 /**
- * Generates the Formal Statutory Demonstration of Law Breaking
+ * Affiliate Monetization Configuration
  */
-function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, officialStars, hasDorm, otaPlatform, matchedHotel, otaId, matchType }) {
+const AFFILIATE_CONFIG = {
+  agoda_cid: "1924567",
+  booking_aid: "8092145",
+  trip_alliance_id: "489210",
+  trip_sid: "1983940"
+};
+
+/**
+ * Generates direct outbound deep-links to OTAs and Google Maps with affiliate monetization tags
+ */
+function generateOtaLinks({ name, city = "", matchedHotel = null, originalUrl = "", otaPlatform = "" }) {
+  const targetName = matchedHotel ? matchedHotel.name : name;
+  const targetCity = (matchedHotel ? matchedHotel.province : city) || "Vietnam";
+  const searchQuery = encodeURIComponent(`${targetName} ${targetCity}`.trim());
+
+  let agodaUrl = `https://www.agoda.com/partners/partnersearch.aspx?cid=${AFFILIATE_CONFIG.agoda_cid}&hl=en-us&pcs=1&text=${searchQuery}`;
+  let bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}&aid=${AFFILIATE_CONFIG.booking_aid}`;
+  let tripUrl = `https://www.trip.com/hotels/list?keyword=${searchQuery}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+
+  if (originalUrl) {
+    try {
+      if (otaPlatform === "Agoda") {
+        agodaUrl = originalUrl.includes('?') 
+          ? `${originalUrl}&cid=${AFFILIATE_CONFIG.agoda_cid}` 
+          : `${originalUrl}?cid=${AFFILIATE_CONFIG.agoda_cid}`;
+      } else if (otaPlatform === "Booking.com") {
+        bookingUrl = originalUrl.includes('?') 
+          ? `${originalUrl}&aid=${AFFILIATE_CONFIG.booking_aid}` 
+          : `${originalUrl}?aid=${AFFILIATE_CONFIG.booking_aid}`;
+      } else if (otaPlatform === "Trip.com") {
+        tripUrl = originalUrl.includes('?') 
+          ? `${originalUrl}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}` 
+          : `${originalUrl}?Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
+      }
+    } catch (e) {
+      // ignore parsing error, default to query search
+    }
+  }
+
+  return {
+    agoda: {
+      name: "Agoda",
+      url: agodaUrl,
+      badge: "🟧 View on Agoda ↗"
+    },
+    booking: {
+      name: "Booking.com",
+      url: bookingUrl,
+      badge: "🟦 View on Booking.com ↗"
+    },
+    trip: {
+      name: "Trip.com",
+      url: tripUrl,
+      badge: "🟨 View on Trip.com ↗"
+    },
+    google_maps: {
+      name: "Google Maps",
+      url: mapsUrl,
+      badge: "🗺️ Google Maps ↗"
+    }
+  };
+}
+
+/**
+ * Finds certified 5-star (or 4-star) alternatives in the same province/city with affiliate links
+ */
+function findVerifiedAlternatives(province = "", hotelsList = []) {
+  if (!hotelsList || hotelsList.length === 0) return [];
+  const normProv = province ? removeAccents(province) : "";
+
+  let candidates = hotelsList.filter(h => {
+    if (h.stars !== 5) return false;
+    if (!normProv) return true;
+    const combined = `${h.prov_norm || removeAccents(h.province)} ${h.addr_norm || removeAccents(h.address)}`;
+    const provTokens = normProv.split(/\s+/).filter(t => t.length > 2 && !NOISE_WORDS.has(t));
+    return provTokens.length === 0 || provTokens.some(pt => combined.includes(pt));
+  });
+
+  if (candidates.length === 0) {
+    candidates = hotelsList.filter(h => {
+      if (!normProv) return true;
+      const combined = `${h.prov_norm || removeAccents(h.province)} ${h.addr_norm || removeAccents(h.address)}`;
+      const provTokens = normProv.split(/\s+/).filter(t => t.length > 2 && !NOISE_WORDS.has(t));
+      return provTokens.length === 0 || provTokens.some(pt => combined.includes(pt));
+    });
+  }
+
+  if (candidates.length === 0) {
+    candidates = hotelsList.filter(h => h.stars === 5);
+  }
+
+  return candidates.slice(0, 4).map(h => {
+    const q = encodeURIComponent(`${h.name} ${h.province}`);
+    return {
+      item_id: h.item_id,
+      name: h.name,
+      stars: h.stars,
+      province: h.province,
+      address: h.address,
+      room_count: h.room_count,
+      decision_code: h.decision_code,
+      agoda_url: `https://www.agoda.com/partners/partnersearch.aspx?cid=${AFFILIATE_CONFIG.agoda_cid}&hl=en-us&pcs=1&text=${q}`,
+      booking_url: `https://www.booking.com/searchresults.html?ss=${q}&aid=${AFFILIATE_CONFIG.booking_aid}`,
+      trip_url: `https://www.trip.com/hotels/list?keyword=${q}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`,
+      maps_url: `https://www.google.com/maps/search/?api=1&query=${q}`
+    };
+  });
+}
+
+/**
+ * Triggers autonomous AI verification via encrypted serverless backend
+ */
+async function triggerAiVerification(propertyData) {
+  try {
+    const res = await fetch('/api/ai_verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: propertyData.property_name || propertyData.name,
+        claimed_stars: propertyData.claimed_stars || propertyData.claimedStars || 5,
+        platform: propertyData.ota_platform || propertyData.platform || "Direct Input",
+        url: propertyData.original_url || propertyData.url || "",
+        city: propertyData.province || propertyData.city || "",
+        has_dorm: Boolean(propertyData.has_dorm || propertyData.hasDorm)
+      })
+    });
+    return await res.json();
+  } catch (err) {
+    console.error("AI verification request failed:", err);
+    return {
+      status: "ERROR",
+      error: err.message
+    };
+  }
+}
+
+/**
+ * Generates the Formal Statutory Demonstration of Law Breaking (or Compliance Dossier for legitimate hotels)
+ */
+function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, officialStars, hasDorm, otaPlatform, matchedHotel, otaId, matchType, isLegitimate }) {
+  if (isLegitimate) {
+    const certCode = matchedHotel ? (matchedHotel.item_id || matchedHotel.decision_code || 'VNAT-AUTH') : 'VNAT-AUTH';
+    const hotelName = matchedHotel ? matchedHotel.name : propertyName;
+    return {
+      is_violation: false,
+      title: "OFFICIAL STATUTORY COMPLIANCE DOSSIER",
+      status_badge: "🟢 STATUTORILY CERTIFIED & FULLY COMPLIANT",
+      statute_monopoly: {
+        law: "Luật Du lịch 2017 (Law No. 09/2017/QH14) - Điều 50, Khoản 3",
+        rule: "Thẩm quyền công nhận hạng cơ sở lưu trú du lịch",
+        analysis: "Under Vietnamese law, the 1-to-5 star classification is a strict STATE-CONTROLLED statutory title exclusively evaluated and issued by the Vietnam National Authority of Tourism (VNAT). This property holds valid legal accreditation awarded directly by the state."
+      },
+      prohibition_clause: {
+        law: "Luật Du lịch 2017 - Điều 50 & Quyết định Công nhận Hạng",
+        rule: "Xác thực danh tính cơ sở lưu trú đạt chuẩn",
+        quote: "Cơ sở lưu trú du lịch được công nhận hạng được quyền gắn biển hiệu, biểu trưng sao và quảng cáo đúng với hạng đã được công nhận.",
+        analysis: `Property identity is authenticated against official VNAT ${officialStars}-Star Accreditation #${certCode} ("${hotelName}"). The property is fully authorized by the state to market and display ${officialStars} Gold Stars (★★★★★).`
+      },
+      ground_truth_evidence: {
+        national_whitelist_size: 681,
+        total_5star: 301,
+        total_4star: 380,
+        evidence_finding: `Deterministic State Authentication: Matched official VNAT Accreditation #${certCode} ("${hotelName}"). Rating of ${officialStars} Stars is officially authenticated and legally authorized under state law.`
+      },
+      facility_standards: null,
+      regulatory_clearance: {
+        decree: "Luật Du lịch 2017 (Điều 9, Khoản 8) & Nghị định 45/2019/NĐ-CP",
+        analysis: `FULL STATUTORY CLEARANCE: Neither the property nor ${otaPlatform} are in violation of advertising or consumer protection statutes. Commercial marketing of ${claimedStars} stars is lawful and authenticated by the state.`
+      },
+      platform_liability: {
+        decree: "Nghị định 85/2021/NĐ-CP (Miễn trừ trách nhiệm)",
+        analysis: `This listing represents an officially authenticated VNAT statutory classification. ${otaPlatform} is displaying legally verified accreditation.`
+      }
+    };
+  }
+
   const isHostel = hasDorm;
   const isInflated = matchedHotel && officialStars < claimedStars;
 
   let evidenceFinding = "";
-  if (matchType.startsWith("DETERMINISTIC")) {
+  if (matchType && matchType.startsWith("DETERMINISTIC")) {
     evidenceFinding = isInflated
       ? `Deterministic Aggregator Link: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Certified star rating is ONLY ${officialStars} Stars. Marketing as ${claimedStars} Stars constitutes unlawful star inflation (+${claimedStars - officialStars}★).`
-      : `Deterministic Aggregator Link: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Rating of ${officialStars} Stars is VERIFIED LEGITIMATE.`;
+      : `Deterministic Aggregator Link: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Certified for ${officialStars} Stars.`;
   } else if (matchedHotel) {
     evidenceFinding = isInflated
       ? `Fuzzy Name Match: Linked to official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Certified for only ${officialStars} Stars. Marketing as ${claimedStars} Stars constitutes unlawful star inflation.`
-      : `Fuzzy Name Match: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Rating verified.`;
+      : `Fuzzy Name Match: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Certified for ${officialStars} Stars.`;
   } else {
     evidenceFinding = `Exhaustive Closed-Registry Exclusion: An exhaustive cross-reference across all 681 official 4★ and 5★ tourism accommodation certificates issued by VNAT nationwide confirms that this ${otaPlatform} profile ${otaId ? `(Hotel ID #${otaId})` : `("${propertyName}")`} has ZERO statutory accreditation. Because the universe of accredited luxury hotels is strictly limited to 681 nationwide, this listing is 100% UNACCREDITED.`;
   }
 
   return {
+    is_violation: true,
+    title: "DEMONSTRATION OF STATUTORY INFRACTION",
+    status_badge: isHostel ? "🚨 BLATANT HOSTEL FRAUD" : (isInflated ? "🟡 STATUTORY STAR INFLATION" : "🔴 UNACCREDITED HOTEL LISTING"),
     statute_monopoly: {
       law: "Luật Du lịch 2017 (Law No. 09/2017/QH14) - Điều 50, Khoản 3",
       rule: "Thẩm quyền công nhận hạng cơ sở lưu trú du lịch",
@@ -640,6 +841,10 @@ if (typeof module !== 'undefined' && module.exports) {
     parseOtaUrl,
     generatePlatformNotice,
     generateRefundDemandLetter,
-    generateDemonstrationOfLawBreaking
+    generateDemonstrationOfLawBreaking,
+    generateOtaLinks,
+    findVerifiedAlternatives,
+    triggerAiVerification,
+    AFFILIATE_CONFIG
   };
 }
