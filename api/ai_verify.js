@@ -36,97 +36,69 @@ function loadLog() {
 }
 
 function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
-  return new Promise((resolve, reject) => {
-    const apiKey = process.env.NOUS_API_KEY || process.env.DEEPSEEK_API_KEY || process.env.OPENROUTER_API_KEY;
-    const baseUrl = process.env.AI_INFERENCE_URL || 
-      (process.env.DEEPSEEK_API_KEY ? "https://api.deepseek.com/chat/completions" : "https://inference-api.nousresearch.com/v1/chat/completions");
-
-    if (!apiKey) {
-      // Return simulated deterministic statutory model response if no API key is set
-      return resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
-    }
+  return new Promise((resolve) => {
+    const tunnelUrl = process.env.HERMES_TUNNEL_URL || "https://204-168-160-204.sslip.io/api/verify";
 
     try {
-      const parsedUrl = new URL(baseUrl);
-      const candList = cityCandidates.map(c => `- ${c.name} (${c.english_name || ''}): ${c.address}`).join("\n");
+      const parsedUrl = new URL(tunnelUrl);
       const postData = JSON.stringify({
-        model: process.env.AI_MODEL_NAME || "nous-deepseek-flash-4.1",
-        messages: [
-          {
-            role: "system",
-            content: `You are TrueStars VN, the official statutory watchdog evaluating accommodation claims in Vietnam under Vietnam Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14) and national star criteria TCVN 4391:2015.
-Your task:
-1. Investigate whether the audited hotel could be one of the officially accredited hotels in this destination under a different commercial, franchise (e.g. Marriott, Melia, Accor, IHG), or historical name.
-2. If it is NOT an official hotel, state clearly: "This is not a [claimed_stars]-star hotel. It is not in the Vietnamese government registry, and has been deceptively advertised by [platform]." and explicitly recommend seeking a refund from [platform] under Vietnamese law (Article 9, Clause 8 of Law on Tourism 2017 & Decree 85/2021/NĐ-CP).
-Output strictly in JSON format with keys:
-- verdict: ("VERIFIED_COMPLIANT", "PROBABLE_STAR_INFLATION", or "UNACCREDITED_DECEPTIVE_LISTING")
-- confidence: (float between 0.0 and 1.0)
-- concise_summary: (string with the direct, authoritative verdict and refund recommendation)
-- refund_advisory: (string explaining legal grounds for refund from platform)
-- investigation_findings: (string explaining alias/rebranding investigation against city candidates)
-- statutory_infractions: (array of strings citing relevant Vietnamese law)
-- tcvn_deficiencies: (array of strings explaining missing structural criteria)
-- risk_advisory: (string summary warning for booking travelers)
-- reasoning: (string paragraph explaining the technical legal analysis)`
-          },
-          {
-            role: "user",
-            content: `Audited Hotel: ${promptData.name}
-Claimed Stars: ${promptData.claimed_stars}★
-Platform: ${promptData.platform || "Direct Input"}
-URL: ${promptData.url || "N/A"}
-Location: ${promptData.city || "Vietnam"}
-Has Dorm / Shared Bunk Beds: ${promptData.has_dorm ? "YES" : "NO"}
-
-Officially Certified Hotels in this Destination (${totalCityCount > 0 ? totalCityCount + ' in ' + promptData.city : totalNationalCount + ' nationwide in Vietnam'}):
-${candList || "Auditing against national closed registry of " + totalNationalCount + " accredited properties."}`
-          }
-        ],
-        temperature: 0.1,
-        response_format: { type: "json_object" }
+        name: promptData.name,
+        claimed_stars: promptData.claimed_stars,
+        platform: promptData.platform || "Direct Input",
+        url: promptData.url || "",
+        city: promptData.city || "Vietnam",
+        has_dorm: Boolean(promptData.has_dorm),
+        candidates: cityCandidates
       });
 
       const req = https.request({
         hostname: parsedUrl.hostname,
-        path: parsedUrl.pathname + parsedUrl.search,
+        port: parsedUrl.port || 443,
+        path: parsedUrl.pathname + (parsedUrl.search || ''),
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
           'Content-Length': Buffer.byteLength(postData)
         },
-        timeout: 10000
+        timeout: 30000
       }, (res) => {
         let body = '';
         res.on('data', chunk => body += chunk);
         res.on('end', () => {
           try {
-            const parsed = JSON.parse(body);
-            const content = parsed.choices?.[0]?.message?.content;
-            if (content) {
-              const result = JSON.parse(content);
-              resolve(result);
-            } else {
-              resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
+            if (res.statusCode === 200) {
+              const parsed = JSON.parse(body);
+              return resolve(parsed);
             }
+            console.error(`Hermes VPS returned status ${res.statusCode}: ${body}`);
+            resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
           } catch (e) {
+            console.error("Failed to parse Hermes response:", e);
             resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
           }
         });
       });
 
-      req.on('error', () => resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount)));
-      req.on('timeout', () => {
-        req.destroy();
+      req.on('error', (err) => {
+        console.error("Hermes tunnel request error:", err);
         resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
       });
+
+      req.on('timeout', () => {
+        req.destroy();
+        console.error("Hermes tunnel request timed out");
+        resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
+      });
+
       req.write(postData);
       req.end();
     } catch (err) {
+      console.error("Error setting up Hermes request:", err);
       resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
     }
   });
 }
+
 
 function generateDeterministicAiAnalysis(data, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
   const claimed = parseInt(data.claimed_stars || 5, 10);
@@ -346,7 +318,7 @@ module.exports = async (req, res) => {
       url: url,
       city: city,
       verified_at: new Date().toISOString(),
-      model: "nous-deepseek-flash-4.1",
+      model: aiAnalysis.model || "nous-deepseek-flash-4.1 (Hermes VPS)",
       verdict: aiAnalysis.verdict,
       confidence: aiAnalysis.confidence,
       concise_summary: aiAnalysis.concise_summary,
