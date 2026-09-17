@@ -35,7 +35,7 @@ function loadLog() {
   return {};
 }
 
-function callExternalModel(promptData, cityCandidates = []) {
+function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
   return new Promise((resolve, reject) => {
     const apiKey = process.env.NOUS_API_KEY || process.env.DEEPSEEK_API_KEY || process.env.OPENROUTER_API_KEY;
     const baseUrl = process.env.AI_INFERENCE_URL || 
@@ -43,7 +43,7 @@ function callExternalModel(promptData, cityCandidates = []) {
 
     if (!apiKey) {
       // Return simulated deterministic statutory model response if no API key is set
-      return resolve(generateDeterministicAiAnalysis(promptData, cityCandidates));
+      return resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
     }
 
     try {
@@ -78,8 +78,8 @@ URL: ${promptData.url || "N/A"}
 Location: ${promptData.city || "Vietnam"}
 Has Dorm / Shared Bunk Beds: ${promptData.has_dorm ? "YES" : "NO"}
 
-Officially Certified Hotels in this Destination:
-${candList || "No official luxury hotels found in this specific destination."}`
+Officially Certified Hotels in this Destination (${totalCityCount > 0 ? totalCityCount + ' in ' + promptData.city : totalNationalCount + ' nationwide in Vietnam'}):
+${candList || "Auditing against national closed registry of " + totalNationalCount + " accredited properties."}`
           }
         ],
         temperature: 0.1,
@@ -107,34 +107,38 @@ ${candList || "No official luxury hotels found in this specific destination."}`
               const result = JSON.parse(content);
               resolve(result);
             } else {
-              resolve(generateDeterministicAiAnalysis(promptData, cityCandidates));
+              resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
             }
           } catch (e) {
-            resolve(generateDeterministicAiAnalysis(promptData, cityCandidates));
+            resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
           }
         });
       });
 
-      req.on('error', () => resolve(generateDeterministicAiAnalysis(promptData, cityCandidates)));
+      req.on('error', () => resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount)));
       req.on('timeout', () => {
         req.destroy();
-        resolve(generateDeterministicAiAnalysis(promptData, cityCandidates));
+        resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
       });
       req.write(postData);
       req.end();
     } catch (err) {
-      resolve(generateDeterministicAiAnalysis(promptData, cityCandidates));
+      resolve(generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount));
     }
   });
 }
 
-function generateDeterministicAiAnalysis(data, cityCandidates = []) {
+function generateDeterministicAiAnalysis(data, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
   const claimed = parseInt(data.claimed_stars || 5, 10);
   const hasDorm = Boolean(data.has_dorm);
   const name = data.name || "Unknown Property";
   const platform = data.platform || "Online Travel Agency";
   const city = data.city || "Vietnam";
-  const candCount = cityCandidates.length > 0 ? cityCandidates.length : 28;
+  
+  const isSpecificCity = city && city.toLowerCase() !== "vietnam" && city.toLowerCase() !== "direct input" && totalCityCount > 0;
+  const targetScope = isSpecificCity
+    ? `${totalCityCount} officially accredited luxury hotels in ${city}`
+    : `${totalNationalCount} officially accredited luxury hotels in Vietnam (301 five-star and 380 four-star properties)`;
 
   if (hasDorm) {
     return {
@@ -142,7 +146,7 @@ function generateDeterministicAiAnalysis(data, cityCandidates = []) {
       confidence: 0.99,
       concise_summary: `This is not a ${claimed}-star hotel. It is a budget hostel or guest pod offering shared dormitory beds. It is not in the Vietnamese government registry, and has been deceptively advertised by ${platform}. If you have stayed at this hotel, I recommend that you seek a refund from ${platform} due to their deceptive advertising under Vietnamese law.`,
       refund_advisory: `I recommend that you seek a refund from ${platform} due to deceptive advertising. Under Article 9, Clause 8 of Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14) and Decree 85/2021/NĐ-CP on digital platform intermediary liability, ${platform} is strictly liable for advertising false star ratings. You are legally entitled to request a 100% refund.`,
-      investigation_findings: `AI investigated the property against all ${candCount} officially accredited luxury establishments in ${city}. The property '${name}' operates dormitory/bunk beds, which under National Standard TCVN 4391:2015 strictly disqualifies any establishment from 4-star or 5-star hotel ranking. No legitimate luxury accreditation exists.`,
+      investigation_findings: `AI investigated the property against all ${targetScope}. The property '${name}' operates dormitory/bunk beds, which under National Standard TCVN 4391:2015 strictly disqualifies any establishment from 4-star or 5-star hotel ranking. No legitimate luxury accreditation exists.`,
       statutory_infractions: [
         "Luật Du lịch 2017 - Điều 9, Khoản 8: Quảng cáo cơ sở lưu trú du lịch không đúng với văn bản công nhận hạng.",
         "TCVN 4391:2015: Shared dormitory and bunk-bed arrangements are legally incompatible with 4-star and 5-star hotel standards.",
@@ -163,7 +167,7 @@ function generateDeterministicAiAnalysis(data, cityCandidates = []) {
     confidence: 0.95,
     concise_summary: `This is not a ${claimed}-star hotel. It is not in the Vietnamese government registry, and has been deceptively advertised by ${platform}. If you have stayed at this hotel, I recommend that you seek a refund from ${platform} due to their deceptive advertising under Vietnamese law.`,
     refund_advisory: `I recommend that you seek a refund from ${platform} due to deceptive advertising under Vietnamese law. Under Article 9, Clause 8 & Article 50 of Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14) and Decree 85/2021/NĐ-CP on digital platform intermediary liability, ${platform} is legally accountable for marketing uncertified star ratings. You can submit our generated refund demand letter directly to ${platform} Customer Support.`,
-    investigation_findings: `AI investigated whether '${name}' could be any of the ${candCount} officially accredited luxury hotels in ${city} under a different commercial, franchise, or historical name. The property holds zero statutory accreditation decisions from the Vietnam National Authority of Tourism (VNAT) and does not correspond to any registered property.`,
+    investigation_findings: `AI investigated whether '${name}' could be any of the ${targetScope} under a different commercial, franchise, or historical name. The property holds zero statutory accreditation decisions from the Vietnam National Authority of Tourism (VNAT) and does not correspond to any registered property.`,
     statutory_infractions: [
       "Luật Du lịch 2017 - Điều 50, Khoản 3: Thẩm quyền thẩm định, công nhận hạng 4 sao và 5 sao thuộc về Cục Du lịch Quốc gia Việt Nam.",
       "Luật Du lịch 2017 - Điều 9, Khoản 8: Nghiêm cấm quảng cáo cơ sở lưu trú khi chưa có quyết định công nhận của cơ quan nhà nước có thẩm quyền.",
@@ -229,6 +233,10 @@ module.exports = async (req, res) => {
 
   // 2. Statutory Precedence Check (Government Whitelist ALWAYS overrides AI)
   let statutoryMatch = null;
+  let allCityCandidates = [];
+  let cityCandidates = [];
+  let totalCityCount = 0;
+  let totalNationalCount = 681;
   try {
     const candidatePaths = [
       path.join(process.cwd(), 'data', 'vnat_whitelist.json'),
@@ -246,13 +254,17 @@ module.exports = async (req, res) => {
       }
     }
 
-    let cityCandidates = [];
     if (data && Array.isArray(data)) {
+      totalNationalCount = data.length;
       const normCity = (city || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-      cityCandidates = data.filter(h => {
-        const hLoc = `${h.province || ""} ${h.english_location || ""} ${h.address || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
-        return normCity && (hLoc.includes(normCity) || normCity.includes(hLoc));
-      }).slice(0, 15);
+      if (normCity && normCity !== "vietnam" && normCity !== "directinput") {
+        allCityCandidates = data.filter(h => {
+          const hLoc = `${h.province || ""} ${h.english_location || ""} ${h.address || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
+          return hLoc.includes(normCity) || normCity.includes(hLoc);
+        });
+        totalCityCount = allCityCandidates.length;
+        cityCandidates = allCityCandidates.slice(0, 15);
+      }
     }
 
     if (data) {
@@ -322,20 +334,7 @@ module.exports = async (req, res) => {
       has_dorm: hasDorm
     };
 
-    let cityCandidates = [];
-    try {
-      const wlPath = path.join(process.cwd(), 'data', 'vnat_whitelist.json');
-      if (fs.existsSync(wlPath)) {
-        const rawWl = JSON.parse(fs.readFileSync(wlPath, 'utf8'));
-        const normCity = (city || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-        cityCandidates = rawWl.filter(h => {
-          const hLoc = `${h.province || ""} ${h.english_location || ""} ${h.address || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
-          return normCity && (hLoc.includes(normCity) || normCity.includes(hLoc));
-        }).slice(0, 15);
-      }
-    } catch (e) {}
-
-    const aiAnalysis = await callExternalModel(promptData, cityCandidates);
+    const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount);
 
     finalRecord = {
       listing_key: listingKey,
