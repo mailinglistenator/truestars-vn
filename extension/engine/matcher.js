@@ -607,7 +607,7 @@ function generateOtaLinks({ name, city = "", matchedHotel = null, originalUrl = 
   const targetCity = cleanCity || city || "Vietnam";
   const searchQuery = encodeURIComponent(`${targetName} ${targetCity}`.trim());
 
-  let agodaUrl = `https://www.agoda.com/partners/partnersearch.aspx?cid=${AFFILIATE_CONFIG.agoda_cid}&hl=en-us&pcs=1&text=${searchQuery}`;
+  let agodaUrl = `https://www.google.com/search?q=site%3Aagoda.com+${searchQuery}`;
   let bookingUrl = `https://www.booking.com/searchresults.html?ss=${searchQuery}&aid=${AFFILIATE_CONFIG.booking_aid}`;
   let tripUrl = `https://www.trip.com/hotels/list?keyword=${searchQuery}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
@@ -661,19 +661,27 @@ function findVerifiedAlternatives(province = "", hotelsList = []) {
   }
 
   return candidates.slice(0, 4).map(h => {
-    const q = encodeURIComponent(`${h.name} ${h.province}`);
+    const engName = h.english_name || removeAccents(h.name).replace(/^(khach san|khu nghi duong|can ho du lich|biet thu)\s+/gi, "").trim();
+    const engProv = h.english_location || removeAccents(h.province).replace(/^(thanh pho|tinh)\s+/gi, "").trim();
+    const q = encodeURIComponent(`${engName} ${engProv}`.trim());
+    const agodaUrl = (h.ota_links && h.ota_links.agoda) ? h.ota_links.agoda.url : `https://www.google.com/search?q=site%3Aagoda.com+${q}`;
+    const bookingUrl = (h.ota_links && h.ota_links.booking) ? h.ota_links.booking.url : `https://www.booking.com/searchresults.html?ss=${q}&aid=${AFFILIATE_CONFIG.booking_aid}`;
+    const tripUrl = (h.ota_links && h.ota_links.trip) ? h.ota_links.trip.url : `https://www.trip.com/hotels/list?keyword=${q}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`;
+    const mapsUrl = (h.ota_links && h.ota_links.google_maps) ? h.ota_links.google_maps.url : `https://www.google.com/maps/search/?api=1&query=${q}`;
+
     return {
       item_id: h.item_id,
-      name: h.name,
+      name: engName,
+      official_name: h.name,
       stars: h.stars,
-      province: h.province,
+      province: engProv,
       address: h.address,
       room_count: h.room_count,
       decision_code: h.decision_code,
-      agoda_url: `https://www.agoda.com/partners/partnersearch.aspx?cid=${AFFILIATE_CONFIG.agoda_cid}&hl=en-us&pcs=1&text=${q}`,
-      booking_url: `https://www.booking.com/searchresults.html?ss=${q}&aid=${AFFILIATE_CONFIG.booking_aid}`,
-      trip_url: `https://www.trip.com/hotels/list?keyword=${q}&Allianceid=${AFFILIATE_CONFIG.trip_alliance_id}&SID=${AFFILIATE_CONFIG.trip_sid}`,
-      maps_url: `https://www.google.com/maps/search/?api=1&query=${q}`
+      agoda_url: agodaUrl,
+      booking_url: bookingUrl,
+      trip_url: tripUrl,
+      maps_url: mapsUrl
     };
   });
 }

@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "truestars-vn",
   "cleanUrls": true,
   "outputDirectory": "public",
   "headers": [
@@ -18,11 +17,11 @@
       ]
     },
     {
-      "source": "/vnat_whitelist.json",
+      "source": "/(.*).json",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=86400, stale-while-revalidate=604800"
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     }

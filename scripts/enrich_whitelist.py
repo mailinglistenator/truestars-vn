@@ -294,44 +294,32 @@ def pick_best_slug(slugs, name):
     ))
     return pool[0]
 
-def generate_ota_links_for_hotel(h, eng_name, eng_loc):
+def generate_ota_links_for_hotel(h, eng_name, eng_loc, is_curated=False, curated_entry=None):
     cid = AFFILIATE_CONFIG["agoda_cid"]
     aid = AFFILIATE_CONFIG["booking_aid"]
     trip_aid = AFFILIATE_CONFIG["trip_alliance_id"]
     trip_sid = AFFILIATE_CONFIG["trip_sid"]
 
-    ota = h.get("ota_identities", {})
-    agoda_ids = ota.get("agoda_ids", [])
-    agoda_slugs = ota.get("agoda_slugs", [])
-    booking_slugs = ota.get("booking_slugs", [])
-    trip_ids = ota.get("trip_ids", [])
-    trip_slugs = ota.get("trip_slugs", [])
-
-    best_booking_slug = pick_best_slug(booking_slugs, eng_name)
-    best_agoda_slug = pick_best_slug(agoda_slugs, eng_name)
-    best_trip_slug = pick_best_slug(trip_slugs, eng_name)
-
     q = urllib.parse.quote_plus(f"{eng_name} {eng_loc}".strip())
 
     # Agoda URL
-    if agoda_ids and agoda_ids[0]:
-        agoda_url = f"https://www.agoda.com/partners/partnersearch.aspx?cid={cid}&hid={agoda_ids[0]}"
-    elif best_agoda_slug:
-        agoda_url = f"https://www.agoda.com/{best_agoda_slug}/hotel/vietnam.html?cid={cid}"
+    if is_curated and curated_entry and curated_entry.get("agoda_ids"):
+        agoda_url = f"https://www.agoda.com/partners/partnersearch.aspx?cid={cid}&hl=en-us&pcs=1&hid={curated_entry['agoda_ids'][0]}"
+    elif is_curated and curated_entry and curated_entry.get("agoda_slugs"):
+        best_slug = curated_entry["agoda_slugs"][0]
+        agoda_url = f"https://www.agoda.com/{best_slug}/hotel/vietnam.html?cid={cid}"
     else:
-        agoda_url = f"https://www.agoda.com/partners/partnersearch.aspx?cid={cid}&hl=en-us&pcs=1&text={q}"
+        agoda_url = f"https://www.google.com/search?q=site%3Aagoda.com+{q}"
 
     # Booking.com URL
-    if best_booking_slug:
-        booking_url = f"https://www.booking.com/hotel/vn/{best_booking_slug}.html?aid={aid}"
+    if is_curated and curated_entry and curated_entry.get("booking_slugs"):
+        booking_url = f"https://www.booking.com/hotel/vn/{curated_entry['booking_slugs'][0]}.html?aid={aid}"
     else:
         booking_url = f"https://www.booking.com/searchresults.html?ss={q}&aid={aid}"
 
     # Trip.com URL
-    if trip_ids and trip_ids[0]:
-        trip_url = f"https://www.trip.com/hotels/detail/?hotelId={trip_ids[0]}&Allianceid={trip_aid}&SID={trip_sid}"
-    elif best_trip_slug:
-        trip_url = f"https://www.trip.com/hotels/{best_trip_slug}-hotel-detail/?Allianceid={trip_aid}&SID={trip_sid}"
+    if is_curated and curated_entry and curated_entry.get("trip_ids"):
+        trip_url = f"https://www.trip.com/hotels/detail/?hotelId={curated_entry['trip_ids'][0]}&Allianceid={trip_aid}&SID={trip_sid}"
     else:
         trip_url = f"https://www.trip.com/hotels/list?keyword={q}&Allianceid={trip_aid}&SID={trip_sid}"
 
@@ -377,9 +365,10 @@ def main():
 
     for h in whitelist:
         item_id = str(h.get("item_id", ""))
-        # Merge curated OTA identities if present
-        if item_id in curated:
-            c = curated[item_id]
+        is_curated = item_id in curated
+        curated_entry = curated.get(item_id)
+        if is_curated:
+            c = curated_entry
             if "ota_identities" not in h or not h["ota_identities"]:
                 h["ota_identities"] = {}
             for k, vals in c.items():
@@ -389,7 +378,7 @@ def main():
 
         eng_loc = get_english_location(h)
         eng_name = generate_english_name(h)
-        ota_links = generate_ota_links_for_hotel(h, eng_name, eng_loc)
+        ota_links = generate_ota_links_for_hotel(h, eng_name, eng_loc, is_curated=is_curated, curated_entry=curated_entry)
 
         h["english_name"] = eng_name
         h["english_location"] = eng_loc

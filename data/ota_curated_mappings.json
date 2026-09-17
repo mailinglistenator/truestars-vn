@@ -1,4 +1,23 @@
 {
+  "2010": {
+    "trip_ids": [
+      "10041235",
+      "648931"
+    ],
+    "trip_slugs": [
+      "danang-marriott-resort-spa-non-nuoc-beach-villas"
+    ],
+    "agoda_slugs": [
+      "vinpearl-resort-spa-da-nang-h8674427",
+      "danang-marriott-resort-spa-non-nuoc-beach-villas"
+    ],
+    "agoda_ids": [
+      "8674427"
+    ],
+    "booking_slugs": [
+      "danang-marriott-resort-spa-non-nuoc-beach-villas"
+    ]
+  },
   "494": {
     "trip_ids": [
       "678508",
