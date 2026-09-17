@@ -88,7 +88,7 @@ function requestEndpoint(urlStr, postData, timeoutMs = 35000) {
   });
 }
 
-async function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681, statutoryMatch = null) {
+async function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681) {
   const postData = JSON.stringify({
     name: promptData.name,
     claimed_stars: promptData.claimed_stars,
@@ -96,8 +96,7 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
     url: promptData.url || "",
     city: promptData.city || "Vietnam",
     has_dorm: Boolean(promptData.has_dorm),
-    candidates: cityCandidates,
-    statutory_match: statutoryMatch
+    candidates: cityCandidates
   });
 
   const endpoints = [
@@ -107,101 +106,29 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
   ].filter(Boolean);
 
   try {
-    const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 28000)));
+    const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 35000)));
     if (result && result.verdict) {
-      // Statutory Supremacy Guard: State-issued VNAT accreditation strictly supersedes model hallucination
-      if (statutoryMatch && statutoryMatch.verdict === "VERIFIED_LEGITIMATE") {
-        if (result.verdict !== "VERIFIED_COMPLIANT" && result.verdict !== "VERIFIED_LEGITIMATE") {
-          console.warn("External model returned non-compliant verdict for officially accredited hotel. Overriding with statutory record.");
-          return generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount, statutoryMatch);
-        }
-      }
       return result;
     }
   } catch (err) {
     console.warn("All tunnel endpoints failed or timed out:", err);
   }
 
-  return generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount, statutoryMatch);
-}
-
-
-function generateDeterministicAiAnalysis(data, cityCandidates = [], totalCityCount = 0, totalNationalCount = 681, statutoryMatch = null) {
-  const claimed = parseInt(data.claimed_stars || 5, 10);
-  const hasDorm = Boolean(data.has_dorm);
-  const name = data.name || "Unknown Property";
-  const platform = data.platform || "Online Travel Agency";
-  const city = data.city || "Vietnam";
-  
-  // STATUTORY SUPREMACY: If the property's identity is authenticated in the official government registry,
-  // it is legally accredited under Article 50 of Vietnam's Law on Tourism 2017.
-  if (statutoryMatch && statutoryMatch.verdict === "VERIFIED_LEGITIMATE") {
-    const matched = statutoryMatch.matched_hotel || {};
-    const certCode = matched.item_id || matched.decision_code || "VNAT-AUTH";
-    const stars = matched.stars || 5;
-    const addr = matched.address || `${city}, Vietnam`;
-    const officialName = matched.name || name;
-
-    return {
-      verdict: "VERIFIED_COMPLIANT",
-      confidence: 1.0,
-      concise_summary: `This is an officially accredited ${stars}-star hotel. It is certified in the Vietnamese government registry under "${officialName}" (Accreditation #${certCode}), and is commercially marketed on ${platform} as "${name}". Its ${stars}-star rating is legally authentic under Vietnamese law.`,
-      refund_advisory: `No refund action warranted under Vietnamese law. Property possesses valid statutory accreditation (Decision #${matched.decision_code || certCode}) issued by the Vietnam National Authority of Tourism (VNAT). Commercial marketing on ${platform} reflects an authorized operational management or franchise rebrand.`,
-      investigation_findings: `AI investigated the official VNAT registry and confirmed that this listing at ${addr} corresponds to official Accreditation #${certCode}. The commercial branding on ${platform} represents an authenticated international management contract or trade name for the certified property.`,
-      statutory_infractions: [],
-      tcvn_deficiencies: [],
-      risk_advisory: `NO RISK: Property is fully accredited by VNAT as a ${stars}-star luxury establishment.`,
-      reasoning: `Identity authenticated against official VNAT Accreditation #${certCode} ("${officialName}") at ${addr}. Certified as ${stars} Stars under Article 50 of Vietnam's Law on Tourism 2017.`
-    };
-  }
-
-  const isSpecificCity = city && city.toLowerCase() !== "vietnam" && city.toLowerCase() !== "direct input" && totalCityCount > 0;
-  const targetScope = isSpecificCity
-    ? `${totalCityCount} officially accredited luxury hotels in ${city}`
-    : `${totalNationalCount} officially accredited luxury hotels in Vietnam (301 five-star and 380 four-star properties)`;
-
-  if (hasDorm) {
-    return {
-      verdict: "UNACCREDITED_DECEPTIVE_LISTING",
-      confidence: 0.99,
-      concise_summary: `This is not a ${claimed}-star hotel. It is a budget hostel or guest pod offering shared dormitory beds. It is not in the Vietnamese government registry, and has been deceptively advertised by ${platform}. If you have stayed at this hotel, I recommend that you seek a refund from ${platform} due to their deceptive advertising under Vietnamese law.`,
-      refund_advisory: `I recommend that you seek a refund from ${platform} due to deceptive advertising. Under Article 9, Clause 8 of Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14) and Decree 85/2021/NĐ-CP on digital platform intermediary liability, ${platform} is strictly liable for advertising false star ratings. You are legally entitled to request a 100% refund.`,
-      investigation_findings: `AI investigated the property against all ${targetScope}. The property '${name}' operates dormitory/bunk beds, which under National Standard TCVN 4391:2015 strictly disqualifies any establishment from 4-star or 5-star hotel ranking. No legitimate luxury accreditation exists.`,
-      statutory_infractions: [
-        "Luật Du lịch 2017 - Điều 9, Khoản 8: Quảng cáo cơ sở lưu trú du lịch không đúng với văn bản công nhận hạng.",
-        "TCVN 4391:2015: Shared dormitory and bunk-bed arrangements are legally incompatible with 4-star and 5-star hotel standards.",
-        "Luật Bảo vệ quyền lợi người tiêu dùng 2023 - Điều 10: Hành vi lừa dối người tiêu dùng về chất lượng dịch vụ."
-      ],
-      tcvn_deficiencies: [
-        "Offers shared dormitory / bunk beds; TCVN 4391:2015 requires 100% private soundproofed guest rooms.",
-        "Fails minimum physical capacity standards (requires min. 80 rooms for 4★, 100 rooms for 5★).",
-        "Lacks mandatory luxury infrastructure (no dedicated service elevator, 24/7 dining, or certified English staff)."
-      ],
-      risk_advisory: `CRITICAL RISK: Traveler is booking a budget hostel or guest pod while paying 4-star/5-star rates under false ${platform} marketing.`,
-      reasoning: `Technical legal audit confirms property '${name}' in ${city} advertises ${claimed} stars on ${platform} while offering shared dormitory accommodations. Under TCVN 4391:2015, dormitory facilities automatically disqualify any establishment from luxury hotel ranking. This constitutes a direct deceptive representation under Article 9 of Vietnam's Law on Tourism 2017.`
-    };
-  }
-
+  // Honest failure: do NOT fabricate a fake AI audit with canned accusations if LLM was unreachable
   return {
-    verdict: "UNACCREDITED_DECEPTIVE_LISTING",
-    confidence: 0.95,
-    concise_summary: `This is not a ${claimed}-star hotel. It is not in the Vietnamese government registry, and has been deceptively advertised by ${platform}. If you have stayed at this hotel, I recommend that you seek a refund from ${platform} due to their deceptive advertising under Vietnamese law.`,
-    refund_advisory: `I recommend that you seek a refund from ${platform} due to deceptive advertising under Vietnamese law. Under Article 9, Clause 8 & Article 50 of Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14) and Decree 85/2021/NĐ-CP on digital platform intermediary liability, ${platform} is legally accountable for marketing uncertified star ratings. You can submit our generated refund demand letter directly to ${platform} Customer Support.`,
-    investigation_findings: `AI investigated whether '${name}' could be any of the ${targetScope} under a different commercial, franchise, or historical name. The property holds zero statutory accreditation decisions from the Vietnam National Authority of Tourism (VNAT) and does not correspond to any registered property.`,
-    statutory_infractions: [
-      "Luật Du lịch 2017 - Điều 50, Khoản 3: Thẩm quyền thẩm định, công nhận hạng 4 sao và 5 sao thuộc về Cục Du lịch Quốc gia Việt Nam.",
-      "Luật Du lịch 2017 - Điều 9, Khoản 8: Nghiêm cấm quảng cáo cơ sở lưu trú khi chưa có quyết định công nhận của cơ quan nhà nước có thẩm quyền.",
-      "Nghị định 45/2019/NĐ-CP (sửa đổi NĐ 129/2021/NĐ-CP): Xử phạt hành chính và buộc tháo dỡ biển hiệu, biểu trưng sao trái phép."
-    ],
-    tcvn_deficiencies: [
-      "Missing official VNAT statutory classification decision in national database (csdl.vietnamtourism.gov.vn).",
-      "Property appears to be an unaccredited private hotel, serviced apartment, or villa marketing self-proclaimed stars.",
-      "Absence of state-audited luxury compliance for safety, backup emergency generator, and service protocols."
-    ],
-    risk_advisory: `HIGH RISK: Property claims ${claimed} stars on ${platform} but does NOT hold statutory accreditation in the official 681-entity national registry. Amenities and safety standards are unverified.`,
-    reasoning: `Statutory verification audit of '${name}' (${city}) confirms absence from the closed registry of 681 certified luxury hotels in Vietnam. Display of ${claimed} stars on ${platform} represents an unauthorized commercial claim violating the state statutory monopoly on star titles under Article 50 of the Law on Tourism 2017.`
+    verdict: "AI_SERVICE_UNAVAILABLE",
+    confidence: 0,
+    concise_summary: "Live statutory AI audit service on Hermes VPS is temporarily unreachable.",
+    refund_advisory: "Live statutory AI verification could not be completed. Please refer to the official VNAT registry lookup.",
+    investigation_findings: "The autonomous LLM reasoning node could not be contacted over encrypted tunnels.",
+    statutory_infractions: [],
+    tcvn_deficiencies: [],
+    risk_advisory: "AI service connection error.",
+    reasoning: "Encrypted connection to Hermes VPS timed out or failed. No AI inference was performed."
   };
 }
+
+
 
 module.exports = async (req, res) => {
   // CORS & Security Headers
@@ -331,14 +258,16 @@ module.exports = async (req, res) => {
           province: city,
           originalUrl: url
         });
-        if (classification.verdict === "VERIFIED_LEGITIMATE") {
-          statutoryMatch = classification;
-          if (statutoryMatch.matched_hotel) {
-            if (!city || city.toLowerCase() === "vietnam") {
-              city = statutoryMatch.matched_hotel.province || city;
-            }
-            // Prioritize the matched hotel candidate at the very top for Hermes
-            cityCandidates = [statutoryMatch.matched_hotel, ...cityCandidates.filter(c => c.item_id !== statutoryMatch.matched_hotel.item_id)];
+        if (classification && classification.matched_hotel && (!city || city.toLowerCase() === "vietnam")) {
+          city = classification.matched_hotel.province || city;
+          const normCity = city.toLowerCase().replace(/[^a-z0-9]/g, "");
+          if (normCity) {
+            allCityCandidates = data.filter(h => {
+              const hLoc = `${h.province || ""} ${h.english_location || ""} ${h.address || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
+              return hLoc.includes(normCity) || normCity.includes(hLoc);
+            });
+            totalCityCount = allCityCandidates.length;
+            cityCandidates = allCityCandidates.slice(0, 30);
           }
         }
       }
@@ -357,7 +286,7 @@ module.exports = async (req, res) => {
     has_dorm: hasDorm
   };
 
-  const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount, statutoryMatch);
+  const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount);
   const latencyMs = Date.now() - startMs;
 
   const finalRecord = {
