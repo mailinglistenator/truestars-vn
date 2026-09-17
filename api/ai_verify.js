@@ -191,13 +191,13 @@ module.exports = async (req, res) => {
     return res.status(200).end();
   }
 
-  const query = req.method === 'POST' ? req.body : req.query;
-  const hotelName = (query.name || "").trim();
-  const platform = (query.platform || "Direct Input").trim();
-  const url = (query.url || "").trim();
-  const claimedStars = parseInt(query.claimed_stars || 5, 10);
-  const city = (query.city || "").trim();
-  const hasDorm = Boolean(query.has_dorm);
+  const query = req.method === 'POST' ? (req.body || {}) : req.query;
+  const hotelName = (query.name || query.hotelName || query.propertyName || query.property_name || query.hotel_name || "").trim();
+  const platform = (query.platform || query.ota_platform || "Direct Input").trim();
+  const url = (query.url || query.original_url || "").trim();
+  const claimedStars = parseInt(query.claimed_stars || query.claimedStars || 5, 10);
+  const city = (query.city || query.location || query.province || "").trim();
+  const hasDorm = Boolean(query.has_dorm || query.hasDorm);
 
   if (!hotelName && !url) {
     return res.status(400).json({ error: "Property name or URL is required." });

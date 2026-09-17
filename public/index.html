@@ -1226,7 +1226,7 @@
       statusTitle.textContent = "AI is gathering government records & aggregator database...";
 
       let auditRecord = aiLog[key];
-      if (!auditRecord) {
+      if (!auditRecord || !auditRecord.concise_summary) {
         try {
           const fetchPromise = fetch('/api/ai_verify', {
             method: 'POST',
