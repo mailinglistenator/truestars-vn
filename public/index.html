@@ -139,6 +139,11 @@
       font-size: 0.95rem;
       font-family: inherit;
     }
+    input[type="text"]::placeholder {
+      color: #64748b;
+      opacity: 0.85;
+      font-style: italic;
+    }
     input[type="text"]:focus, select:focus {
       outline: none;
       border-color: var(--primary);
@@ -750,19 +755,19 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
         <div>
           <label>Your Full Name</label>
-          <input type="text" id="ref-name" value="John Doe" oninput="updateRefundLetter()">
+          <input type="text" id="ref-name" placeholder="e.g. John Doe" value="" oninput="updateRefundLetter()">
         </div>
         <div>
           <label>Booking Reference #</label>
-          <input type="text" id="ref-booking-id" value="BK-98421092" oninput="updateRefundLetter()">
+          <input type="text" id="ref-booking-id" placeholder="e.g. BK-98421092" value="" oninput="updateRefundLetter()">
         </div>
         <div>
           <label>Dates of Reservation</label>
-          <input type="text" id="ref-dates" value="01 Oct 2026 - 08 Oct 2026" oninput="updateRefundLetter()">
+          <input type="text" id="ref-dates" placeholder="e.g. 01 Oct 2026 - 08 Oct 2026" value="" oninput="updateRefundLetter()">
         </div>
         <div>
           <label>Total Amount Paid</label>
-          <input type="text" id="ref-amount" value="$450.00 USD" oninput="updateRefundLetter()">
+          <input type="text" id="ref-amount" placeholder="e.g. $450.00 USD / 11,200,000 VND" value="" oninput="updateRefundLetter()">
         </div>
       </div>
 
@@ -1484,6 +1489,7 @@
     }
 
     function openRefundDemandModal() {
+      updateRefundLetter();
       document.getElementById('refund-modal').style.display = 'flex';
     }
 
@@ -1497,16 +1503,16 @@
 
     function updateRefundLetter() {
       if (!currentAudit) return;
-      const name = document.getElementById('ref-name').value || '[Your Name]';
-      const bId = document.getElementById('ref-booking-id').value || '[Booking ID]';
-      const dates = document.getElementById('ref-dates').value || '[Stay Dates]';
-      const amount = document.getElementById('ref-amount').value || '[$ Amount]';
+      const name = (document.getElementById('ref-name').value || '').trim();
+      const bId = (document.getElementById('ref-booking-id').value || '').trim();
+      const dates = (document.getElementById('ref-dates').value || '').trim();
+      const amount = (document.getElementById('ref-amount').value || '').trim();
 
-      let text = currentAudit.refund_demand_letter;
-      text = text.replace(/\[Insert Your Full Name\]/g, name);
-      text = text.replace(/\[Insert Booking Reference Number\]/g, bId);
-      text = text.replace(/\[Insert Check-In & Check-Out Dates\]/g, dates);
-      text = text.replace(/\[Insert Amount & Currency.*?\]/g, amount);
+      let text = currentAudit.refund_demand_letter || '';
+      text = text.replace(/\[Insert Your Full Name\]/g, name || '[Insert Your Full Name]');
+      text = text.replace(/\[Insert Booking Reference Number\]/g, bId || '[Insert Booking Reference Number]');
+      text = text.replace(/\[Insert Check-In & Check-Out Dates\]/g, dates || '[Insert Check-In & Check-Out Dates]');
+      text = text.replace(/\[Insert Amount & Currency.*?\]/g, amount || '[Insert Amount & Currency, e.g. $450.00 USD / 11,200,000 VND]');
 
       document.getElementById('refund-letter-text').textContent = text;
     }
