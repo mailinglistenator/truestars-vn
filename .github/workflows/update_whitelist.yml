@@ -1,0 +1,65 @@
+name: Autonomous VNAT Whitelist Refresh & Vercel Deploy
+
+on:
+  schedule:
+    # Runs every Sunday at 02:00 UTC (09:00 AM Indochina Time)
+    - cron: '0 2 * * 0'
+  workflow_dispatch: # Allows manual 1-click trigger from GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          pip install Pillow
+
+      - name: Run VNAT Ground Truth Crawler
+        run: |
+          python3 src/vnat_crawler.py
+
+      - name: Synchronize Data & Repackage Extension
+        run: |
+          cp data/vnat_whitelist.json public/vnat_whitelist.json
+          cp data/vnat_whitelist.json extension/data/vnat_whitelist.json
+          python3 scripts/package_extension.py
+
+      - name: Run Parity & Integrity Verification
+        run: |
+          python3 -m unittest tests/test_matcher.py
+          node tests/test_js_engine.js
+
+      - name: Commit and Push Changes (If Registry Updated)
+        id: git-check
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            git add data/ public/ extension/ dist/
+            git commit -m "Automated VNAT whitelist refresh & extension repackage [skip ci]"
+            git push origin master
+            echo "Updated database committed and pushed to master."
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected in official VNAT registry."
+          fi
+
+      - name: Deploy Fresh Registry to Vercel Production
+        if: steps.git-check.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npx vercel --prod --yes --token "$VERCEL_TOKEN"
+          echo "Production deployment on Vercel refreshed with latest VNAT data."
