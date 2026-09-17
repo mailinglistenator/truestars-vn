@@ -96,15 +96,13 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
     "https://204-168-160-204.sslip.io/api/verify"
   ].filter(Boolean);
 
-  for (const url of endpoints) {
-    try {
-      const result = await requestEndpoint(url, postData, 35000);
-      if (result && result.verdict) {
-        return result;
-      }
-    } catch (err) {
-      console.warn(`Tunnel endpoint ${url} failed: ${err.message}. Trying next endpoint...`);
+  try {
+    const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 28000)));
+    if (result && result.verdict) {
+      return result;
     }
+  } catch (err) {
+    console.warn("All tunnel endpoints failed or timed out:", err);
   }
 
   return generateDeterministicAiAnalysis(promptData, cityCandidates, totalCityCount, totalNationalCount);
