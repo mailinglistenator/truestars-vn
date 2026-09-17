@@ -112,6 +112,13 @@ function parseOtaUrl(rawInput) {
           }
         }
       }
+      const cityMatch = url.pathname.match(/\/hotel\/([^\/\.]+)/i);
+      if (cityMatch && !city) {
+        city = cityMatch[1].replace(/-vn$/i, "").replace(/[-_]/g, " ").trim();
+        if (city.toLowerCase().startsWith("ho chi")) {
+          city = "Ho Chi Minh City";
+        }
+      }
       otaId = url.searchParams.get("hotel_id") || "";
     } else if (host.includes("booking.com")) {
       platform = "Booking.com";
@@ -170,11 +177,18 @@ function parseOtaUrl(rawInput) {
       extractedName = `Unspecified ${platform} Listing`;
     }
 
+    if (city) {
+      city = decodeURIComponent(city)
+        .split(" ")
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    }
+
     return {
       isUrl: true,
       name: extractedName,
       platform: platform,
-      city: city ? decodeURIComponent(city) : "",
+      city: city || "",
       originalUrl: trimmed,
       otaId: otaId,
       otaSlug: otaSlug
@@ -301,27 +315,54 @@ class TrueStarsMatcher {
       }
     }
 
-    // 3. EVALUATE CLASSIFICATION & VERDICT
+    // 3. AUTO-DETECT CLAIMED STARS & DORM CRITERIA
+    let effectiveClaimedStars = parseInt(claimedStars, 10) || 0;
+    let effectiveHasDorm = Boolean(hasDorm);
+
+    const combinedText = `${name} ${originalUrl} ${otaSlug}`.toLowerCase();
+
+    // Auto-detect dormitory cues (hostel / dorm / bunk / pod / capsule / backpacker)
+    if (!effectiveHasDorm) {
+      if (/\b(hostel|dorm|dormitory|bunk|pod|capsule|backpacker|guesthouse)\b/i.test(combinedText)) {
+        effectiveHasDorm = true;
+      }
+    }
+
+    // Auto-detect star rating
+    if (effectiveClaimedStars === 0) {
+      if (/\b(5-star|5 star|5star|5\*|5sao|5 sao)\b/i.test(combinedText)) {
+        effectiveClaimedStars = 5;
+      } else if (/\b(4-star|4 star|4star|4\*|4sao|4 sao)\b/i.test(combinedText)) {
+        effectiveClaimedStars = 4;
+      } else if (matchedHotel) {
+        // Matched certified hotel: default to its official rating
+        effectiveClaimedStars = matchedHotel.stars;
+      } else {
+        // Unaccredited commercial hotel/villa audited by consumer: default to 5 stars
+        effectiveClaimedStars = 5;
+      }
+    }
+
     const officialStars = matchedHotel ? matchedHotel.stars : 0;
-    const isHighRank = claimedStars >= 4;
+    const isHighRank = effectiveClaimedStars >= 4;
 
     let verdict = "UNACCREDITED_HOTEL";
     let severity = "HIGH";
     let summary = "";
     const violations = [];
 
-    if (matchedHotel && officialStars === claimedStars && !hasDorm) {
+    if (matchedHotel && officialStars >= effectiveClaimedStars && !effectiveHasDorm) {
       verdict = "VERIFIED_LEGITIMATE";
       severity = "NONE";
-      summary = `Verified Legitimate: This property's identity is authenticated against official VNAT 5-Star Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}").`;
-    } else if (hasDorm && isHighRank) {
+      summary = `Verified Legitimate: This property's identity is authenticated against official VNAT ${officialStars}-Star Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}").`;
+    } else if (effectiveHasDorm && isHighRank) {
       verdict = "BLATANT_HOSTEL_FRAUD";
       severity = "CRITICAL";
-      summary = `Backpacker hostel or budget lodging falsely marketing as ${claimedStars} stars. Offers dormitory/bunk beds. TCVN 4391:2015 strictly prohibits dorms and requires minimum 80-100 private guest rooms.`;
+      summary = `Backpacker hostel or budget lodging falsely marketing as ${effectiveClaimedStars} stars. Offers dormitory/bunk beds. TCVN 4391:2015 strictly prohibits dorms and requires minimum 80-100 private guest rooms.`;
       violations.push({
         law: "Luật Du lịch 2017 - Điều 9, Khoản 8",
         statute_title: "Các hành vi bị nghiêm cấm trong hoạt động du lịch",
-        application: `Displaying ${claimedStars} stars without VNAT statutory accreditation.`
+        application: `Displaying ${effectiveClaimedStars} stars without VNAT statutory accreditation.`
       });
       violations.push({
         law: "TCVN 4391:2015 - Tiêu chuẩn Xếp hạng Khách sạn",
@@ -333,23 +374,23 @@ class TrueStarsMatcher {
         statute_title: "Hành vi lừa dối người tiêu dùng & Trách nhiệm nền tảng số trung gian",
         application: `Platform renders gold star iconography misleading guests on safety and luxury standards.`
       });
-    } else if (matchedHotel && officialStars < claimedStars) {
+    } else if (matchedHotel && officialStars < effectiveClaimedStars) {
       verdict = "STAR_INFLATION";
       severity = "HIGH";
-      summary = `Statutory Star Inflation: This property's identity maps to VNAT Accreditation #${matchedHotel.item_id}, which is officially certified for only ${officialStars} Stars, but marketed on ${otaPlatform} as ${claimedStars} Stars (+${claimedStars - officialStars}★).`;
+      summary = `Statutory Star Inflation: This property's identity maps to VNAT Accreditation #${matchedHotel.item_id}, which is officially certified for only ${officialStars} Stars, but marketed on ${otaPlatform} as ${effectiveClaimedStars} Stars (+${effectiveClaimedStars - officialStars}★).`;
       violations.push({
         law: "Luật Du lịch 2017 - Điều 9, Khoản 8 & Điều 50",
         statute_title: "Quảng cáo sai thứ hạng được cơ quan nhà nước công nhận",
-        application: `Officially certified as ${officialStars} stars, but displayed on platform as ${claimedStars} stars.`
+        application: `Officially certified as ${officialStars} stars, but displayed on platform as ${effectiveClaimedStars} stars.`
       });
     } else if (isHighRank && (!matchedHotel || officialStars === 0)) {
       verdict = "UNACCREDITED_HOTEL";
       severity = "HIGH";
 
       if (isUrlQuery) {
-        summary = `Exhaustive Identity Verification: Out of all 681 statutory 4★ and 5★ hotel accreditations issued by VNAT nationwide, this ${otaPlatform} property (${otaId ? `Hotel ID #${otaId}` : 'unlinked listing'}) does NOT match any accredited certificate. Displaying ${claimedStars} stars violates Article 9, Clause 8 of Vietnam's Law on Tourism 2017.`;
+        summary = `Exhaustive Identity Verification: Out of all 681 statutory 4★ and 5★ hotel accreditations issued by VNAT nationwide, this ${otaPlatform} property (${otaId ? `Hotel ID #${otaId}` : 'unlinked listing'}) does NOT match any accredited certificate. Displaying ${effectiveClaimedStars} stars violates Article 9, Clause 8 of Vietnam's Law on Tourism 2017.`;
       } else {
-        summary = `Commercial property claims ${claimedStars} stars on ${otaPlatform} but is NOT present in the official VNAT National Accreditation Registry.`;
+        summary = `Commercial property claims ${effectiveClaimedStars} stars on ${otaPlatform} but is NOT present in the official VNAT National Accreditation Registry.`;
       }
 
       violations.push({
@@ -374,30 +415,30 @@ class TrueStarsMatcher {
 
     const platformNotice = isViolation ? generatePlatformNotice({
       propertyName: name,
-      claimedStars,
+      claimedStars: effectiveClaimedStars,
       officialStars,
       otaPlatform,
       city: province,
       originalUrl,
       violations,
       matchedHotel,
-      hasDorm,
+      hasDorm: effectiveHasDorm,
       otaId
     }) : "";
 
     const refundDemandLetter = isViolation ? generateRefundDemandLetter({
       propertyName: name,
-      claimedStars,
+      claimedStars: effectiveClaimedStars,
       officialStars,
       otaPlatform,
-      hasDorm
+      hasDorm: effectiveHasDorm
     }) : "";
 
     const lawBreakingProof = generateDemonstrationOfLawBreaking({
       propertyName: name,
-      claimedStars,
+      claimedStars: effectiveClaimedStars,
       officialStars,
-      hasDorm,
+      hasDorm: effectiveHasDorm,
       otaPlatform,
       matchedHotel,
       otaId,
@@ -419,9 +460,9 @@ class TrueStarsMatcher {
 
     return {
       property_name: name,
-      claimed_stars: claimedStars,
+      claimed_stars: effectiveClaimedStars,
       official_stars: officialStars,
-      has_dorm: hasDorm,
+      has_dorm: effectiveHasDorm,
       ota_platform: otaPlatform,
       original_url: originalUrl,
       ota_id: otaId,
