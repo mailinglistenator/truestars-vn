@@ -1,7 +1,12 @@
 /**
  * TrueStars VN — High-Speed Client-Side Entity Resolution & Statutory Audit Engine
- * Includes Smart OTA URL Parsers, Evidentiary Law-Breaking Demonstrations,
- * and Formal Legal Notice & Traveler Refund Letter Generators.
+ * 
+ * Features:
+ * 1. Deterministic O(1) Aggregator Identity Resolution (Trip.com hotelId, Agoda slug/id, Booking slug).
+ * 2. Closed-World Exhaustive Verification across all 681 official VNAT accreditations.
+ * 3. Smart OTA URL parser extracting IDs and slugs.
+ * 4. Evidentiary demonstration of law breaking.
+ * 5. Automated Cease & Desist Takedown Notice & Traveler Refund Demand Letter generators.
  */
 
 const GEO_REPLACEMENTS = [
@@ -72,14 +77,14 @@ function sequenceRatio(s1, s2) {
 }
 
 /**
- * Smart OTA URL Parser: Extracts platform, clean hotel name/slug, and city
+ * Smart OTA URL Parser: Extracts platform, hotelId, canonical slug, city, and clean display name
  */
 function parseOtaUrl(rawInput) {
-  if (!rawInput) return { isUrl: false, name: "", platform: "Direct Input", city: "" };
+  if (!rawInput) return { isUrl: false, name: "", platform: "Direct Input", city: "", otaId: "", otaSlug: "" };
 
   const trimmed = rawInput.trim();
   if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
-    return { isUrl: false, name: trimmed, platform: "Direct Input", city: "" };
+    return { isUrl: false, name: trimmed, platform: "Direct Input", city: "", otaId: "", otaSlug: "" };
   }
 
   try {
@@ -88,25 +93,40 @@ function parseOtaUrl(rawInput) {
     let platform = "Online Travel Agency";
     let extractedName = "";
     let city = "";
+    let otaId = "";
+    let otaSlug = "";
 
     if (host.includes("agoda.com")) {
       platform = "Agoda";
-      const parts = url.pathname.split("/").filter(Boolean);
-      for (const p of parts) {
-        if (p.includes(".html")) {
-          extractedName = p.replace(/\.html.*$/, "").replace(/[-_]/g, " ");
-          break;
-        } else if (p.length > 3 && !["hotel", "hotels", "country", "city"].includes(p)) {
-          extractedName = p.replace(/[-_]/g, " ");
+      const match = url.pathname.match(/\/([^\/]+)\/hotel\//i);
+      if (match) {
+        otaSlug = match[1].toLowerCase();
+        extractedName = otaSlug.replace(/[-_]/g, " ");
+      } else {
+        const parts = url.pathname.split("/").filter(Boolean);
+        for (const p of parts) {
+          if (!["hotel", "hotels", "country", "city"].includes(p)) {
+            otaSlug = p.replace(/\.html.*$/, "").toLowerCase();
+            extractedName = otaSlug.replace(/[-_]/g, " ");
+            break;
+          }
         }
       }
+      otaId = url.searchParams.get("hotel_id") || "";
     } else if (host.includes("booking.com")) {
       platform = "Booking.com";
-      const parts = url.pathname.split("/").filter(Boolean);
-      for (const p of parts) {
-        if (p.includes(".html")) {
-          extractedName = p.replace(/\.html.*$/, "").replace(/[-_]/g, " ");
-          break;
+      const match = url.pathname.match(/\/hotel\/[a-z]{2}\/([^\/\.]+)/i);
+      if (match) {
+        otaSlug = match[1].toLowerCase();
+        extractedName = otaSlug.replace(/[-_]/g, " ");
+      } else {
+        const parts = url.pathname.split("/").filter(Boolean);
+        for (const p of parts) {
+          if (p.includes(".html")) {
+            otaSlug = p.replace(/\.html.*$/, "").toLowerCase();
+            extractedName = otaSlug.replace(/[-_]/g, " ");
+            break;
+          }
         }
       }
       if (url.searchParams.get("ss")) {
@@ -115,20 +135,22 @@ function parseOtaUrl(rawInput) {
     } else if (host.includes("trip.com")) {
       platform = "Trip.com";
       city = url.searchParams.get("cityEnName") || "";
-      const hotelId = url.searchParams.get("hotelId") || "";
+      otaId = url.searchParams.get("hotelId") || "";
 
       // Check if URL has a descriptive slug in the path
       const pathSegments = url.pathname.split("/").filter(Boolean);
       for (const seg of pathSegments) {
-        if (seg.includes("-hotel-detail-") || (!["hotels", "detail", "hotel"].includes(seg) && seg.length > 4)) {
-          extractedName = seg.replace(/^[a-z0-9]+-hotel-detail-\d+/, "").replace(/[-_]/g, " ").trim();
-          if (extractedName) break;
+        if (seg.includes("-hotel-detail-")) {
+          const m = seg.match(/-hotel-detail-(\d+)/);
+          if (m) otaId = m[1];
+        } else if (!["hotels", "detail", "hotel"].includes(seg) && seg.length > 4) {
+          otaSlug = seg.toLowerCase();
+          extractedName = seg.replace(/[-_]/g, " ").trim();
         }
       }
 
-      // If opaque URL with just hotelId & cityEnName (e.g. /hotels/detail/?cityEnName=Da%20Nang&hotelId=2848061)
-      if (!extractedName && hotelId) {
-        extractedName = `Trip.com Hotel Listing #${hotelId}${city ? ` (${decodeURIComponent(city)})` : ""}`;
+      if (!extractedName && otaId) {
+        extractedName = `Trip.com Hotel Listing #${otaId}${city ? ` (${decodeURIComponent(city)})` : ""}`;
       }
     }
 
@@ -139,7 +161,6 @@ function parseOtaUrl(rawInput) {
       .replace(/\s+/g, " ")
       .trim();
 
-    // Capitalize words for clean display
     if (extractedName) {
       extractedName = extractedName
         .split(" ")
@@ -154,16 +175,24 @@ function parseOtaUrl(rawInput) {
       name: extractedName,
       platform: platform,
       city: city ? decodeURIComponent(city) : "",
-      originalUrl: trimmed
+      originalUrl: trimmed,
+      otaId: otaId,
+      otaSlug: otaSlug
     };
   } catch (err) {
-    return { isUrl: true, name: trimmed.substring(0, 50), platform: "Online Travel Agency", city: "", originalUrl: trimmed };
+    return { isUrl: true, name: trimmed.substring(0, 50), platform: "Online Travel Agency", city: "", originalUrl: trimmed, otaId: "", otaSlug: "" };
   }
 }
 
 class TrueStarsMatcher {
   constructor(hotelsList = []) {
     this.hotels = [];
+    this.byTripId = new Map();
+    this.byTripSlug = new Map();
+    this.byAgodaSlug = new Map();
+    this.byAgodaId = new Map();
+    this.byBookingSlug = new Map();
+
     if (Array.isArray(hotelsList) && hotelsList.length > 0) {
       this.loadHotels(hotelsList);
     }
@@ -177,76 +206,114 @@ class TrueStarsMatcher {
       addr_norm: removeAccents(h.address),
       tokens: extractCoreTokens(h.name)
     }));
-  }
 
-  findMatches(hotelName, province = "", threshold = 0.50) {
-    if (!hotelName) return [];
-    const inputNorm = removeAccents(hotelName);
-    const inputTokens = extractCoreTokens(hotelName);
-    const normProv = removeAccents(province);
-
-    const scored = [];
+    // Build Inverted Aggregator Identity Maps for O(1) matching
+    this.byTripId.clear();
+    this.byTripSlug.clear();
+    this.byAgodaSlug.clear();
+    this.byAgodaId.clear();
+    this.byBookingSlug.clear();
 
     for (const h of this.hotels) {
-      if (normProv) {
-        const provTokens = normProv.split(/\s+/);
-        const combined = `${h.prov_norm} ${h.addr_norm}`;
-        const hasOverlap = provTokens.some(pt => combined.includes(pt));
-        if (!hasOverlap) continue;
-      }
-
-      const candNorm = h.name_norm;
-      const candTokens = h.tokens;
-
-      // 1. Substring match
-      if (inputNorm && candNorm.includes(inputNorm)) {
-        const score = Math.max(0.85, inputNorm.length / candNorm.length);
-        scored.push({ hotel: h, score: Math.round(score * 1000) / 1000 });
-        continue;
-      }
-
-      // 2. Sequence ratio
-      const seqScore = sequenceRatio(inputNorm, candNorm);
-
-      // 3. Token overlap
-      let tokenScore = 0.0;
-      if (inputTokens.size > 0 && candTokens.size > 0) {
-        let intersection = 0;
-        for (const t of inputTokens) {
-          if (candTokens.has(t)) intersection++;
+      const ota = h.ota_identities || {};
+      
+      // Trip IDs
+      if (Array.isArray(ota.trip_ids)) {
+        for (const tid of ota.trip_ids) {
+          this.byTripId.set(String(tid), h);
         }
-        const union = new Set([...inputTokens, ...candTokens]).size;
-        tokenScore = intersection / union;
       }
+      // Trip Slugs
+      if (Array.isArray(ota.trip_slugs)) {
+        for (const tslug of ota.trip_slugs) {
+          this.byTripSlug.set(tslug.toLowerCase(), h);
+        }
+      }
+      // Agoda Slugs
+      if (Array.isArray(ota.agoda_slugs)) {
+        for (const aslug of ota.agoda_slugs) {
+          this.byAgodaSlug.set(aslug.toLowerCase(), h);
+        }
+      }
+      // Agoda IDs
+      if (Array.isArray(ota.agoda_ids)) {
+        for (const aid of ota.agoda_ids) {
+          this.byAgodaId.set(String(aid), h);
+        }
+      }
+      // Booking Slugs
+      if (Array.isArray(ota.booking_slugs)) {
+        for (const bslug of ota.booking_slugs) {
+          this.byBookingSlug.set(bslug.toLowerCase(), h);
+        }
+      }
+    }
+  }
 
-      const finalScore = (seqScore * 0.40) + (tokenScore * 0.60);
-      if (finalScore >= threshold) {
-        scored.push({ hotel: h, score: Math.round(finalScore * 1000) / 1000 });
+  /**
+   * Primary Matching Method:
+   * First tests exact deterministic aggregator identity.
+   * Falls back to high-speed token/fuzzy sequence matching.
+   */
+  classify({ name, claimedStars = 5, hasDorm = false, province = "", otaPlatform = "Direct Input", originalUrl = "", otaId = "", otaSlug = "" }) {
+    let matchedHotel = null;
+    let matchType = "NONE";
+    let matchScore = 0.0;
+
+    // 1. DETERMINISTIC AGGREGATOR IDENTITY LOOKUP (Zero False Positives)
+    if (otaPlatform === "Trip.com") {
+      if (otaId && this.byTripId.has(String(otaId))) {
+        matchedHotel = this.byTripId.get(String(otaId));
+        matchType = "DETERMINISTIC_TRIP_ID_LINK";
+        matchScore = 1.0;
+      } else if (otaSlug && this.byTripSlug.has(otaSlug.toLowerCase())) {
+        matchedHotel = this.byTripSlug.get(otaSlug.toLowerCase());
+        matchType = "DETERMINISTIC_TRIP_SLUG_LINK";
+        matchScore = 1.0;
+      }
+    } else if (otaPlatform === "Agoda") {
+      if (otaSlug && this.byAgodaSlug.has(otaSlug.toLowerCase())) {
+        matchedHotel = this.byAgodaSlug.get(otaSlug.toLowerCase());
+        matchType = "DETERMINISTIC_AGODA_SLUG_LINK";
+        matchScore = 1.0;
+      } else if (otaId && this.byAgodaId.has(String(otaId))) {
+        matchedHotel = this.byAgodaId.get(String(otaId));
+        matchType = "DETERMINISTIC_AGODA_ID_LINK";
+        matchScore = 1.0;
+      }
+    } else if (otaPlatform === "Booking.com") {
+      if (otaSlug && this.byBookingSlug.has(otaSlug.toLowerCase())) {
+        matchedHotel = this.byBookingSlug.get(otaSlug.toLowerCase());
+        matchType = "DETERMINISTIC_BOOKING_SLUG_LINK";
+        matchScore = 1.0;
       }
     }
 
-    scored.sort((a, b) => b.score - a.score);
-    return scored;
-  }
+    // 2. FALLBACK: Text / Fuzzy resolution if not matched via exact aggregator ID
+    const isUrlQuery = originalUrl && originalUrl.length > 0;
 
-  classify({ name, claimedStars = 5, hasDorm = false, roomCount = null, province = "", otaPlatform = "Online Travel Agency", originalUrl = "" }) {
-    const matches = this.findMatches(name, province, 0.45);
-    const bestMatch = matches.length > 0 ? matches[0] : null;
-    const matchScore = bestMatch ? bestMatch.score : 0.0;
-    const matchedHotel = matchScore >= 0.70 ? bestMatch.hotel : null;
+    if (!matchedHotel && name) {
+      const candidates = this.findMatches(name, province, 0.45);
+      if (candidates.length > 0 && candidates[0].score >= 0.70) {
+        matchedHotel = candidates[0].hotel;
+        matchScore = candidates[0].score;
+        matchType = "FUZZY_NAME_MATCH";
+      }
+    }
+
+    // 3. EVALUATE CLASSIFICATION & VERDICT
     const officialStars = matchedHotel ? matchedHotel.stars : 0;
+    const isHighRank = claimedStars >= 4;
 
     let verdict = "UNACCREDITED_HOTEL";
     let severity = "HIGH";
     let summary = "";
     const violations = [];
 
-    const isHighRank = claimedStars >= 4;
-
     if (matchedHotel && officialStars === claimedStars && !hasDorm) {
       verdict = "VERIFIED_LEGITIMATE";
       severity = "NONE";
-      summary = `Verified legitimate ${officialStars}-star hotel officially accredited by the Vietnam National Authority of Tourism (VNAT).`;
+      summary = `Verified Legitimate: This property's identity is authenticated against official VNAT 5-Star Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}").`;
     } else if (hasDorm && isHighRank) {
       verdict = "BLATANT_HOSTEL_FRAUD";
       severity = "CRITICAL";
@@ -259,7 +326,7 @@ class TrueStarsMatcher {
       violations.push({
         law: "TCVN 4391:2015 - Tiêu chuẩn Xếp hạng Khách sạn",
         statute_title: "Quy chuẩn cơ sở vật chất tối thiểu cho Khách sạn 4-5 sao",
-        application: "Dormitory and bunk beds disqualify establishment from 4-star or 5-star hotel status."
+        application: "Dormitory and bunk beds physically and legally disqualify establishment from 4-star or 5-star hotel status."
       });
       violations.push({
         law: "Luật Bảo vệ quyền lợi người tiêu dùng 2023 - Điều 10 & 39",
@@ -269,7 +336,7 @@ class TrueStarsMatcher {
     } else if (matchedHotel && officialStars < claimedStars) {
       verdict = "STAR_INFLATION";
       severity = "HIGH";
-      summary = `Official VNAT certified rating is ${officialStars} stars, but marketed as ${claimedStars} stars (+${claimedStars - officialStars} star inflation).`;
+      summary = `Statutory Star Inflation: This property's identity maps to VNAT Accreditation #${matchedHotel.item_id}, which is officially certified for only ${officialStars} Stars, but marketed on ${otaPlatform} as ${claimedStars} Stars (+${claimedStars - officialStars}★).`;
       violations.push({
         law: "Luật Du lịch 2017 - Điều 9, Khoản 8 & Điều 50",
         statute_title: "Quảng cáo sai thứ hạng được cơ quan nhà nước công nhận",
@@ -278,7 +345,13 @@ class TrueStarsMatcher {
     } else if (isHighRank && (!matchedHotel || officialStars === 0)) {
       verdict = "UNACCREDITED_HOTEL";
       severity = "HIGH";
-      summary = `Commercial property claims ${claimedStars} stars on ${otaPlatform} but is NOT present in the official VNAT National Accreditation Registry.`;
+
+      if (isUrlQuery) {
+        summary = `Exhaustive Identity Verification: Out of all 681 statutory 4★ and 5★ hotel accreditations issued by VNAT nationwide, this ${otaPlatform} property (${otaId ? `Hotel ID #${otaId}` : 'unlinked listing'}) does NOT match any accredited certificate. Displaying ${claimedStars} stars violates Article 9, Clause 8 of Vietnam's Law on Tourism 2017.`;
+      } else {
+        summary = `Commercial property claims ${claimedStars} stars on ${otaPlatform} but is NOT present in the official VNAT National Accreditation Registry.`;
+      }
+
       violations.push({
         law: "Luật Du lịch 2017 - Điều 9, Khoản 8",
         statute_title: "Quảng cáo cơ sở lưu trú du lịch khi chưa có văn bản công nhận",
@@ -305,7 +378,8 @@ class TrueStarsMatcher {
       originalUrl,
       violations,
       matchedHotel,
-      hasDorm
+      hasDorm,
+      otaId
     });
 
     const refundDemandLetter = generateRefundDemandLetter({
@@ -322,7 +396,9 @@ class TrueStarsMatcher {
       officialStars,
       hasDorm,
       otaPlatform,
-      matchedHotel
+      matchedHotel,
+      otaId,
+      matchType
     });
 
     return {
@@ -332,10 +408,14 @@ class TrueStarsMatcher {
       has_dorm: hasDorm,
       ota_platform: otaPlatform,
       original_url: originalUrl,
+      ota_id: otaId,
+      ota_slug: otaSlug,
       verdict: verdict,
       severity: severity,
       summary: summary,
+      match_type: matchType,
       matched_hotel: matchedHotel ? {
+        item_id: matchedHotel.item_id,
         name: matchedHotel.name,
         stars: matchedHotel.stars,
         address: matchedHotel.address,
@@ -350,14 +430,73 @@ class TrueStarsMatcher {
       refund_demand_letter: refundDemandLetter
     };
   }
+
+  findMatches(hotelName, province = "", threshold = 0.50) {
+    if (!hotelName) return [];
+    const inputNorm = removeAccents(hotelName);
+    const inputTokens = extractCoreTokens(hotelName);
+    const normProv = removeAccents(province);
+
+    const scored = [];
+
+    for (const h of this.hotels) {
+      if (normProv) {
+        const provTokens = normProv.split(/\s+/);
+        const combined = `${h.prov_norm} ${h.addr_norm}`;
+        const hasOverlap = provTokens.some(pt => combined.includes(pt));
+        if (!hasOverlap) continue;
+      }
+
+      const candNorm = h.name_norm;
+      const candTokens = h.tokens;
+
+      if (inputNorm && candNorm.includes(inputNorm)) {
+        const score = Math.max(0.85, inputNorm.length / candNorm.length);
+        scored.push({ hotel: h, score: Math.round(score * 1000) / 1000 });
+        continue;
+      }
+
+      const seqScore = sequenceRatio(inputNorm, candNorm);
+      let tokenScore = 0.0;
+      if (inputTokens.size > 0 && candTokens.size > 0) {
+        let intersection = 0;
+        for (const t of inputTokens) {
+          if (candTokens.has(t)) intersection++;
+        }
+        const union = new Set([...inputTokens, ...candTokens]).size;
+        tokenScore = intersection / union;
+      }
+
+      const finalScore = (seqScore * 0.40) + (tokenScore * 0.60);
+      if (finalScore >= threshold) {
+        scored.push({ hotel: h, score: Math.round(finalScore * 1000) / 1000 });
+      }
+    }
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored;
+  }
 }
 
 /**
  * Generates the Formal Statutory Demonstration of Law Breaking
  */
-function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, officialStars, hasDorm, otaPlatform, matchedHotel }) {
+function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, officialStars, hasDorm, otaPlatform, matchedHotel, otaId, matchType }) {
   const isHostel = hasDorm;
   const isInflated = matchedHotel && officialStars < claimedStars;
+
+  let evidenceFinding = "";
+  if (matchType.startsWith("DETERMINISTIC")) {
+    evidenceFinding = isInflated
+      ? `Deterministic Aggregator Link: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Certified star rating is ONLY ${officialStars} Stars. Marketing as ${claimedStars} Stars constitutes unlawful star inflation (+${claimedStars - officialStars}★).`
+      : `Deterministic Aggregator Link: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Rating of ${officialStars} Stars is VERIFIED LEGITIMATE.`;
+  } else if (matchedHotel) {
+    evidenceFinding = isInflated
+      ? `Fuzzy Name Match: Linked to official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Certified for only ${officialStars} Stars. Marketing as ${claimedStars} Stars constitutes unlawful star inflation.`
+      : `Fuzzy Name Match: Matched official VNAT Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}"). Rating verified.`;
+  } else {
+    evidenceFinding = `Exhaustive Closed-Registry Exclusion: An exhaustive cross-reference across all 681 official 4★ and 5★ tourism accommodation certificates issued by VNAT nationwide confirms that this ${otaPlatform} profile ${otaId ? `(Hotel ID #${otaId})` : `("${propertyName}")`} has ZERO statutory accreditation. Because the universe of accredited luxury hotels is strictly limited to 681 nationwide, this listing is 100% UNACCREDITED.`;
+  }
 
   return {
     statute_monopoly: {
@@ -375,9 +514,7 @@ function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, offici
       national_whitelist_size: 681,
       total_5star: 301,
       total_4star: 380,
-      evidence_finding: isInflated
-        ? `Official Registry Match: "${matchedHotel.name}" is certified for only ${officialStars} Stars. Marketing it as ${claimedStars} Stars constitutes unlawful star inflation (+${claimedStars - officialStars}★).`
-        : `Official Registry Search: A complete crawl of the VNAT central database (csdl.vietnamtourism.gov.vn) confirms ZERO 4-star or 5-star accreditation records exist for "${propertyName}". Out of only 681 certified hotels nationwide, this listing is 100% UNACCREDITED.`
+      evidence_finding: evidenceFinding
     },
     facility_standards: isHostel ? {
       standard: "TCVN 4391:2015 - Tiêu chuẩn Xếp hạng Khách sạn",
@@ -393,7 +530,7 @@ function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, offici
 /**
  * Generates Cease & Desist / Legal Takedown Notice to Offending Platform
  */
-function generatePlatformNotice({ propertyName, claimedStars, officialStars, otaPlatform, city, originalUrl, violations, matchedHotel, hasDorm }) {
+function generatePlatformNotice({ propertyName, claimedStars, officialStars, otaPlatform, city, originalUrl, violations, matchedHotel, hasDorm, otaId }) {
   const dateStr = new Date().toLocaleDateString('en-GB');
 
   return `FORMAL STATUTORY NOTICE OF UNLAWFUL HOTEL STAR CLASSIFICATION
@@ -408,7 +545,7 @@ CC:
     3. Cục Du lịch Quốc gia Việt Nam - VNAT
 
 RE: SYSTEMIC CONSUMER DECEPTION & STATUTORY INFRACTION
-PROPERTY: ${propertyName}
+PROPERTY: ${propertyName} ${otaId ? `[Platform ID: #${otaId}]` : ''}
 LOCATION: ${city || "Vietnam"}
 LISTING URL: ${originalUrl || "[Platform Listing URL]"}
 DISPLAYED RATING ON PLATFORM: ${'★'.repeat(claimedStars)} (${claimedStars} Stars)

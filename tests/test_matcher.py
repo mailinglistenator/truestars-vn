@@ -75,5 +75,47 @@ class TestAuditService(unittest.TestCase):
         self.assertEqual(result["severity"], "HIGH")
         self.assertTrue(result["legal_dossier"]["is_violation"])
 
+    def test_deterministic_ota_identity_links(self):
+        # 1. Trip.com exact ID
+        res_trip = self.service.audit_property({
+            "name": "https://www.trip.com/hotels/detail/?cityEnName=Hanoi&hotelId=678508",
+            "claimed_stars": 5
+        })
+        self.assertEqual(res_trip["status"], "VERIFIED_LEGITIMATE")
+        self.assertEqual(res_trip["match_type"], "DETERMINISTIC_TRIP_ID_LINK")
+        self.assertEqual(res_trip["official_record"]["stars"], 5)
+
+        # 2. Agoda exact slug
+        res_agoda = self.service.audit_property({
+            "name": "https://www.agoda.com/furama-resort-danang/hotel/da-nang-vn.html",
+            "claimed_stars": 5
+        })
+        self.assertEqual(res_agoda["status"], "VERIFIED_LEGITIMATE")
+        self.assertEqual(res_agoda["match_type"], "DETERMINISTIC_AGODA_SLUG_LINK")
+
+        # 3. Booking.com exact slug
+        res_booking = self.service.audit_property({
+            "name": "https://www.booking.com/hotel/vn/caravelle.html",
+            "claimed_stars": 5
+        })
+        self.assertEqual(res_booking["status"], "VERIFIED_LEGITIMATE")
+        self.assertEqual(res_booking["match_type"], "DETERMINISTIC_BOOKING_SLUG_LINK")
+
+        # 4. Agoda star inflation
+        res_inf = self.service.audit_property({
+            "name": "https://www.agoda.com/avani-hai-phong-harbour-view-hotel/hotel/hai-phong-vn.html",
+            "claimed_stars": 5
+        })
+        self.assertEqual(res_inf["status"], "STAR_INFLATION")
+        self.assertEqual(res_inf["match_type"], "DETERMINISTIC_AGODA_SLUG_LINK")
+
+        # 5. Unaccredited URL
+        res_unacc = self.service.audit_property({
+            "name": "https://www.booking.com/hotel/vn/unregistered-scam-hotel.html",
+            "claimed_stars": 5
+        })
+        self.assertEqual(res_unacc["status"], "UNACCREDITED_HOTEL")
+
 if __name__ == "__main__":
     unittest.main()
+
