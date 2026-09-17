@@ -400,6 +400,10 @@ def main():
         h["english_name"] = eng_name
         h["english_location"] = eng_loc
         h["ota_links"] = ota_links
+        h["direct_agoda_url"] = ota_links["agoda"]["url"]
+        h["direct_booking_url"] = ota_links["booking"]["url"]
+        h["direct_trip_url"] = ota_links["trip"]["url"]
+        h["direct_maps_url"] = ota_links["google_maps"]["url"]
 
     # Write enriched list back to public and data
     with open(wl_path, "w", encoding="utf-8") as f:
