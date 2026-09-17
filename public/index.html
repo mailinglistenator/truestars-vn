@@ -21,8 +21,6 @@
       --warning-bg: rgba(245, 158, 11, 0.12);
       --success: #10b981;
       --success-bg: rgba(16, 185, 129, 0.12);
-      --purple: #a855f7;
-      --purple-bg: rgba(168, 85, 247, 0.12);
       --gold: #fbbf24;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,7 +62,7 @@
     .tagline {
       color: var(--text-muted);
       font-size: 1.15rem;
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto 1.5rem;
     }
     .extension-banner {
@@ -73,7 +71,7 @@
       border-radius: 12px;
       padding: 1rem 1.5rem;
       margin: 1.5rem auto 2rem;
-      max-width: 820px;
+      max-width: 860px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -113,18 +111,12 @@
     .stat-val { font-size: 2rem; font-weight: 800; color: #fff; }
     .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
 
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 1.75rem;
+      margin-bottom: 2rem;
     }
     .card-title {
       font-size: 1.35rem;
@@ -173,63 +165,132 @@
     }
     .btn-submit:hover { background: var(--primary-hover); }
 
+    /* Verdict Box */
     .verdict-box {
-      margin-top: 1.5rem;
-      border-radius: 12px;
-      padding: 1.5rem;
+      margin-top: 2rem;
+      border-radius: 14px;
+      padding: 1.75rem;
       display: none;
     }
     .verdict-CRITICAL, .verdict-BLATANT_HOSTEL_FRAUD {
       background: var(--danger-bg);
-      border: 1px solid var(--danger);
+      border: 2px solid var(--danger);
     }
     .verdict-HIGH, .verdict-UNACCREDITED_HOTEL, .verdict-STAR_INFLATION {
       background: var(--warning-bg);
-      border: 1px solid var(--warning);
+      border: 2px solid var(--warning);
     }
     .verdict-NONE, .verdict-VERIFIED_LEGITIMATE {
       background: var(--success-bg);
-      border: 1px solid var(--success);
+      border: 2px solid var(--success);
     }
 
-    .verdict-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
+    .reality-check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin: 1.25rem 0;
     }
-    .verdict-title { font-size: 1.25rem; font-weight: 800; }
+    .reality-card {
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .reality-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
     .gold-stars { color: var(--gold); }
 
-    .statute-tag {
-      background: #090d16;
-      border-left: 3px solid var(--danger);
-      padding: 0.75rem 1rem;
-      margin-top: 0.5rem;
-      border-radius: 0 6px 6px 0;
+    /* Demonstration of Law Breaking */
+    .law-demo-box {
+      background: #070a12;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .law-demo-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #f87171;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .proof-item {
+      background: #0d1322;
+      border-left: 4px solid var(--danger);
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 0.85rem;
       font-size: 0.85rem;
     }
-    .statute-title { font-weight: 700; color: #f87171; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 0.85rem; }
-    th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 1rem;
-      height: 1rem;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s linear infinite;
+    .proof-law {
+      font-weight: 800;
+      color: #60a5fa;
+      margin-bottom: 0.25rem;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .proof-quote {
+      font-style: italic;
+      color: #cbd5e1;
+      margin-bottom: 0.4rem;
+      background: rgba(0,0,0,0.3);
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+    }
+    .proof-finding {
+      color: #fca5a5;
+      font-weight: 600;
+    }
 
+    /* Action Buttons */
+    .action-buttons-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .btn-action-outline {
+      background: #1e293b;
+      border: 1px solid #3b82f6;
+      color: #fff;
+      padding: 0.85rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .btn-action-outline:hover {
+      background: #2563eb;
+      border-color: #60a5fa;
+    }
+    .btn-action-refund {
+      background: #1e293b;
+      border: 1px solid #10b981;
+    }
+    .btn-action-refund:hover {
+      background: #059669;
+      border-color: #34d399;
+    }
+
+    /* Letter Modals */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -240,10 +301,12 @@
       background: #131b2e;
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      max-width: 600px;
+      max-width: 760px;
       width: 100%;
       padding: 2rem;
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .modal-close {
       position: absolute;
@@ -253,14 +316,42 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
+    .letter-preview {
+      background: #070a12;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      max-height: 380px;
+      overflow-y: auto;
+      margin: 1.25rem 0;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 0.85rem; }
+    th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+
+    .tag-platform {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="badge-gov">🛡️ OFFICIAL VIETNAM TOURISM AUDIT ENGINE</div>
+      <div class="badge-gov">🛡️ STATUTORY TOURISM AUDIT WATCHDOG</div>
       <h1>TrueStars VN</h1>
-      <p class="tagline">The statutory watchdog exposing deceptive 4★ and 5★ hotel star ratings on Agoda, Booking.com, and Trip.com in Vietnam against official government records.</p>
+      <p class="tagline">Real-time statutory verification exposing unaccredited 4★ and 5★ hotel listings on Agoda, Booking.com, and Trip.com against the official Vietnam National Authority of Tourism (VNAT) registry.</p>
       
       <div class="extension-banner">
         <div>
@@ -272,15 +363,15 @@
 
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-val" id="cnt-5star">301</div>
+          <div class="stat-val">301</div>
           <div class="stat-label">Official VNAT 5-Star Hotels</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" id="cnt-4star">380</div>
+          <div class="stat-val">380</div>
           <div class="stat-label">Official VNAT 4-Star Hotels</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" id="cnt-total">681</div>
+          <div class="stat-val">681</div>
           <div class="stat-label">Total Legitimate Whitelist</div>
         </div>
         <div class="stat-card">
@@ -290,123 +381,199 @@
       </div>
     </header>
 
-    <div class="main-grid">
-      <!-- Section 1: Live Property Audit -->
-      <div class="card">
-        <div class="card-title">🔍 Run Statutory Hotel Audit</div>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
-          Enter any hotel name or paste an Agoda / Booking.com link to cross-reference against the official national registry.
-        </p>
+    <!-- Main Audit Section -->
+    <div class="card">
+      <div class="card-title">🔍 Run Statutory Hotel Audit</div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+        Paste any hotel link from Agoda, Booking.com, or Trip.com, or type a property name to cross-reference against government records.
+      </p>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
-          <div class="input-group">
-            <label>Hotel Name or Booking URL</label>
-            <input type="text" id="audit-input" placeholder="e.g. Hanoi Old Quarter Backpacker Oasis or Agoda URL">
-          </div>
-          <div class="input-group">
-            <label>Claimed Star Rating</label>
-            <select id="audit-stars">
-              <option value="5">★★★★★ (5 Stars)</option>
-              <option value="4">★★★★ (4 Stars)</option>
-            </select>
-          </div>
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+        <div class="input-group">
+          <label>Hotel Name or OTA Booking URL</label>
+          <input type="text" id="audit-input" placeholder="e.g. Paste Trip.com / Agoda URL or type hotel name" oninput="onAuditInputChange()">
+          <div id="url-hint" style="display:none; font-size: 0.8rem; color: #60a5fa; margin-top: 0.35rem;"></div>
         </div>
-
-        <label class="checkbox-group">
-          <input type="checkbox" id="audit-dorm">
-          <span>Property sells Dormitory / Bunk Beds (Disqualifies under TCVN 4391:2015)</span>
-        </label>
-
-        <button class="btn-submit" id="btn-run-audit" onclick="executeAudit()">Verify Against National Registry</button>
-
-        <!-- Verdict Result Display -->
-        <div id="verdict-box" class="verdict-box">
-          <div class="verdict-header">
-            <div>
-              <span id="verdict-badge" style="padding: 0.25rem 0.65rem; border-radius: 6px; font-weight: 800; font-size: 0.85rem;"></span>
-              <h2 id="verdict-prop-name" style="font-size: 1.4rem; margin-top: 0.5rem;"></h2>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-size: 0.8rem; color: var(--text-muted);">OTA Claimed</div>
-              <div id="verdict-claimed-stars" class="gold-stars" style="font-size: 1.25rem;"></div>
-            </div>
-          </div>
-
-          <div style="background: rgba(0,0,0,0.25); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <p id="verdict-summary" style="font-size: 0.95rem; font-weight: 500;"></p>
-          </div>
-
-          <div id="matched-record-box" style="display: none; background: #090d16; border: 1px solid var(--card-border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-            <div style="font-size: 0.8rem; color: #60a5fa; font-weight: 700; text-transform: uppercase;">Official VNAT Record Match</div>
-            <div id="matched-name" style="font-weight: 700; font-size: 1.05rem; margin-top: 0.25rem;"></div>
-            <div id="matched-details" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;"></div>
-          </div>
-
-          <div id="violations-container"></div>
+        <div class="input-group">
+          <label>Marketed Star Rating on Platform</label>
+          <select id="audit-stars">
+            <option value="5">★★★★★ (5 Stars)</option>
+            <option value="4">★★★★ (4 Stars)</option>
+          </select>
         </div>
       </div>
 
-      <!-- Section 2: National Registry Explorer -->
-      <div class="card">
-        <div class="card-title">📋 Official National Accreditation Whitelist (681 Certified Properties)</div>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
-          Search through all certified 4★ and 5★ hotels nationwide, verified by the Vietnam National Authority of Tourism.
-        </p>
+      <label class="checkbox-group">
+        <input type="checkbox" id="audit-dorm">
+        <span>Property sells Dormitory / Bunk Beds (Physical disqualification under TCVN 4391:2015)</span>
+      </label>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-          <input type="text" id="search-q" placeholder="Search by hotel name or street..." oninput="filterRegistry()">
-          <select id="search-prov" onchange="filterRegistry()">
-            <option value="">All Provinces / Cities</option>
-            <option value="Hà Nội">Hà Nội</option>
-            <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-            <option value="Đà Nẵng">Đà Nẵng</option>
-            <option value="Khánh Hoà">Khánh Hoà (Nha Trang)</option>
-            <option value="Quảng Nam">Quảng Nam (Hội An)</option>
-            <option value="Kiên Giang">Kiên Giang (Phú Quốc)</option>
-          </select>
-          <select id="search-star" onchange="filterRegistry()">
-            <option value="">All Stars (4★ & 5★)</option>
-            <option value="5">5-Star Only (301)</option>
-            <option value="4">4-Star Only (380)</option>
-          </select>
+      <button class="btn-submit" id="btn-run-audit" onclick="executeAudit()">Verify Against National Registry</button>
+
+      <!-- Verdict Display -->
+      <div id="verdict-box" class="verdict-box">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <span id="verdict-badge" style="padding: 0.3rem 0.75rem; border-radius: 6px; font-weight: 800; font-size: 0.85rem;"></span>
+              <span id="verdict-platform-tag" class="tag-platform"></span>
+            </div>
+            <h2 id="verdict-prop-name" style="font-size: 1.5rem; font-weight: 800; color: #fff;"></h2>
+            <div id="verdict-location" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;"></div>
+          </div>
         </div>
 
-        <div id="registry-results" style="max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;">
-          <!-- Loaded dynamically -->
+        <!-- Reality Check Side-by-Side -->
+        <div class="reality-check-grid">
+          <div class="reality-card">
+            <div class="reality-label" style="color: #fbbf24;">Marketed on Platform</div>
+            <div id="verdict-claimed-stars" class="gold-stars" style="font-size: 1.6rem; font-weight: 800;"></div>
+            <div id="verdict-claimed-sub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;"></div>
+          </div>
+          <div class="reality-card" id="reality-official-card">
+            <div class="reality-label" id="reality-official-label" style="color: #ef4444;">Official State Registry</div>
+            <div id="verdict-official-stars" style="font-size: 1.6rem; font-weight: 800;"></div>
+            <div id="verdict-official-sub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;"></div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 8px; margin-bottom: 1.25rem;">
+          <p id="verdict-summary" style="font-size: 0.95rem; font-weight: 500;"></p>
+        </div>
+
+        <!-- DEMONSTRATION OF LAW BREAKING -->
+        <div class="law-demo-box">
+          <div class="law-demo-title">
+            <span>⚖️ DEMONSTRATION OF STATUTORY INFRACTION</span>
+          </div>
+          <div id="law-demo-content">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- FORM LETTER GENERATOR BUTTONS -->
+        <div class="action-buttons-row">
+          <button class="btn-action-outline" onclick="openPlatformNoticeModal()">
+            <span>📝 Generate Platform Cease & Desist Notice</span>
+          </button>
+          <button class="btn-action-outline btn-action-refund" onclick="openRefundDemandModal()">
+            <span>💰 Generate Traveler Refund Demand Letter</span>
+          </button>
         </div>
       </div>
+    </div>
 
-      <!-- Section 3: Hall of Shame -->
-      <div class="card">
-        <div class="card-title">🚨 OTA Hall of Shame — Most Blatant Hostel Frauds</div>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">
-          Notorious backpacker party hostels and homestays illegally marketed with 4 or 5 stars on Online Travel Agencies.
-        </p>
-        <table>
-          <thead>
-            <tr>
-              <th>Property Name</th>
-              <th>Location</th>
-              <th>Platform</th>
-              <th>Marketed Stars</th>
-              <th>Official Status</th>
-              <th>Avg Price</th>
-              <th>Statutory Infraction</th>
-            </tr>
-          </thead>
-          <tbody id="shame-tbody"></tbody>
-        </table>
+    <!-- Whitelist Explorer -->
+    <div class="card">
+      <div class="card-title">📋 Official National Accreditation Whitelist (681 Certified Properties)</div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+        Search through all certified 4★ and 5★ hotels nationwide, verified by the Vietnam National Authority of Tourism.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <input type="text" id="search-q" placeholder="Search by hotel name or street..." oninput="filterRegistry()">
+        <select id="search-prov" onchange="filterRegistry()">
+          <option value="">All Provinces / Cities</option>
+          <option value="Hà Nội">Hà Nội</option>
+          <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+          <option value="Đà Nẵng">Đà Nẵng</option>
+          <option value="Khánh Hoà">Khánh Hoà (Nha Trang)</option>
+          <option value="Quảng Nam">Quảng Nam (Hội An)</option>
+          <option value="Kiên Giang">Kiên Giang (Phú Quốc)</option>
+        </select>
+        <select id="search-star" onchange="filterRegistry()">
+          <option value="">All Stars (4★ & 5★)</option>
+          <option value="5">5-Star Only (301)</option>
+          <option value="4">4-Star Only (380)</option>
+        </select>
+      </div>
+
+      <div id="registry-results" style="max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;"></div>
+    </div>
+
+    <!-- Hall of Shame -->
+    <div class="card">
+      <div class="card-title">🚨 OTA Hall of Shame — Most Blatant Hostel Frauds</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Property Name</th>
+            <th>Location</th>
+            <th>Platform</th>
+            <th>Marketed Stars</th>
+            <th>Official Status</th>
+            <th>Avg Price</th>
+            <th>Statutory Infraction</th>
+          </tr>
+        </thead>
+        <tbody id="shame-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL 1: Platform Cease & Desist Takedown Notice -->
+  <div id="platform-notice-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('platform-notice-modal')">&times;</button>
+      <h2 style="font-size: 1.35rem; margin-bottom: 0.35rem;">📝 Formal Platform Cease & Desist Notice</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem;">
+        Pre-formatted legal notice citing Article 9 Clause 8 Law on Tourism 2017 and Decree 85/2021/NĐ-CP, ready to send to the platform's legal and compliance team.
+      </p>
+
+      <div id="platform-notice-text" class="letter-preview"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button id="btn-copy-platform-notice" class="btn-submit" style="width: auto; padding: 0.75rem 1.5rem;" onclick="copyPlatformNotice()">📋 Copy Notice to Clipboard</button>
+        <span id="platform-copy-toast" style="color: #34d399; font-size: 0.85rem; display: none;">✓ Copied to clipboard!</span>
       </div>
     </div>
   </div>
 
-  <!-- Extension Modal -->
-  <div id="ext-modal" class="modal-overlay">
+  <!-- MODAL 2: Traveler Refund Demand Letter -->
+  <div id="refund-modal" class="modal-overlay">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeExtensionModal()">&times;</button>
+      <button class="modal-close" onclick="closeModal('refund-modal')">&times;</button>
+      <h2 style="font-size: 1.35rem; margin-bottom: 0.35rem;">💰 Traveler Refund Demand Letter</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem;">
+        Customizable form letter demanding a full refund based on deceptive practices under Vietnam's Consumer Protection Law 2023 and credit card chargeback standards.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+        <div>
+          <label>Your Full Name</label>
+          <input type="text" id="ref-name" value="John Doe" oninput="updateRefundLetter()">
+        </div>
+        <div>
+          <label>Booking Reference #</label>
+          <input type="text" id="ref-booking-id" value="BK-98421092" oninput="updateRefundLetter()">
+        </div>
+        <div>
+          <label>Dates of Reservation</label>
+          <input type="text" id="ref-dates" value="01 Oct 2026 - 08 Oct 2026" oninput="updateRefundLetter()">
+        </div>
+        <div>
+          <label>Total Amount Paid</label>
+          <input type="text" id="ref-amount" value="$450.00 USD" oninput="updateRefundLetter()">
+        </div>
+      </div>
+
+      <div id="refund-letter-text" class="letter-preview"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button id="btn-copy-refund" class="btn-submit" style="width: auto; padding: 0.75rem 1.5rem; background: #059669;" onclick="copyRefundLetter()">📋 Copy Refund Demand Letter</button>
+        <span id="refund-copy-toast" style="color: #34d399; font-size: 0.85rem; display: none;">✓ Copied to clipboard!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Chrome Extension Instructions -->
+  <div id="ext-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 580px;">
+      <button class="modal-close" onclick="closeModal('ext-modal')">&times;</button>
       <h2 style="margin-bottom: 0.5rem;">🧩 TrueStars VN Chrome Extension</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-        Protect yourself directly on Agoda, Booking.com, and Trip.com. The extension badges verified hotels and sounds the alarm on fake star ratings as you browse.
+        Protect yourself directly on Agoda, Booking.com, and Trip.com. The extension automatically badges verified hotels and sounds the alarm on fake star ratings as you browse.
       </p>
 
       <div style="background: #090d16; border: 1px solid var(--card-border); padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
@@ -416,7 +583,7 @@
           <li>Open Google Chrome and navigate to <code style="color: #fbbf24;">chrome://extensions</code>.</li>
           <li>Toggle <strong style="color: #fff;">Developer Mode</strong> on the top right.</li>
           <li>Click <strong style="color: #fff;">Load Unpacked</strong> and select the <code style="color: #60a5fa;">extension/</code> directory.</li>
-          <li>Done! Browse any Agoda or Booking listing in Vietnam to see live verification badges.</li>
+          <li>Done! Browse any Agoda, Booking, or Trip.com listing in Vietnam to see live verification badges.</li>
         </ol>
       </div>
 
@@ -428,6 +595,7 @@
   <script>
     let matcher = null;
     let whitelistData = [];
+    let currentAudit = null;
 
     const HALL_OF_SHAME = [
       {
@@ -480,86 +648,180 @@
       }
     }
 
+    function onAuditInputChange() {
+      const val = document.getElementById('audit-input').value.trim();
+      const hint = document.getElementById('url-hint');
+      if (val.startsWith('http://') || val.startsWith('https://')) {
+        const parsed = parseOtaUrl(val);
+        hint.style.display = 'block';
+        hint.textContent = `✓ Detected ${parsed.platform} Link: Identified as "${parsed.name}"${parsed.city ? ` in ${parsed.city}` : ''}`;
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+
     function executeAudit() {
-      const input = document.getElementById('audit-input').value.trim();
+      const rawInput = document.getElementById('audit-input').value.trim();
       const stars = parseInt(document.getElementById('audit-stars').value, 10);
       const hasDorm = document.getElementById('audit-dorm').checked;
 
-      if (!input) {
-        alert("Please enter a hotel name or URL.");
+      if (!rawInput) {
+        alert("Please enter a hotel name or booking URL.");
         return;
       }
 
-      // Extract hotel name if an Agoda or Booking URL is pasted
-      let hotelName = input;
-      if (input.startsWith('http://') || input.startsWith('https://')) {
-        const parts = input.split('/');
-        for (const p of parts) {
-          if (p.includes('-hotel-') || p.includes('.html')) {
-            hotelName = p.replace(/\.html.*$/, '').replace(/-/g, ' ');
-            break;
-          }
-        }
-      }
+      const parsed = parseOtaUrl(rawInput);
+      const hotelName = parsed.name || rawInput;
 
-      const result = matcher.classify({
+      currentAudit = matcher.classify({
         name: hotelName,
         claimedStars: stars,
-        hasDorm: hasDorm
+        hasDorm: hasDorm,
+        otaPlatform: parsed.platform,
+        province: parsed.city,
+        originalUrl: parsed.originalUrl || ""
       });
 
-      renderAuditResult(result);
+      renderAuditResult(currentAudit, parsed);
     }
 
-    function renderAuditResult(r) {
+    function renderAuditResult(r, parsed) {
       const box = document.getElementById('verdict-box');
       box.className = `verdict-box verdict-${r.verdict}`;
       box.style.display = 'block';
 
       const badge = document.getElementById('verdict-badge');
+      const officialLabel = document.getElementById('reality-official-label');
+      const officialCard = document.getElementById('reality-official-card');
+
       if (r.verdict === 'VERIFIED_LEGITIMATE') {
         badge.style.background = '#059669';
         badge.style.color = '#fff';
         badge.textContent = '🟢 VERIFIED LEGITIMATE';
+        officialLabel.style.color = '#34d399';
+        document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#34d399;">${'★'.repeat(r.official_stars)} (${r.official_stars}★)</span>`;
+        document.getElementById('verdict-official-sub').textContent = 'Officially Accredited by VNAT';
       } else if (r.verdict === 'BLATANT_HOSTEL_FRAUD') {
         badge.style.background = '#dc2626';
         badge.style.color = '#fff';
         badge.textContent = '🚨 BLATANT HOSTEL FRAUD';
+        officialLabel.style.color = '#ef4444';
+        document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Hostel)</span>';
+        document.getElementById('verdict-official-sub').textContent = 'Disqualified (Offers Dormitory Beds)';
       } else if (r.verdict === 'STAR_INFLATION') {
         badge.style.background = '#d97706';
         badge.style.color = '#fff';
         badge.textContent = '🟡 STAR INFLATION';
+        officialLabel.style.color = '#f59e0b';
+        document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#f59e0b;">${'★'.repeat(r.official_stars)} (${r.official_stars}★)</span>`;
+        document.getElementById('verdict-official-sub').textContent = `Accredited for only ${r.official_stars}★ (+${r.claimed_stars - r.official_stars}★ Inflated)`;
       } else {
         badge.style.background = '#e11d48';
         badge.style.color = '#fff';
         badge.textContent = '🔴 UNACCREDITED HOTEL';
+        officialLabel.style.color = '#ef4444';
+        document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Unaccredited)</span>';
+        document.getElementById('verdict-official-sub').textContent = 'Missing from National Registry';
       }
 
+      document.getElementById('verdict-platform-tag').textContent = r.ota_platform;
       document.getElementById('verdict-prop-name').textContent = r.property_name;
-      document.getElementById('verdict-claimed-stars').textContent = '★'.repeat(r.claimed_stars);
+      document.getElementById('verdict-location').textContent = parsed.city ? `Location: ${parsed.city}, Vietnam` : 'Location: Vietnam';
+      document.getElementById('verdict-claimed-stars').textContent = `${'★'.repeat(r.claimed_stars)} (${r.claimed_stars}★)`;
+      document.getElementById('verdict-claimed-sub').textContent = `Displayed on ${r.ota_platform}`;
       document.getElementById('verdict-summary').textContent = r.summary;
 
-      const matchedBox = document.getElementById('matched-record-box');
-      if (r.matched_hotel) {
-        matchedBox.style.display = 'block';
-        document.getElementById('matched-name').textContent = `${r.matched_hotel.name} (${'★'.repeat(r.matched_hotel.stars)})`;
-        document.getElementById('matched-details').textContent = `${r.matched_hotel.address} | Rooms: ${r.matched_hotel.room_count || 'N/A'}`;
-      } else {
-        matchedBox.style.display = 'none';
-      }
+      // Render Demonstration of Law Breaking
+      const demoContainer = document.getElementById('law-demo-content');
+      const proof = r.law_breaking_proof;
+      demoContainer.innerHTML = `
+        <div class="proof-item">
+          <div class="proof-law">1. Statutory Monopoly on Star Ratings</div>
+          <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.statute_monopoly.law}</div>
+          <div class="proof-finding">${proof.statute_monopoly.analysis}</div>
+        </div>
 
-      const vContainer = document.getElementById('violations-container');
-      vContainer.innerHTML = '';
-      if (r.violations.length > 0) {
-        r.violations.forEach(v => {
-          const div = document.createElement('div');
-          div.className = 'statute-tag';
-          div.innerHTML = `<div class="statute-title">⚠ ${v.law}</div><div>${v.statute_title}</div><div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem;">${v.application}</div>`;
-          vContainer.appendChild(div);
-        });
-      }
+        <div class="proof-item">
+          <div class="proof-law">2. Explicit Statutory Prohibition (Điều 9, Khoản 8)</div>
+          <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.prohibition_clause.law}</div>
+          <div class="proof-quote">"${proof.prohibition_clause.quote}"</div>
+          <div class="proof-finding">${proof.prohibition_clause.analysis}</div>
+        </div>
+
+        <div class="proof-item">
+          <div class="proof-law">3. Ground Truth Evidentiary Proof (The Smoking Gun)</div>
+          <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">Vietnam National Tourism Database: csdl.vietnamtourism.gov.vn</div>
+          <div class="proof-finding">${proof.ground_truth_evidence.evidence_finding}</div>
+        </div>
+
+        ${proof.facility_standards ? `
+          <div class="proof-item">
+            <div class="proof-law">4. National Facility Standards (TCVN 4391:2015)</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.facility_standards.standard}</div>
+            <div class="proof-finding">${proof.facility_standards.analysis}</div>
+          </div>
+        ` : ''}
+
+        <div class="proof-item" style="border-left-color: #f59e0b;">
+          <div class="proof-law" style="color: #fbbf24;">5. Platform Intermediary Strict Liability</div>
+          <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.platform_liability.decree}</div>
+          <div class="proof-finding" style="color: #fde68a;">${proof.platform_liability.analysis}</div>
+        </div>
+      `;
+
+      // Pre-fill Letters
+      document.getElementById('platform-notice-text').textContent = r.platform_notice;
+      updateRefundLetter();
 
       box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function openPlatformNoticeModal() {
+      document.getElementById('platform-notice-modal').style.display = 'flex';
+    }
+
+    function openRefundDemandModal() {
+      document.getElementById('refund-modal').style.display = 'flex';
+    }
+
+    function openExtensionModal() {
+      document.getElementById('ext-modal').style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function updateRefundLetter() {
+      if (!currentAudit) return;
+      const name = document.getElementById('ref-name').value || '[Your Name]';
+      const bId = document.getElementById('ref-booking-id').value || '[Booking ID]';
+      const dates = document.getElementById('ref-dates').value || '[Stay Dates]';
+      const amount = document.getElementById('ref-amount').value || '[$ Amount]';
+
+      let text = currentAudit.refund_demand_letter;
+      text = text.replace(/\[Insert Your Full Name\]/g, name);
+      text = text.replace(/\[Insert Booking Reference Number\]/g, bId);
+      text = text.replace(/\[Insert Check-In & Check-Out Dates\]/g, dates);
+      text = text.replace(/\[Insert Amount & Currency.*?\]/g, amount);
+
+      document.getElementById('refund-letter-text').textContent = text;
+    }
+
+    function copyPlatformNotice() {
+      const text = document.getElementById('platform-notice-text').textContent;
+      navigator.clipboard.writeText(text);
+      const toast = document.getElementById('platform-copy-toast');
+      toast.style.display = 'inline';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+
+    function copyRefundLetter() {
+      const text = document.getElementById('refund-letter-text').textContent;
+      navigator.clipboard.writeText(text);
+      const toast = document.getElementById('refund-copy-toast');
+      toast.style.display = 'inline';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
 
     function filterRegistry() {
@@ -598,7 +860,7 @@
         <tr>
           <td><strong>${h.name}</strong><br><small style="color: var(--text-muted); font-size: 0.75rem;">${h.details}</small></td>
           <td>${h.city}</td>
-          <td><span style="background: rgba(59,130,246,0.2); color: #60a5fa; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">${h.ota}</span></td>
+          <td><span class="tag-platform">${h.ota}</span></td>
           <td><span class="gold-stars">${'★'.repeat(h.claimed)}</span></td>
           <td><span style="color: #ef4444; font-weight: 700;">❌ 0★ (Hostel)</span></td>
           <td style="color: #34d399; font-weight: 600;">${h.price}</td>
@@ -607,18 +869,9 @@
       `).join('');
     }
 
-    function openExtensionModal() {
-      document.getElementById('ext-modal').style.display = 'flex';
-    }
-
-    function closeExtensionModal() {
-      document.getElementById('ext-modal').style.display = 'none';
-    }
-
     window.onclick = function(event) {
-      const modal = document.getElementById('ext-modal');
-      if (event.target === modal) {
-        closeExtensionModal();
+      if (event.target.classList.contains('modal-overlay')) {
+        event.target.style.display = 'none';
       }
     };
 

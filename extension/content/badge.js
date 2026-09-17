@@ -102,8 +102,15 @@
       </div>
       ${matchedHtml}
       ${violationsHtml}
-      <div style="display: flex; gap: 8px; margin-top: 16px;">
-        <button id="truestars-copy-notice" class="truestars-btn-action" style="background: #334155;">📋 Copy Legal Citation</button>
+      <div style="background: #070a12; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 11px;">
+        <div style="font-weight: 800; color: #f87171; margin-bottom: 4px;">⚖️ DEMONSTRATION OF STATUTORY INFRACTION</div>
+        <div style="color: #cbd5e1; line-height: 1.4;">
+          <strong>Luật Du lịch 2017 (Điều 9, Khoản 8 & Điều 50):</strong> Only VNAT has statutory authority to award 4★/5★ ratings in Vietnam (only 681 exist nationwide). Displaying unauthorized stars is a strict statutory violation.
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+        <button id="truestars-copy-platform-notice" class="truestars-btn-action" style="background: #2563eb; width: 100%; text-align: center;">📝 Copy Platform Cease & Desist Notice</button>
+        <button id="truestars-copy-refund-letter" class="truestars-btn-action" style="background: #059669; width: 100%; text-align: center;">💰 Copy Traveler Refund Demand Letter</button>
       </div>
     `;
 
@@ -115,11 +122,18 @@
       if (e.target === backdrop) backdrop.remove();
     });
 
-    document.getElementById('truestars-copy-notice').addEventListener('click', () => {
-      navigator.clipboard.writeText(audit.legal_notice || audit.summary);
-      const btn = document.getElementById('truestars-copy-notice');
-      btn.textContent = '✓ Citation Copied!';
-      setTimeout(() => { btn.textContent = '📋 Copy Legal Citation'; }, 2000);
+    document.getElementById('truestars-copy-platform-notice').addEventListener('click', () => {
+      navigator.clipboard.writeText(audit.platform_notice || audit.legal_notice || audit.summary);
+      const btn = document.getElementById('truestars-copy-platform-notice');
+      btn.textContent = '✓ Platform Notice Copied!';
+      setTimeout(() => { btn.textContent = '📝 Copy Platform Cease & Desist Notice'; }, 2000);
+    });
+
+    document.getElementById('truestars-copy-refund-letter').addEventListener('click', () => {
+      navigator.clipboard.writeText(audit.refund_demand_letter || audit.summary);
+      const btn = document.getElementById('truestars-copy-refund-letter');
+      btn.textContent = '✓ Refund Demand Letter Copied!';
+      setTimeout(() => { btn.textContent = '💰 Copy Traveler Refund Demand Letter'; }, 2000);
     });
   }
 
