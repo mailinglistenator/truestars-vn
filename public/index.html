@@ -1034,8 +1034,8 @@
       const logEntry = aiLog[r.ai_verification_key];
       if (logEntry) {
         aiBtn.className = "btn-ai-verify btn-ai-verified";
-        aiBtn.innerHTML = `<span>🤖 AI Result: ${logEntry.verdict.replace(/_/g, ' ')}</span>`;
-        if (directAiBtn) directAiBtn.innerHTML = `🤖 AI Result: ${logEntry.verdict.replace(/_/g, ' ')}`;
+        aiBtn.innerHTML = `<span>🤖 AI Result: ${logEntry.verdict.replace(/_/g, ' ')} (Click to Re-Audit)</span>`;
+        if (directAiBtn) directAiBtn.innerHTML = `🤖 DeepSeek AI Audit (Re-Run)`;
         renderInlineAiDossier(logEntry);
       } else {
         aiBtn.className = "btn-ai-verify";
@@ -1209,7 +1209,7 @@
       icon1.innerHTML = '🔄'; step1.style.color = '#38bdf8'; step1.style.fontWeight = '700';
       icon2.innerHTML = '⏳'; step2.style.color = '#94a3b8'; step2.style.fontWeight = 'normal';
       icon3.innerHTML = '⏳'; step3.style.color = '#94a3b8'; step3.style.fontWeight = 'normal';
-      statusTitle.textContent = "AI is checking the listing and marketing claims...";
+      statusTitle.textContent = "AI is inspecting listing claims & OTA metadata...";
       spinner.style.background = '#a78bfa';
 
       const btn1 = document.getElementById('btn-ai-verify');
@@ -1217,68 +1217,74 @@
       const origText1 = btn1 ? btn1.innerHTML : '';
       const origText2 = btn2 ? btn2.innerHTML : '';
 
-      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>⏳ Auditing via DeepSeek Flash 4.1...</span>`; }
-      if (btn2) { btn2.disabled = true; btn2.innerHTML = `⏳ AI Auditing...`; }
+      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>⏳ Auditing via Hermes VPS (DeepSeek Flash 4.1)...</span>`; }
+      if (btn2) { btn2.disabled = true; btn2.innerHTML = `⏳ Hermes VPS Auditing...`; }
 
       const key = currentAudit.ai_verification_key;
+      const startTime = performance.now();
 
-      // Small delay for natural human perception of Stage 1
-      await new Promise(r => setTimeout(r, 260));
+      // Dispatch fetch immediately with force: true to guarantee live Hermes VPS inference
+      const fetchPromise = fetch('/api/ai_verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: currentAudit.property_name,
+          claimed_stars: currentAudit.claimed_stars,
+          platform: currentAudit.ota_platform,
+          url: currentAudit.original_url,
+          city: currentAudit.province || "",
+          has_dorm: currentAudit.has_dorm,
+          force: true
+        })
+      });
 
-      // Advance to Stage 2: Gathering records
-      icon1.innerHTML = '✅'; step1.style.color = '#34d399'; step1.style.fontWeight = 'normal';
-      icon2.innerHTML = '🔄'; step2.style.color = '#38bdf8'; step2.style.fontWeight = '700';
-      statusTitle.textContent = "AI is gathering government records & aggregator database...";
+      // Advance stages naturally while the live LLM inference is running on the VPS
+      const stageTimer1 = setTimeout(() => {
+        icon1.innerHTML = '✅'; step1.style.color = '#34d399'; step1.style.fontWeight = 'normal';
+        icon2.innerHTML = '🔄'; step2.style.color = '#38bdf8'; step2.style.fontWeight = '700';
+        statusTitle.textContent = "AI is querying official VNAT statutory registry & matching candidates...";
+      }, 700);
 
-      let auditRecord = aiLog[key];
-      if (!auditRecord || !auditRecord.concise_summary) {
-        try {
-          const fetchPromise = fetch('/api/ai_verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: currentAudit.property_name,
-              claimed_stars: currentAudit.claimed_stars,
-              platform: currentAudit.ota_platform,
-              url: currentAudit.original_url,
-              city: currentAudit.province || "",
-              has_dorm: currentAudit.has_dorm
-            })
-          });
-
-          await new Promise(r => setTimeout(r, 320));
-
-          // Advance to Stage 3: Statutory evaluation
-          icon2.innerHTML = '✅'; step2.style.color = '#34d399'; step2.style.fontWeight = 'normal';
-          icon3.innerHTML = '🔄'; step3.style.color = '#38bdf8'; step3.style.fontWeight = '700';
-          statusTitle.textContent = "AI is evaluating statutory compliance under Law on Tourism 2017...";
-
-          const res = await fetchPromise;
-          const data = await res.json();
-          if (data && data.audit) {
-            auditRecord = data.audit;
-            aiLog[key] = auditRecord;
-          }
-        } catch (err) {
-          console.error("AI audit failed:", err);
-        }
-      } else {
-        await new Promise(r => setTimeout(r, 280));
+      const stageTimer2 = setTimeout(() => {
         icon2.innerHTML = '✅'; step2.style.color = '#34d399'; step2.style.fontWeight = 'normal';
         icon3.innerHTML = '🔄'; step3.style.color = '#38bdf8'; step3.style.fontWeight = '700';
-        statusTitle.textContent = "AI is evaluating statutory compliance under Law on Tourism 2017...";
-        await new Promise(r => setTimeout(r, 220));
+        statusTitle.textContent = "DeepSeek Flash 4.1 reasoning on Law on Tourism 2017 & TCVN 4391:2015 via Hermes VPS...";
+      }, 1800);
+
+      let auditRecord = null;
+      try {
+        const res = await fetchPromise;
+        clearTimeout(stageTimer1);
+        clearTimeout(stageTimer2);
+
+        // Ensure stages 1 & 2 are marked done
+        icon1.innerHTML = '✅'; step1.style.color = '#34d399'; step1.style.fontWeight = 'normal';
+        icon2.innerHTML = '✅'; step2.style.color = '#34d399'; step2.style.fontWeight = 'normal';
+        icon3.innerHTML = '🔄'; step3.style.color = '#38bdf8'; step3.style.fontWeight = '700';
+
+        const data = await res.json();
+        if (data && data.audit) {
+          auditRecord = data.audit;
+          aiLog[key] = auditRecord;
+        }
+      } catch (err) {
+        clearTimeout(stageTimer1);
+        clearTimeout(stageTimer2);
+        console.error("Hermes VPS AI audit error:", err);
       }
+
+      const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
 
       // Stage 3 complete
       icon3.innerHTML = '✅'; step3.style.color = '#34d399'; step3.style.fontWeight = 'normal';
-      statusTitle.textContent = "✅ Statutory AI Audit Complete";
+      const latencyDisplay = auditRecord && auditRecord.latency_sec ? auditRecord.latency_sec : elapsedSec;
+      statusTitle.textContent = `✅ Statutory AI Audit Complete (${latencyDisplay}s • Hermes VPS • DeepSeek Flash 4.1)`;
       spinner.style.background = '#10b981';
 
       if (auditRecord) {
         if (btn1) {
           btn1.className = "btn-ai-verify btn-ai-verified";
-          btn1.innerHTML = `<span>🤖 AI Result: ${auditRecord.verdict.replace(/_/g, ' ')}</span>`;
+          btn1.innerHTML = `<span>🤖 AI Result: ${auditRecord.verdict.replace(/_/g, ' ')} (${latencyDisplay}s)</span>`;
         }
         if (btn2) {
           btn2.innerHTML = `🤖 AI Result: ${auditRecord.verdict.replace(/_/g, ' ')}`;
@@ -1308,7 +1314,9 @@
       const infractions = document.getElementById('inline-ai-infractions');
 
       const confPercent = Math.round((audit.confidence || 0.95) * 100);
-      confidence.textContent = `${confPercent}% Statutory Confidence`;
+      const latencySec = audit.latency_sec ? `${audit.latency_sec}s` : (audit.latency_ms ? `${(audit.latency_ms/1000).toFixed(1)}s` : '');
+      const modelLabel = audit.model ? (audit.model.includes('Hermes') ? 'Hermes VPS' : audit.model) : 'Hermes VPS';
+      confidence.innerHTML = `<span>🛡️ ${confPercent}% Statutory Confidence</span> &bull; <span style="color: #c4b5fd;">⚡ ${modelLabel}${latencySec ? ` (${latencySec})` : ''}</span>`;
 
       if (audit.verdict === 'VERIFIED_COMPLIANT') {
         badge.style.display = 'inline-block';

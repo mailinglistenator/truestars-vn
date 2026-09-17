@@ -736,7 +736,8 @@ async function triggerAiVerification(propertyData) {
         platform: propertyData.ota_platform || propertyData.platform || "Direct Input",
         url: propertyData.original_url || propertyData.url || "",
         city: propertyData.province || propertyData.city || "",
-        has_dorm: Boolean(propertyData.has_dorm || propertyData.hasDorm)
+        has_dorm: Boolean(propertyData.has_dorm || propertyData.hasDorm),
+        force: true
       })
     });
     return await res.json();

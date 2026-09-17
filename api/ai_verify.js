@@ -60,7 +60,7 @@ function callExternalModel(promptData, cityCandidates = [], totalCityCount = 0, 
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(postData)
         },
-        timeout: 30000
+        timeout: 45000
       }, (res) => {
         let body = '';
         res.on('data', chunk => body += chunk);
@@ -181,32 +181,37 @@ module.exports = async (req, res) => {
 
   const listingKey = normalizeKey(url || `${platform}-${hotelName}`);
 
-  // 1. Check in-memory / permanent log cache
-  if (memoryCache.has(listingKey)) {
-    const cached = memoryCache.get(listingKey);
-    return res.status(200).json({
-      status: "ALREADY_LOGGED",
-      cached: true,
-      listing_key: listingKey,
-      audit: cached
-    });
+  const force = Boolean(query.force || query.live || query.refresh);
+  const startMs = Date.now();
+
+  // 1. Check in-memory / permanent log cache only if NOT forced
+  if (!force) {
+    if (memoryCache.has(listingKey)) {
+      const cached = memoryCache.get(listingKey);
+      return res.status(200).json({
+        status: "ALREADY_LOGGED",
+        cached: true,
+        listing_key: listingKey,
+        audit: cached
+      });
+    }
+
+    const diskLog = loadLog();
+    if (diskLog[listingKey] && diskLog[listingKey].concise_summary) {
+      memoryCache.set(listingKey, diskLog[listingKey]);
+      return res.status(200).json({
+        status: "ALREADY_LOGGED",
+        cached: true,
+        listing_key: listingKey,
+        audit: diskLog[listingKey]
+      });
+    }
   }
 
-  const diskLog = loadLog();
-  if (diskLog[listingKey] && diskLog[listingKey].concise_summary) {
-    memoryCache.set(listingKey, diskLog[listingKey]);
-    return res.status(200).json({
-      status: "ALREADY_LOGGED",
-      cached: true,
-      listing_key: listingKey,
-      audit: diskLog[listingKey]
-    });
-  }
-
-  // 2. Statutory Precedence Check (Government Whitelist ALWAYS overrides AI)
+  // 2. Candidate Discovery & Statutory Verification against Official Whitelist
   let statutoryMatch = null;
-  let allCityCandidates = [];
   let cityCandidates = [];
+  let allCityCandidates = [];
   let totalCityCount = 0;
   let totalNationalCount = 681;
   try {
@@ -235,7 +240,9 @@ module.exports = async (req, res) => {
           return hLoc.includes(normCity) || normCity.includes(hLoc);
         });
         totalCityCount = allCityCandidates.length;
-        cityCandidates = allCityCandidates.slice(0, 15);
+        cityCandidates = allCityCandidates.slice(0, 25);
+      } else {
+        cityCandidates = data.slice(0, 25);
       }
     }
 
@@ -261,6 +268,10 @@ module.exports = async (req, res) => {
         });
         if (classification.verdict === "VERIFIED_LEGITIMATE") {
           statutoryMatch = classification;
+          if (statutoryMatch.matched_hotel) {
+            // Prioritize the matched hotel candidate at the very top for Hermes
+            cityCandidates = [statutoryMatch.matched_hotel, ...cityCandidates.filter(c => c.item_id !== statutoryMatch.matched_hotel.item_id)];
+          }
         }
       }
     }
@@ -268,68 +279,40 @@ module.exports = async (req, res) => {
     // Non-fatal, continue to model call
   }
 
-  let finalRecord;
-  if (statutoryMatch) {
-    const h = statutoryMatch.matched_hotel;
-    const officialLegalName = h ? h.name : (hotelName || "Officially Certified Hotel");
-    const resolvedPlatform = (platform && platform !== "Direct Input") ? platform : (statutoryMatch.ota_platform || "OTA Platform");
-    const commercialName = (h && (h.commercial_name || h.english_name)) ? (h.commercial_name || h.english_name) : (statutoryMatch.property_name || hotelName || officialLegalName);
-    const resolvedHotelName = hotelName || commercialName;
-    const itemId = h ? (h.item_id || h.decision_code || 'AUTH') : 'AUTH';
-    const officialStars = statutoryMatch.official_stars || 5;
+  // 3. Dispatch Live Statutory AI Verification to Hermes on VPS over Encrypted Tunnel
+  const promptData = {
+    name: hotelName,
+    claimed_stars: claimedStars,
+    platform: platform,
+    url: url,
+    city: city,
+    has_dorm: hasDorm
+  };
 
-    finalRecord = {
-      listing_key: listingKey,
-      hotel_name: resolvedHotelName,
-      claimed_stars: claimedStars,
-      platform: resolvedPlatform,
-      url: url,
-      city: city || (h ? h.province : ""),
-      verified_at: new Date().toISOString(),
-      model: "nous-deepseek-flash-4.1 (VNAT Statutory Precedence)",
-      verdict: "VERIFIED_COMPLIANT",
-      confidence: 1.0,
-      concise_summary: `This is an officially accredited ${officialStars}-star hotel. It is certified in the Vietnamese government registry under "${officialLegalName}" (Accreditation #${itemId}), and is commercially marketed on ${resolvedPlatform} as "${commercialName}". Its ${officialStars}-star rating is legally authentic under Vietnamese law.`,
-      refund_advisory: `No refund required: Property is fully compliant with statutory luxury standards under Article 50 of Vietnam's Law on Tourism 2017 and authenticated against official government registry records.`,
-      investigation_findings: `AI investigated the official VNAT registry and confirmed that this listing at ${h ? h.address : (city || 'Vietnam')} corresponds to official Accreditation #${itemId}. The commercial branding on ${resolvedPlatform} represents an authenticated international management contract for the certified property.`,
-      statutory_infractions: [],
-      tcvn_deficiencies: [],
-      risk_advisory: "NO RISK: Officially certified luxury hotel authenticated against Vietnam National Authority of Tourism registry.",
-      reasoning: `Identity authenticated against official VNAT Accreditation #${itemId} ("${officialLegalName}"). Certified as ${officialStars} Stars under Article 50 of Vietnam's Law on Tourism 2017.`
-    };
-  } else {
-    // 3. Perform Autonomous AI Verification with Nous DeepSeek Flash 4.1
-    const promptData = {
-      name: hotelName,
-      claimed_stars: claimedStars,
-      platform: platform,
-      url: url,
-      city: city,
-      has_dorm: hasDorm
-    };
+  const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount);
+  const latencyMs = Date.now() - startMs;
 
-    const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount);
-
-    finalRecord = {
-      listing_key: listingKey,
-      hotel_name: hotelName,
-      claimed_stars: claimedStars,
-      platform: platform,
-      url: url,
-      city: city,
-      verified_at: new Date().toISOString(),
-      model: aiAnalysis.model || "nous-deepseek-flash-4.1 (Hermes VPS)",
-      verdict: aiAnalysis.verdict,
-      confidence: aiAnalysis.confidence,
-      concise_summary: aiAnalysis.concise_summary,
-      refund_advisory: aiAnalysis.refund_advisory,
-      investigation_findings: aiAnalysis.investigation_findings,
-      statutory_infractions: aiAnalysis.statutory_infractions || [],
-      tcvn_deficiencies: aiAnalysis.tcvn_deficiencies || [],
-      risk_advisory: aiAnalysis.risk_advisory,
-      reasoning: aiAnalysis.reasoning
-    };
-  }
+  const finalRecord = {
+    listing_key: listingKey,
+    hotel_name: hotelName,
+    claimed_stars: claimedStars,
+    platform: platform,
+    url: url,
+    city: city,
+    verified_at: new Date().toISOString(),
+    model: aiAnalysis.model || "deepseek/deepseek-v4.1-flash (Hermes VPS)",
+    latency_ms: latencyMs,
+    latency_sec: (latencyMs / 1000).toFixed(1),
+    verdict: aiAnalysis.verdict,
+    confidence: aiAnalysis.confidence,
+    concise_summary: aiAnalysis.concise_summary,
+    refund_advisory: aiAnalysis.refund_advisory,
+    investigation_findings: aiAnalysis.investigation_findings || `AI cross-examined official VNAT registry candidates in ${city || 'Vietnam'} via Hermes VPS.`,
+    statutory_infractions: aiAnalysis.statutory_infractions || [],
+    tcvn_deficiencies: aiAnalysis.tcvn_deficiencies || [],
+    risk_advisory: aiAnalysis.risk_advisory,
+    reasoning: aiAnalysis.reasoning
+  };
 
   // Cache permanently in memory
   memoryCache.set(listingKey, finalRecord);

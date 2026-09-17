@@ -189,5 +189,82 @@
     "tcvn_deficiencies": [],
     "risk_advisory": "NO RISK: Officially certified luxury hotel authenticated against Vietnam National Authority of Tourism registry.",
     "reasoning": "Identity authenticated against official VNAT Accreditation #8088 (\"Khu căn hộ du lịch Vinpearl Condotel Riverfront Danang\"). Certified as 5 Stars under Article 50 of Vietnam's Law on Tourism 2017."
+  },
+  "https-www-booking-com-hotel-vn-melia-vinpearl-danang-riverfont-html": {
+    "listing_key": "https-www-booking-com-hotel-vn-melia-vinpearl-danang-riverfont-html",
+    "hotel_name": "Melia Vinpearl Danang Riverfront",
+    "claimed_stars": 5,
+    "platform": "Booking.com",
+    "url": "https://www.booking.com/hotel/vn/melia-vinpearl-danang-riverfont.html",
+    "city": "Da Nang",
+    "verified_at": "2026-09-17T17:57:47.790Z",
+    "model": "deepseek/deepseek-v4.1-flash (Hermes VPS)",
+    "latency_ms": 20013,
+    "latency_sec": "20.0",
+    "verdict": "VERIFIED_COMPLIANT",
+    "confidence": 0.99,
+    "concise_summary": "Melia Vinpearl Danang Riverfront is the commercial/Melia-managed identity of Khu căn hộ du lịch Vinpearl Condotel Riverfront Danang (VNAT #8088), a 5-star accredited property at 341 Trần Hưng Đạo, Đà Nẵng.",
+    "refund_advisory": "Not applicable; the property is verified as officially accredited under Vietnamese law.",
+    "investigation_findings": "AI cross-examined official VNAT registry candidates in Da Nang via Hermes VPS.",
+    "statutory_infractions": [],
+    "tcvn_deficiencies": [],
+    "risk_advisory": "No deceptive-listing risk identified. The property is officially accredited and the commercial name corresponds to a valid VNAT-registered 5-star accommodation.",
+    "reasoning": "The official VNAT registry lists Khu căn hộ du lịch Vinpearl Condotel Riverfront Danang, Cert #8088, 5★, at 341 Trần Hưng Đạo, Quận Sơn Trà, Thành phố Đà Nẵng. The audited Booking.com listing uses the trade name Melia Vinpearl Danang Riverfront, which is the commercial/Melia-managed identity of the same property. The address matches the VNAT-accredited property, and the 5-star claim is consistent with the registered classification. Therefore, the listing is not an unaccredited or deceptive listing; it reflects a valid statutory accreditation under an operator/commercial rebrand."
+  },
+  "https-www-agoda-com-luxury-danang-penthouse-hotel-danang-vn-html": {
+    "listing_key": "https-www-agoda-com-luxury-danang-penthouse-hotel-danang-vn-html",
+    "hotel_name": "Luxury Danang Beachfront Penthouse with Private Pool",
+    "claimed_stars": 5,
+    "platform": "Agoda",
+    "url": "https://www.agoda.com/luxury-danang-penthouse/hotel/danang-vn.html",
+    "city": "Da Nang",
+    "verified_at": "2026-09-17T17:45:59.419Z",
+    "model": "openai/gpt-oss-120b (Hermes VPS Fallback)",
+    "verdict": "UNACCREDITED_DECEPTIVE_LISTING",
+    "confidence": 0.95,
+    "concise_summary": "This is not a 5-star hotel. It is not in the Vietnamese government registry, and has been deceptively advertised by Agoda. If you have stayed at this hotel, I recommend that you seek a refund from Agoda due to their deceptive advertising under Vietnamese law.",
+    "refund_advisory": "Under Article 9 Clause 8 of the Law on Tourism 2017, any person or entity that provides false or misleading information about tourism services is liable for civil liability and must compensate the consumer. Decree 85/2021/ND-CP further stipulates administrative fines (up to VND 200 million) for online travel agencies that list non‑accredited properties as hotels. You may file a complaint with the Ministry of Culture, Sports and Tourism (MCT) or the local Department of Tourism, request a full refund from Agoda, and, if necessary, pursue civil damages for misrepresentation.",
+    "statutory_infractions": [
+      "Violation of Article 9 Clause 8 of Law on Tourism 2017 (misleading advertising)",
+      "Breach of Decree 85/2021/ND-CP on penalties for false hotel listings on online platforms",
+      "Non‑compliance with Circular 02/2020/TT‑BGTVT on obligations of online travel agencies"
+    ],
+    "tcvn_deficiencies": [
+      "The property is a private penthouse, not a hotel; it lacks mandatory 5‑star facilities such as 24‑hour front desk, on‑site restaurant, conference rooms, and recreational areas required by TCVN 4391:2015",
+      "Room count and public area size do not meet the minimum thresholds for a 5‑star classification",
+      "Safety and fire protection systems (e.g., sprinkler system, fire alarm zones) are not verified for a hotel‑type building as required by TCVN 4391:2015"
+    ],
+    "risk_advisory": "Travelers booking this listing face a high risk of consumer fraud: the advertised 5‑star status is unsupported, meaning the accommodation may lack hotel‑level services, safety standards, and legal consumer protections. Booking through Agoda does not guarantee statutory compliance, so travelers should request a refund, avoid future bookings of unregistered properties, and report the listing to the authorities.",
+    "reasoning": "The audited listing \"Luxury Danang Beachfront Penthouse with Private Pool\" does not correspond to any name, franchise, management contract, commercial or historical name in the official VNAT registry for Da Nang. None of the accredited hotels listed (e.g., Vinpearl Danang, Furama, Hyatt Regency, Pullman, Novotel, etc.) match the description or address of a beachfront penthouse. The only similar entries are condo‑type properties (Altara Suites, Vinpearl Condotel Riverfront) which are registered as serviced apartments, not hotels, and they are not marketed under the exact title used by Agoda. Consequently, the listing is a non‑accredited accommodation falsely presented as a 5‑star hotel, violating Vietnamese tourism advertising laws and failing to meet TCVN 4391:2015 star criteria."
+  },
+  "https-www-agoda-com-luxury-danang-beachfront-penthouse-hotel-da-nang-vn-html": {
+    "listing_key": "https-www-agoda-com-luxury-danang-beachfront-penthouse-hotel-da-nang-vn-html",
+    "hotel_name": "Luxury Danang Beachfront Penthouse with Private Pool",
+    "claimed_stars": 5,
+    "platform": "Agoda",
+    "url": "https://www.agoda.com/luxury-danang-beachfront-penthouse/hotel/da-nang-vn.html",
+    "city": "Da Nang",
+    "verified_at": "2026-09-17T17:59:18.066Z",
+    "model": "openai/gpt-oss-120b (Hermes VPS Fallback)",
+    "latency_ms": 20463,
+    "latency_sec": "20.5",
+    "verdict": "UNACCREDITED_DECEPTIVE_LISTING",
+    "confidence": 0.95,
+    "concise_summary": "This is not a 5-star hotel. It is not in the Vietnamese government registry, and has been deceptively advertised by Agoda. If you have stayed at this hotel, I recommend that you seek a refund from Agoda due to their deceptive advertising under Vietnamese law.",
+    "refund_advisory": "Article 9 Clause 8 of the Law on Tourism 2017 prohibits businesses from providing false or misleading information about tourism services. Decree 85/2021/ND-CP specifies administrative penalties (up to VND 200 million or suspension of business license) for such violations. Under the Consumer Protection Law, consumers may claim a full refund and compensation for damages caused by deceptive listings.",
+    "investigation_findings": "AI cross-examined official VNAT registry candidates in Da Nang via Hermes VPS.",
+    "statutory_infractions": [
+      "Violation of Article 9 Clause 8 of Law on Tourism 2017 (misleading advertising)",
+      "Violation of Decree 85/2021/ND-CP on penalties for false tourism information",
+      "Potential breach of Article 31 of the Consumer Protection Law regarding truthful information"
+    ],
+    "tcvn_deficiencies": [
+      "No evidence of compliance with TCVN 4391:2015 minimum room size (≥45 m² for 5‑star)",
+      "No verified fire‑safety systems (sprinklers, smoke detectors) as required for 5‑star classification",
+      "Absence of required on‑site medical facilities and 24‑hour security staff per TCVN standards",
+      "Lack of accredited food‑service facilities (restaurant, bar) meeting 5‑star service criteria"
+    ],
+    "risk_advisory": "Travelers booking this listing may face sub‑standard accommodation, lack of safety systems, and no legal recourse as the property is not a licensed hotel. Booking through Agoda under a false 5‑star claim increases the risk of financial loss and safety hazards. Consumers should cancel the reservation, request a refund, and choose a VNAT‑accredited hotel.",
+    "reasoning": "The advertised \"Luxury Danang Beachfront Penthouse with Private Pool\" does not correspond to any entry in the VNAT (Vietnam National Administration of Tourism) accredited hotel list for Da Nang. The closest matching entries are condo‑type properties (e.g., Altara Suites, Vinpearl Condotel Riverfront) but those are registered as serviced apartments, not 5‑star hotels, and their official names differ. No official franchise or management contract (Marriott, Accor, IHG, etc.) links this penthouse to a recognized hotel brand. Consequently, the listing misrepresents the property as a 5‑star hotel, violating Vietnamese tourism advertising regulations and failing to meet the structural, safety, and service criteria of TCVN 4391:2015. This constitutes deceptive advertising and warrants the UNACCREDITED_DECEPTIVE_LISTING verdict."
   }
 }
