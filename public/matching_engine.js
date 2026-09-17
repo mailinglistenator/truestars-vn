@@ -206,6 +206,7 @@ class TrueStarsMatcher {
     this.byAgodaSlug = new Map();
     this.byAgodaId = new Map();
     this.byBookingSlug = new Map();
+    this.bySlugName = new Map();
 
     if (Array.isArray(hotelsList) && hotelsList.length > 0) {
       this.loadHotels(hotelsList);
@@ -231,6 +232,7 @@ class TrueStarsMatcher {
     this.byAgodaSlug.clear();
     this.byAgodaId.clear();
     this.byBookingSlug.clear();
+    this.bySlugName.clear();
 
     for (const h of this.hotels) {
       const ota = h.ota_identities || {};
@@ -265,6 +267,19 @@ class TrueStarsMatcher {
           this.byBookingSlug.set(bslug.toLowerCase(), h);
         }
       }
+
+      // Index all unhyphenated brand slugs for exact phrase lookup
+      const allSlugs = [
+        ...(ota.trip_slugs || []),
+        ...(ota.agoda_slugs || []),
+        ...(ota.booking_slugs || [])
+      ];
+      for (const s of allSlugs) {
+        if (s) {
+          const unhyphen = removeAccents(s.replace(/-/g, " "));
+          if (unhyphen) this.bySlugName.set(unhyphen, h);
+        }
+      }
     }
   }
 
@@ -277,6 +292,16 @@ class TrueStarsMatcher {
     let matchedHotel = null;
     let matchType = "NONE";
     let matchScore = 0.0;
+
+    // Auto-parse URL if otaSlug/otaId/platform are not provided
+    if (originalUrl && (!otaSlug || !otaId || otaPlatform === "Direct Input" || !otaPlatform)) {
+      const parsed = parseOtaUrl(originalUrl);
+      if (!otaSlug && parsed.otaSlug) otaSlug = parsed.otaSlug;
+      if (!otaId && parsed.otaId) otaId = parsed.otaId;
+      if ((otaPlatform === "Direct Input" || !otaPlatform) && parsed.platform) otaPlatform = parsed.platform;
+      if (!name && parsed.name) name = parsed.name;
+      if (!province && parsed.city) province = parsed.city;
+    }
 
     // 1. DETERMINISTIC AGGREGATOR IDENTITY LOOKUP (Zero False Positives)
     if (otaPlatform === "Trip.com") {
@@ -309,6 +334,15 @@ class TrueStarsMatcher {
 
     // 2. FALLBACK: Text / Fuzzy resolution if not matched via exact aggregator ID
     const isUrlQuery = originalUrl && originalUrl.length > 0;
+
+    if (!matchedHotel && name) {
+      const normInput = removeAccents(name);
+      if (this.bySlugName && this.bySlugName.has(normInput)) {
+        matchedHotel = this.bySlugName.get(normInput);
+        matchType = "DETERMINISTIC_SLUG_NAME_LINK";
+        matchScore = 1.0;
+      }
+    }
 
     if (!matchedHotel && name) {
       const candidates = this.findMatches(name, province, 0.45);

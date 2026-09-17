@@ -217,21 +217,45 @@ module.exports = async (req, res) => {
   // 2. Statutory Precedence Check (Government Whitelist ALWAYS overrides AI)
   let statutoryMatch = null;
   try {
-    const wlPath = path.join(process.cwd(), 'public', 'vnat_whitelist.json');
-    if (fs.existsSync(wlPath)) {
-      const data = JSON.parse(fs.readFileSync(wlPath, 'utf8'));
-      const { TrueStarsMatcher } = require('../public/matching_engine.js');
-      const m = new TrueStarsMatcher(data);
-      const classification = m.classify({
-        name: hotelName,
-        claimedStars,
-        hasDorm,
-        otaPlatform: platform,
-        province: city,
-        originalUrl: url
-      });
-      if (classification.verdict === "VERIFIED_LEGITIMATE") {
-        statutoryMatch = classification;
+    const candidatePaths = [
+      path.join(process.cwd(), 'data', 'vnat_whitelist.json'),
+      path.join(process.cwd(), 'public', 'vnat_whitelist.json'),
+      path.join(__dirname, '..', 'data', 'vnat_whitelist.json'),
+      path.join(__dirname, '..', 'public', 'vnat_whitelist.json')
+    ];
+    let data = null;
+    for (const p of candidatePaths) {
+      if (fs.existsSync(p)) {
+        try {
+          data = JSON.parse(fs.readFileSync(p, 'utf8'));
+          break;
+        } catch (e) {}
+      }
+    }
+
+    if (data) {
+      let TrueStarsMatcher = null;
+      try {
+        TrueStarsMatcher = require('../public/matching_engine.js').TrueStarsMatcher;
+      } catch (e) {
+        try {
+          TrueStarsMatcher = require(path.join(process.cwd(), 'public', 'matching_engine.js')).TrueStarsMatcher;
+        } catch (e2) {}
+      }
+
+      if (TrueStarsMatcher) {
+        const m = new TrueStarsMatcher(data);
+        const classification = m.classify({
+          name: hotelName,
+          claimedStars,
+          hasDorm,
+          otaPlatform: platform,
+          province: city,
+          originalUrl: url
+        });
+        if (classification.verdict === "VERIFIED_LEGITIMATE") {
+          statutoryMatch = classification;
+        }
       }
     }
   } catch (err) {
