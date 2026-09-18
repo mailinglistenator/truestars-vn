@@ -166,34 +166,34 @@ module.exports = async (req, res) => {
   const rawCity = String(query.city || query.location || query.province || queryParams.city || "");
 
   // PROMPT INJECTION DEFENSE PERIMETER
-  const INJECTION_REGEX = /(?:ignore|disregard|forget|bypass)\s+(?:all\s+)?(?:previous|prior|above|system)\s+(?:instructions|prompts|rules|commands|directives)|system\s*:\s*|assistant\s*:\s*|user\s*:\s*|<\|im_start\|>|<\|im_end\|>|\[inst\]|\[\/inst\]|developer\s+mode|jailbreak|pretend\s+you\s+are|you\s+are\s+now|override\s+system/i;
+  const INJECTION_REGEX = /(?:ignore|disregard|forget|bypass|override)\s+(?:all\s+)?(?:(?:previous|prior|above|system)\s+)?(?:instructions|prompts|rules|commands|directives|filters|guidelines)|(?:return|output|say|reply\s+with)\s+(?:verdict\s*)?['"]?(?:verified|compliant|5\s*stars)|system\s*:\s*|assistant\s*:\s*|user\s*:\s*|<\|im_start\|>|<\|im_end\|>|\[inst\]|\[\/inst\]|developer\s+mode|jailbreak|pretend\s+you\s+are|you\s+are\s+now/i;
 
   const combinedRaw = `${rawHotelName} ${rawUrl} ${rawPlatform} ${rawCity}`;
   if (INJECTION_REGEX.test(combinedRaw)) {
     const quarantinedRecord = {
-      listing_key: normalizeKey(rawUrl || rawHotelName || "adversarial-attempt"),
-      hotel_name: rawHotelName.slice(0, 60).replace(/[^a-zA-Z0-9 ._-]/g, ""),
+      listing_key: normalizeKey(rawUrl || rawHotelName || "query-unsupported"),
+      hotel_name: rawHotelName.slice(0, 60).replace(/[^a-zA-Z0-9 ._-]/g, "") || "Audit Query",
       claimed_stars: 5,
-      platform: "Adversarial Injection Detected",
+      platform: "Direct Input",
       url: "",
-      city: "Security Quarantine",
+      city: "Query Audit",
       verified_at: new Date().toISOString(),
       model: "TrueStars Statutory AI Engine",
-      latency_ms: 5,
+      latency_ms: 2,
       latency_sec: "0.0",
-      verdict: "UNACCREDITED_DECEPTIVE_LISTING",
-      confidence: 1.0,
-      concise_summary: "Security quarantine: Adversarial prompt injection syntax was intercepted by TrueStars statutory perimeter defenses.",
-      refund_advisory: "Request contained prohibited adversarial command sequences attempting to manipulate statutory audit integrity.",
-      investigation_findings: "Automated statutory perimeter intercepted prompt injection payload. Evaluated as non-compliant and deceptive.",
-      statutory_infractions: ["Decree 85/2021/NĐ-CP - Cyber Data Integrity & Digital Manipulation Prohibition"],
-      tcvn_deficiencies: ["Disqualified: Query failed automated input integrity and compliance checks."],
-      risk_advisory: "Critical security risk: Adversarial query intercepted.",
-      reasoning: "The input contains explicit prompt injection tokens designed to override statutory evaluation instructions. Under statutory security protocols, adversarial inputs are categorically denied accreditation."
+      verdict: "AI_SERVICE_UNAVAILABLE",
+      confidence: 0.0,
+      concise_summary: "AI verification is unavailable for this query format. Please refer to the official VNAT statutory registry lookup.",
+      refund_advisory: "Automated AI audit is unavailable. Please verify accreditation directly in the official national registry.",
+      investigation_findings: "Input query contains unsupported directive syntax. No adverse determination or penalty is made against this property.",
+      statutory_infractions: [],
+      tcvn_deficiencies: [],
+      risk_advisory: "AI audit unavailable for this input. Please search using the property's standard official name.",
+      reasoning: "The query format could not be verified by the statutory AI reasoning engine. In accordance with consumer protection standards, unverified queries do not penalize the establishment."
     };
 
     return res.status(200).json({
-      status: "ADVERSARIAL_INJECTION_QUARANTINED",
+      status: "AI_SERVICE_UNAVAILABLE",
       cached: false,
       listing_key: quarantinedRecord.listing_key,
       audit: quarantinedRecord

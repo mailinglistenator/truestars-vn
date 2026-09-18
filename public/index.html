@@ -1493,14 +1493,14 @@
       const origText1 = btn1 ? btn1.innerHTML : '';
       const origText2 = btn2 ? btn2.innerHTML : '';
 
-      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>⏳ Investigating Rebrand via Hermes VPS...</span>`; }
+      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>⏳ Investigating Rebrand via Statutory AI...</span>`; }
       if (btn2) { btn2.disabled = true; btn2.innerHTML = `⏳ AI Investigating Rebrand...`; }
 
       const key = currentAudit.ai_verification_key;
       const startTime = performance.now();
       const cityName = (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : (currentAudit.matched_hotel ? currentAudit.matched_hotel.province : "") || "";
 
-      // Dispatch fetch immediately with force: true to guarantee live Hermes VPS inference
+      // Dispatch fetch immediately with force: true to guarantee live statutory AI inference
       const fetchPromise = fetch('/api/ai_verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1515,7 +1515,7 @@
         })
       });
 
-      // Advance stages naturally while the live LLM inference is running on the VPS
+      // Advance stages naturally while the live LLM inference is running
       const stageTimer1 = setTimeout(() => {
         icon1.innerHTML = '✅'; step1.style.color = '#34d399'; step1.style.fontWeight = 'normal';
         icon2.innerHTML = '🔄'; step2.style.color = '#38bdf8'; step2.style.fontWeight = '700';
@@ -1525,7 +1525,7 @@
       const stageTimer2 = setTimeout(() => {
         icon2.innerHTML = '✅'; step2.style.color = '#34d399'; step2.style.fontWeight = 'normal';
         icon3.innerHTML = '🔄'; step3.style.color = '#38bdf8'; step3.style.fontWeight = '700';
-        statusTitle.textContent = "DeepSeek Flash 4.1 investigating commercial rebranding, operator contracts, & statutory compliance...";
+        statusTitle.textContent = "TrueStars AI investigating commercial rebranding, operator contracts, & statutory compliance...";
       }, 1800);
 
       let auditRecord = null;
@@ -1547,7 +1547,7 @@
       } catch (err) {
         clearTimeout(stageTimer1);
         clearTimeout(stageTimer2);
-        console.error("Hermes VPS AI audit error:", err);
+        console.error("Statutory AI audit error:", err);
       }
 
       const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
@@ -1555,12 +1555,16 @@
       // Stage 3 complete
       icon3.innerHTML = '✅'; step3.style.color = '#34d399'; step3.style.fontWeight = 'normal';
       const latencyDisplay = auditRecord && auditRecord.latency_sec ? auditRecord.latency_sec : elapsedSec;
-      statusTitle.textContent = `✅ Statutory AI Audit Complete (${latencyDisplay}s • Hermes VPS • DeepSeek Flash 4.1)`;
+      statusTitle.textContent = `✅ Statutory AI Audit Complete (${latencyDisplay}s • Statutory AI Engine)`;
       spinner.style.background = '#10b981';
 
       if (auditRecord) {
-        const isRebrandFound = auditRecord.verdict === 'VERIFIED_COMPLIANT';
-        const badgeLabel = isRebrandFound ? '🟢 REBRAND VERIFIED' : '🔴 UNACCREDITED DECEPTIVE';
+        let badgeLabel = '🔴 UNACCREDITED DECEPTIVE';
+        if (auditRecord.verdict === 'VERIFIED_COMPLIANT') {
+          badgeLabel = '🟢 REBRAND VERIFIED';
+        } else if (auditRecord.verdict === 'AI_SERVICE_UNAVAILABLE') {
+          badgeLabel = '⚪ AI UNAVAILABLE';
+        }
         if (btn1) {
           btn1.className = "btn-ai-verify btn-ai-verified";
           btn1.innerHTML = `<span>🤖 ${badgeLabel} (${latencyDisplay}s)</span>`;
@@ -1594,7 +1598,7 @@
 
       const confPercent = Math.round((audit.confidence || 0.95) * 100);
       const latencySec = audit.latency_sec ? `${audit.latency_sec}s` : (audit.latency_ms ? `${(audit.latency_ms/1000).toFixed(1)}s` : '');
-      const modelLabel = audit.model ? (audit.model.includes('Hermes') ? 'Hermes VPS' : audit.model) : 'Hermes VPS';
+      const modelLabel = audit.model || 'TrueStars Statutory AI Engine';
       confidence.innerHTML = `<span>🛡️ ${confPercent}% Statutory Confidence</span> &bull; <span style="color: #c4b5fd;">⚡ ${modelLabel}${latencySec ? ` (${latencySec})` : ''}</span>`;
 
       if (audit.verdict === 'VERIFIED_COMPLIANT') {
@@ -1645,6 +1649,26 @@
         risk.style.background = 'rgba(217, 119, 6, 0.15)';
         risk.style.borderLeftColor = '#f59e0b';
         risk.style.color = '#fef3c7';
+      } else if (audit.verdict === 'AI_SERVICE_UNAVAILABLE') {
+        badge.style.display = 'inline-block';
+        badge.style.background = '#64748b';
+        badge.style.color = '#fff';
+        badge.textContent = '⚪ AI AUDIT UNAVAILABLE';
+
+        bullets.innerHTML = `
+          <div>
+            <strong>ℹ️ Automated Verification Notice:</strong>
+            <span style="color: #94a3b8; font-weight: 700;">AUDIT UNAVAILABLE FOR THIS QUERY</span> — The automated AI audit is unavailable for this query format. In accordance with consumer protection standards, no adverse determination or penalty is assessed against this property.
+          </div>
+          <div>
+            <strong>🏛️ National Registry Recommendation:</strong>
+            Please search using the establishment's standard trade or legal name to consult the official 681-hotel National VNAT Registry directly.
+          </div>
+        `;
+
+        risk.style.background = 'rgba(100, 116, 139, 0.15)';
+        risk.style.borderLeftColor = '#64748b';
+        risk.style.color = '#cbd5e1';
       } else {
         badge.style.display = 'inline-block';
         badge.style.background = '#e11d48';
@@ -1672,13 +1696,20 @@
       }
 
       if (audit.concise_summary) {
+        const isCompliant = audit.verdict === 'VERIFIED_COMPLIANT';
+        const isUnavailable = audit.verdict === 'AI_SERVICE_UNAVAILABLE';
+        const boxBg = isCompliant ? 'rgba(16, 185, 129, 0.15)' : (isUnavailable ? 'rgba(100, 116, 139, 0.15)' : 'rgba(225, 29, 72, 0.18)');
+        const boxBorder = isCompliant ? '#10b981' : (isUnavailable ? '#64748b' : '#ef4444');
+        const boxColor = isCompliant ? '#6ee7b7' : (isUnavailable ? '#e2e8f0' : '#fca5a5');
+        const boxIcon = isCompliant ? '✅' : (isUnavailable ? 'ℹ️' : '🚨');
+
         bullets.innerHTML = `
-          <div style="background: ${audit.verdict === 'VERIFIED_COMPLIANT' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(225, 29, 72, 0.18)'}; border-left: 4px solid ${audit.verdict === 'VERIFIED_COMPLIANT' ? '#10b981' : '#ef4444'}; padding: 1rem 1.15rem; border-radius: 0 8px 8px 0; margin-bottom: 0.5rem;">
-            <div style="font-size: 1.02rem; font-weight: 700; color: ${audit.verdict === 'VERIFIED_COMPLIANT' ? '#6ee7b7' : '#fca5a5'}; line-height: 1.45; margin-bottom: 0.4rem;">
-              ${audit.verdict === 'VERIFIED_COMPLIANT' ? '✅' : '🚨'} "${audit.concise_summary}"
+          <div style="background: ${boxBg}; border-left: 4px solid ${boxBorder}; padding: 1rem 1.15rem; border-radius: 0 8px 8px 0; margin-bottom: 0.5rem;">
+            <div style="font-size: 1.02rem; font-weight: 700; color: ${boxColor}; line-height: 1.45; margin-bottom: 0.4rem;">
+              ${boxIcon} "${audit.concise_summary}"
             </div>
             ${audit.refund_advisory ? `
-              <div style="font-size: 0.88rem; color: ${audit.verdict === 'VERIFIED_COMPLIANT' ? '#a7f3d0' : '#fecdd3'}; line-height: 1.5; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.1);">
+              <div style="font-size: 0.88rem; color: ${isCompliant ? '#a7f3d0' : (isUnavailable ? '#cbd5e1' : '#fecdd3')}; line-height: 1.5; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.1);">
                 🛡️ <strong>Refund Guidance:</strong> ${audit.refund_advisory}
               </div>
             ` : ''}
@@ -1734,6 +1765,10 @@
         badge.style.background = '#d97706';
         badge.style.color = '#fff';
         badge.textContent = '🟡 PROBABLE STAR INFLATION';
+      } else if (audit.verdict === 'AI_SERVICE_UNAVAILABLE') {
+        badge.style.background = '#64748b';
+        badge.style.color = '#fff';
+        badge.textContent = '⚪ AI UNAVAILABLE';
       } else {
         badge.style.background = '#e11d48';
         badge.style.color = '#fff';
