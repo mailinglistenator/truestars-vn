@@ -40,6 +40,20 @@ def get_nous_token():
         with open(AUTH_FILE, "r", encoding="utf-8") as f:
             auth = json.load(f)
         nous = auth.get("providers", {}).get("nous", {})
+        expires_at_str = nous.get("expires_at")
+        if expires_at_str:
+            try:
+                from datetime import datetime, timezone
+                dt = datetime.fromisoformat(expires_at_str.replace("Z", "+00:00"))
+                now = datetime.now(timezone.utc)
+                if (dt - now).total_seconds() < 300:
+                    logging.info("Nous token expired or expiring soon, refreshing...")
+                    refresh_token_if_needed()
+                    with open(AUTH_FILE, "r", encoding="utf-8") as f2:
+                        auth = json.load(f2)
+                    nous = auth.get("providers", {}).get("nous", {})
+            except Exception as pe:
+                logging.warning(f"Error checking token expiry: {pe}")
         token = nous.get("access_token")
         return token
     except Exception as e:
@@ -119,7 +133,7 @@ async def verify(request: Request):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON body")
 
-    raw_name = str(payload.get("name", ""))
+    raw_name = str(payload.get("name") or payload.get("hotel_name") or "")
     raw_url = str(payload.get("url", ""))
     raw_platform = str(payload.get("platform", "Direct Input"))
     raw_city = str(payload.get("city", "Vietnam"))
@@ -228,7 +242,7 @@ async def verify(request: Request):
         ],
         "response_format": {"type": "json_object"},
         "temperature": 0.1,
-        "max_tokens": 1500
+        "max_tokens": 3500
     }
 
     try:
@@ -248,11 +262,26 @@ async def verify(request: Request):
                 parsed["latency_ms"] = int((time.time() - t0) * 1000)
                 return parsed
             else:
-                logging.warning(f"Nous returned invalid/empty JSON, falling back to Groq...")
+                logging.warning("Nous returned invalid/empty JSON, falling back to Groq...")
         else:
             logging.warning(f"Nous returned {r.status_code} ({r.text[:200]}), falling back to Groq...")
     except Exception as e:
-        logging.warning(f"Nous request failed: {e}, falling back to Groq...")
+        logging.warning(f"Nous request failed: {e}, attempting token refresh and retry...")
+        try:
+            refresh_token_if_needed()
+            token = get_nous_token()
+            headers["Authorization"] = f"Bearer {token}"
+            r = requests.post("https://inference-api.nousresearch.com/v1/chat/completions", json=payload, headers=headers, timeout=35)
+            if r.status_code == 200:
+                res_json = r.json()
+                content = res_json["choices"][0]["message"]["content"]
+                parsed = extract_json(content)
+                if parsed and parsed.get("verdict"):
+                    parsed["model"] = "TrueStars Statutory AI Engine"
+                    parsed["latency_ms"] = int((time.time() - t0) * 1000)
+                    return parsed
+        except Exception as retry_e:
+            logging.warning(f"Nous retry after refresh failed: {retry_e}, falling back to Groq...")
 
     # 2. Fast Fallback: Groq on VPS
     try:
@@ -271,7 +300,7 @@ async def verify(request: Request):
                 ],
                 "response_format": {"type": "json_object"},
                 "temperature": 0.1,
-                "max_tokens": 1500
+                "max_tokens": 3500
             }
             gr = requests.post("https://api.groq.com/openai/v1/chat/completions", json=groq_payload, headers=groq_headers, timeout=20)
             if gr.status_code == 200:
