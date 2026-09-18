@@ -97,6 +97,13 @@ const testCases = [
     expected: "UNACCREDITED_HOTEL",
     expectViolation: true,
     expectedClaimedStars: 4
+  },
+  {
+    url: "https://www.booking.com/hotel/vn/lahome-villa-apartment.html?aid=2405612&label=brave_nonbrand_organic_trigger_f3f828ac-4c6a-4b54-8e46-e2779b841553",
+    stars: 0, // Auto-detect should identify 4 stars for villa apartment
+    expected: "UNACCREDITED_HOTEL",
+    expectViolation: true,
+    expectedClaimedStars: 4
   }
 ];
 
