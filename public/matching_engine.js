@@ -1056,6 +1056,8 @@ if (typeof window !== 'undefined') {
   window.TrueStarsIsVietnam = isVietnamContext;
   window.TrueStarsInferCity = inferCityFromText;
   window.TrueStarsMatcher = TrueStarsMatcher;
+  window.removeAccents = removeAccents;
+  window.parseOtaUrl = parseOtaUrl;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
