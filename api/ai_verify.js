@@ -309,9 +309,9 @@ module.exports = async (req, res) => {
           return hLoc.includes(normCity) || normCity.includes(hLoc);
         });
         totalCityCount = allCityCandidates.length;
-        cityCandidates = allCityCandidates.slice(0, 25);
+        cityCandidates = allCityCandidates.slice(0, 12);
       } else {
-        cityCandidates = data.slice(0, 25);
+        cityCandidates = data.slice(0, 12);
       }
     }
 

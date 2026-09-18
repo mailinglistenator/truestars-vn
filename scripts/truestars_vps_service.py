@@ -178,7 +178,7 @@ async def verify(request: Request):
         raise HTTPException(status_code=400, detail="Hotel name or URL required")
 
     cand_lines = []
-    for c in candidates[:30]:
+    for c in candidates[:12]:
         cert = c.get("item_id") or c.get("decision_code") or "AUTH"
         stars = c.get("stars", 5)
         addr = sanitize_str(c.get("address", ""), 120)
