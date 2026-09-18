@@ -241,11 +241,20 @@ module.exports = async (req, res) => {
 
   const listingKey = normalizeKey(url || `${platform}-${hotelName}`);
 
-  const force = Boolean(query.force || query.live || query.refresh || queryParams.force || queryParams.live || queryParams.refresh);
+  // Disallow client-side force re-audits to prevent LLM spam.
+  // Audits are permanent, idempotent, and authoritative.
+  // Re-audits can only be forced with an authorized admin secret.
+  const adminSecret = process.env.ADMIN_REAUDIT_SECRET;
+  const authHeader = (req.headers && (req.headers['x-admin-secret'] || req.headers['authorization'])) || '';
+  const isAuthorizedAdmin = Boolean(adminSecret && (authHeader === adminSecret || query.admin_secret === adminSecret || queryParams.admin_secret === adminSecret));
+  const force = isAuthorizedAdmin && Boolean(query.force || query.live || query.refresh || queryParams.force || queryParams.live || queryParams.refresh);
   const startMs = Date.now();
 
   // 1. Check in-memory / permanent log cache only if NOT forced
   if (!force) {
+    const nameKey = normalizeKey(`${platform}-${hotelName}`);
+    const simpleKey = normalizeKey(hotelName);
+
     if (memoryCache.has(listingKey)) {
       const cached = memoryCache.get(listingKey);
       return res.status(200).json({
@@ -255,15 +264,26 @@ module.exports = async (req, res) => {
         audit: cached
       });
     }
+    if (nameKey && memoryCache.has(nameKey)) {
+      const cached = memoryCache.get(nameKey);
+      return res.status(200).json({
+        status: "ALREADY_LOGGED",
+        cached: true,
+        listing_key: nameKey,
+        audit: cached
+      });
+    }
 
     const diskLog = loadLog();
-    if (diskLog[listingKey] && diskLog[listingKey].concise_summary) {
-      memoryCache.set(listingKey, diskLog[listingKey]);
+    const diskRecord = diskLog[listingKey] || (nameKey ? diskLog[nameKey] : null) || (simpleKey ? diskLog[simpleKey] : null);
+    if (diskRecord && diskRecord.verdict && diskRecord.verdict !== "AI_SERVICE_UNAVAILABLE") {
+      memoryCache.set(listingKey, diskRecord);
+      if (nameKey) memoryCache.set(nameKey, diskRecord);
       return res.status(200).json({
         status: "ALREADY_LOGGED",
         cached: true,
         listing_key: listingKey,
-        audit: diskLog[listingKey]
+        audit: diskRecord
       });
     }
   }

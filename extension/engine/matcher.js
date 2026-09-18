@@ -853,8 +853,7 @@ async function triggerAiVerification(propertyData) {
         claimed_stars: propertyData.claimed_stars || propertyData.claimedStars || 5,
         platform: propertyData.ota_platform || propertyData.platform || "Direct Input",
         url: propertyData.original_url || propertyData.url || "",
-        city: propertyData.province || propertyData.city || (propertyData.matched_hotel ? propertyData.matched_hotel.province : "") || "",
-        force: true
+        city: propertyData.province || propertyData.city || (propertyData.matched_hotel ? propertyData.matched_hotel.province : "") || ""
       })
     });
     return await res.json();

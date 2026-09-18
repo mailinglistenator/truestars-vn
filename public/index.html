@@ -1235,6 +1235,8 @@
         return;
       }
 
+      window.latestAiAudit = null;
+
       const parsed = parseOtaUrl(rawInput);
       const hotelName = parsed.name || rawInput;
 
@@ -1336,7 +1338,11 @@
         const inlineDossier = document.getElementById('inline-ai-dossier');
         if (inlineDossier) inlineDossier.style.display = 'none';
       } else {
-        const logEntry = window.latestAiAudit || aiLog[r.ai_verification_key];
+        const key = r.ai_verification_key;
+        const nameKey = (r.property_name ? `${r.ota_platform}-${r.property_name}` : '').toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+        const logEntry = (window.latestAiAudit && (window.latestAiAudit.listing_key === key || window.latestAiAudit.listing_key === nameKey || window.latestAiAudit.hotel_name === r.property_name))
+          ? window.latestAiAudit
+          : (aiLog ? (aiLog[key] || (nameKey && aiLog[nameKey])) : null);
         if (directAiBtn) {
           directAiBtn.style.opacity = '1';
           directAiBtn.disabled = false;
@@ -1358,11 +1364,12 @@
             aiBtn.style.border = "";
             aiBtn.style.color = "";
             aiBtn.style.cursor = "pointer";
-            const reauditSuffix = dict.ai_btn_reaudit_suffix || '(Click to Re-Audit)';
-            aiBtn.innerHTML = `<span>🤖 ${badgeLabel} ${reauditSuffix}</span>`;
+            aiBtn.innerHTML = `<span>🤖 ${badgeLabel}</span>`;
           }
           if (directAiBtn) {
             directAiBtn.innerHTML = `🤖 ${badgeLabel}`;
+            directAiBtn.style.opacity = '1';
+            directAiBtn.disabled = false;
           }
           if (aiHint) {
             aiHint.innerHTML = `${dict.ai_engine_name || 'TrueStars Statutory AI Engine'}<br><span style="color: #94a3b8;">${logEntry.latency_sec ? `${logEntry.latency_sec}s` : '0.0s'}</span>`;
@@ -1723,13 +1730,21 @@
       }
 
       // 8. Re-render active AI dossier if present
-      const latestAi = window.latestAiAudit || (currentAudit.ai_verification_key && aiLog[currentAudit.ai_verification_key]);
+      const key = currentAudit.ai_verification_key;
+      const nameKey = (currentAudit.property_name ? `${currentAudit.ota_platform}-${currentAudit.property_name}` : '').toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      const latestAi = (window.latestAiAudit && (window.latestAiAudit.listing_key === key || window.latestAiAudit.listing_key === nameKey || window.latestAiAudit.hotel_name === currentAudit.property_name))
+        ? window.latestAiAudit
+        : (aiLog ? (aiLog[key] || (nameKey && aiLog[nameKey])) : null);
       if (latestAi) {
         renderInlineAiDossier(latestAi, lang);
       }
     }
 
+    let isAiAuditing = false;
+
     async function handleAiVerificationClick() {
+      if (isAiAuditing) return;
+
       const dict = (typeof I18N !== "undefined" && I18N[currentLang]) ? I18N[currentLang] : ((typeof I18N !== "undefined" && I18N["en"]) || {});
       if (!currentAudit) {
         const inputVal = document.getElementById("audit-input").value.trim();
@@ -1750,11 +1765,30 @@
         return;
       }
 
+      // Check if audit already completed / logged (Strict Zero Spam Re-Audit):
+      const key = currentAudit.ai_verification_key;
+      const nameKey = (currentAudit.property_name ? `${currentAudit.ota_platform}-${currentAudit.property_name}` : '').toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      const existing = (window.latestAiAudit && (window.latestAiAudit.listing_key === key || window.latestAiAudit.listing_key === nameKey || window.latestAiAudit.hotel_name === currentAudit.property_name)) 
+        ? window.latestAiAudit 
+        : (aiLog ? (aiLog[key] || (nameKey && aiLog[nameKey])) : null);
+
+      if (existing && existing.verdict && existing.verdict !== 'AI_SERVICE_UNAVAILABLE') {
+        renderInlineAiDossier(existing, currentLang);
+        updateAiButtonsDisplay(currentAudit, currentLang);
+        const dossier = document.getElementById("inline-ai-dossier");
+        if (dossier) {
+          dossier.style.display = "block";
+          dossier.scrollIntoView({ behavior: "smooth" });
+        }
+        return;
+      }
+
       // Pre-flight client-side injection defense on the button
       const combinedInput = `${currentAudit.property_name || ""} ${currentAudit.original_url || ""}`;
       const INJECTION_PRECHECK = /(?:ignore|disregard|forget|bypass|override)\s+(?:all\s+)?(?:(?:previous|prior|above|system)\s+)?(?:instructions|prompts|rules|commands|directives|filters|guidelines)|(?:return|output|say|reply\s+with)\s+(?:verdict\s*)?['"]?(?:verified|compliant|5\s*stars)|system\s*:\s*|assistant\s*:\s*|user\s*:\s*|<\|im_start\|>|<\|im_end\|>|\[inst\]|\[\/inst\]|developer\s+mode|jailbreak|pretend\s+you\s+are|you\s+are\s+now/i;
       if (INJECTION_PRECHECK.test(combinedInput)) {
         const unavailRecord = {
+          listing_key: key,
           hotel_name: currentAudit.property_name || "Audit Query",
           claimed_stars: currentAudit.claimed_stars || 5,
           city: (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : "Vietnam",
@@ -1770,6 +1804,7 @@
         return;
       }
 
+      isAiAuditing = true;
       const dossier = document.getElementById("inline-ai-dossier");
       if (dossier) {
         dossier.style.display = "block";
@@ -1805,11 +1840,10 @@
       if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>${dict.ai_running_btn1 || "⏳ Investigating Rebrand via Statutory AI..."}</span>`; }
       if (btn2) { btn2.disabled = true; btn2.innerHTML = dict.ai_running_btn2 || "⏳ AI Investigating Rebrand..."; }
 
-      const key = currentAudit.ai_verification_key;
       const startTime = performance.now();
       const cityName = (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : (currentAudit.matched_hotel ? currentAudit.matched_hotel.province : "") || "";
 
-      // Dispatch fetch immediately with force: true and active language
+      // Dispatch fetch (idempotent, no force override)
       const fetchPromise = fetch("/api/ai_verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1819,8 +1853,7 @@
           platform: currentAudit.ota_platform,
           url: currentAudit.original_url,
           city: cityName,
-          lang: currentLang,
-          force: true
+          lang: currentLang
         })
       });
 
@@ -1852,11 +1885,17 @@
           auditRecord = data.audit;
           auditRecord.lang = currentLang;
           aiLog[key] = auditRecord;
+          if (nameKey) aiLog[nameKey] = auditRecord;
+          window.latestAiAudit = auditRecord;
         }
       } catch (err) {
         clearTimeout(stageTimer1);
         clearTimeout(stageTimer2);
         console.error("Statutory AI audit error:", err);
+      } finally {
+        isAiAuditing = false;
+        if (btn1) btn1.disabled = false;
+        if (btn2) btn2.disabled = false;
       }
 
       const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
@@ -1875,9 +1914,6 @@
         if (btn1) btn1.innerHTML = origText1;
         if (btn2) btn2.innerHTML = origText2;
       }
-
-      if (btn1) btn1.disabled = false;
-      if (btn2) btn2.disabled = false;
     }
 
     function renderInlineAiDossier(audit, lang = currentLang) {
@@ -2174,10 +2210,13 @@
     }
 
     function openAiModalDirectly() {
-      if (window.latestAiAudit) {
-        showAiModal(window.latestAiAudit);
-      } else if (currentAudit && aiLog[currentAudit.ai_verification_key]) {
-        showAiModal(aiLog[currentAudit.ai_verification_key]);
+      const key = currentAudit ? currentAudit.ai_verification_key : null;
+      const nameKey = (currentAudit && currentAudit.property_name ? `${currentAudit.ota_platform}-${currentAudit.property_name}` : '').toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      const existing = (window.latestAiAudit && key && (window.latestAiAudit.listing_key === key || window.latestAiAudit.listing_key === nameKey || window.latestAiAudit.hotel_name === currentAudit?.property_name))
+        ? window.latestAiAudit
+        : (currentAudit && aiLog ? (aiLog[key] || (nameKey && aiLog[nameKey])) : window.latestAiAudit);
+      if (existing) {
+        showAiModal(existing);
       }
     }
 
