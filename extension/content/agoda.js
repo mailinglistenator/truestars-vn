@@ -37,18 +37,21 @@
       const txt = card.textContent.toLowerCase();
       if (txt.includes('5-star') || txt.includes('5 star')) stars = 5;
       else if (txt.includes('4-star') || txt.includes('4 star')) stars = 4;
+      else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name)) stars = 4;
     }
 
     // 3. Dorm / Bunk Bed detection
     const cardText = card.textContent.toLowerCase();
     const hasDorm = /\b(bunk|dorm|dormitory|shared bathroom|capsule|hostel)\b/i.test(cardText);
 
+    const defaultStars = /\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name) ? 4 : 5;
+
     // Target injection container
     const target = card.querySelector('[data-selenium="hotel-name"]') || titleEl;
     if (target && window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(target.parentElement || target, {
         name,
-        claimedStars: stars || 5, // audit if high-claim or hostel
+        claimedStars: stars || defaultStars,
         hasDorm
       });
     }
@@ -62,11 +65,19 @@
     headerTitle.dataset.truestarsScanned = 'true';
 
     const name = headerTitle.textContent.trim();
-    let stars = 5;
+    let stars = 0;
     const starEl = document.querySelector('[data-selenium="hotel-star-rating"]') || document.querySelector('.HeaderCms__stars');
     if (starEl) {
       const match = (starEl.getAttribute('aria-label') || starEl.textContent || '').match(/(\d(\.\d)?)/);
       if (match) stars = Math.round(parseFloat(match[1]));
+    }
+
+    if (stars === 0) {
+      const pageText = document.body.textContent.toLowerCase();
+      if (pageText.includes('5-star') || pageText.includes('5 star')) stars = 5;
+      else if (pageText.includes('4-star') || pageText.includes('4 star')) stars = 4;
+      else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name)) stars = 4;
+      else stars = 5;
     }
 
     const pageText = document.body.textContent.toLowerCase();

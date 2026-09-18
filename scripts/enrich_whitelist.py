@@ -407,7 +407,7 @@ def main():
         h["direct_trip_url"] = ota_links["trip"]["url"]
         h["direct_maps_url"] = ota_links["google_maps"]["url"]
 
-    # Write enriched list back to public and data
+    # Write enriched list back to public, data, and extension
     with open(wl_path, "w", encoding="utf-8") as f:
         json.dump(whitelist, f, ensure_ascii=False, indent=2)
 
@@ -415,9 +415,10 @@ def main():
         with open(data_wl_path, "w", encoding="utf-8") as f:
             json.dump(whitelist, f, ensure_ascii=False, indent=2)
 
-    data_wl_path = os.path.join(base_dir, "data", "vnat_whitelist.json")
-    with open(data_wl_path, "w", encoding="utf-8") as f:
-        json.dump(whitelist, f, ensure_ascii=False, indent=2)
+    ext_wl_path = os.path.join(base_dir, "extension", "data", "vnat_whitelist.json")
+    if os.path.exists(os.path.dirname(ext_wl_path)):
+        with open(ext_wl_path, "w", encoding="utf-8") as f:
+            json.dump(whitelist, f, ensure_ascii=False, indent=2)
 
     print(f"Successfully enriched {len(whitelist)} hotels with English names, destinations, and OTA links!")
     print(f"Sample hotel 0: {whitelist[0]['name']} -> {whitelist[0]['english_name']} ({whitelist[0]['english_location']})")

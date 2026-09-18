@@ -212,6 +212,73 @@
     }
     .gold-stars { color: var(--gold); }
 
+    /* Multilingual Flag Switcher */
+    .lang-bar {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+    .lang-btn {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      border-radius: 9999px;
+      padding: 0.28rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      text-decoration: none;
+    }
+    .lang-btn:hover {
+      border-color: rgba(56, 189, 248, 0.5);
+      color: #f8fafc;
+      background: rgba(56, 189, 248, 0.12);
+    }
+    .lang-btn.active {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.22);
+      color: #38bdf8;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Star Tier Pills */
+    .star-pill-group {
+      display: inline-flex;
+      gap: 0.35rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .star-pill {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      border-radius: 6px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .star-pill:hover {
+      border-color: #fbbf24;
+      color: #fef3c7;
+    }
+    .star-pill.active {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      font-weight: 700;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+    }
+
     /* Demonstration of Law Breaking */
     .law-demo-box {
       background: #070a12;
@@ -457,59 +524,86 @@
 </head>
 <body>
   <div class="container">
+    <!-- Top Bar with Flag Language Selector -->
+    <div class="lang-bar">
+      <span style="font-size: 0.75rem; color: #64748b; margin-right: 0.25rem; font-weight: 600;">🌐 Language:</span>
+      <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')" title="English">🇬🇧 EN</button>
+      <button class="lang-btn" data-lang="vi" onclick="setLanguage('vi')" title="Tiếng Việt">🇻🇳 VI</button>
+      <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')" title="中文">🇨🇳 中文</button>
+      <button class="lang-btn" data-lang="ko" onclick="setLanguage('ko')" title="한국어">🇰🇷 한국어</button>
+      <button class="lang-btn" data-lang="ja" onclick="setLanguage('ja')" title="日本語">🇯🇵 日本語</button>
+      <button class="lang-btn" data-lang="es" onclick="setLanguage('es')" title="Español">🇪🇸 ES</button>
+    </div>
+
     <header>
-      <div class="badge-gov">🛡️ STATUTORY TOURISM AUDIT WATCHDOG</div>
+      <div class="badge-gov" data-i18n="badge_gov">🛡️ STATUTORY TOURISM AUDIT WATCHDOG</div>
       <h1>TrueStars VN</h1>
-      <p class="tagline">Real-time statutory verification exposing unaccredited 4★ and 5★ hotel listings on Agoda, Booking.com, and Trip.com against the official Vietnam National Authority of Tourism (VNAT) registry.</p>
+      <p class="tagline" data-i18n="tagline">Real-time statutory verification exposing unaccredited 4★ and 5★ hotel listings on Agoda, Booking.com, and Trip.com against the official Vietnam National Authority of Tourism (VNAT) registry.</p>
       
       <div class="extension-banner">
         <div>
-          <h3>🧩 Get the TrueStars Chrome Extension</h3>
-          <p>Expose fake stars directly on Agoda, Booking.com, and Trip.com while you browse in real-time.</p>
+          <h3 data-i18n="ext_banner_title">🧩 Get the TrueStars Chrome Extension</h3>
+          <p data-i18n="ext_banner_desc">Expose fake stars directly on Agoda, Booking.com, and Trip.com while you browse in real-time.</p>
         </div>
-        <button class="btn-ext" onclick="openExtensionModal()">Get Extension</button>
+        <button class="btn-ext" onclick="openExtensionModal()" data-i18n="ext_banner_btn">Get Extension</button>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-val">301</div>
-          <div class="stat-label">Official VNAT 5-Star Hotels</div>
+          <div class="stat-label" data-i18n="stat_5star">Official VNAT 5-Star Hotels</div>
         </div>
         <div class="stat-card">
           <div class="stat-val">380</div>
-          <div class="stat-label">Official VNAT 4-Star Hotels</div>
+          <div class="stat-label" data-i18n="stat_4star">Official VNAT 4-Star Hotels</div>
         </div>
         <div class="stat-card">
           <div class="stat-val">681</div>
-          <div class="stat-label">Total Legitimate Whitelist</div>
+          <div class="stat-label" data-i18n="stat_total">Total Legitimate Whitelist</div>
         </div>
         <div class="stat-card">
           <div class="stat-val" style="color: #ef4444;">~98%</div>
-          <div class="stat-label">Hanoi OTA Star Inflation Rate</div>
+          <div class="stat-label" data-i18n="stat_inflation">Hanoi OTA Star Inflation Rate</div>
         </div>
       </div>
     </header>
 
     <!-- Main Audit Section -->
     <div class="card">
-      <div class="card-title">🔍 Run Statutory Hotel Audit</div>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
-        Paste any hotel link from Agoda, Booking.com, or Trip.com, or type a property name to cross-reference against government records.
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div class="card-title" style="margin-bottom: 0;" data-i18n="audit_card_title">🔍 Run Statutory Hotel Audit</div>
+        <span style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;" data-i18n="input_badge_objective">🎯 OBJECTIVE STATUTORY AUDIT</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;" data-i18n="audit_card_desc">
+        Paste any OTA booking link (recommended for 100% objective verification) or hotel name to cross-reference against government records.
       </p>
 
       <div class="input-group" style="margin-bottom: 0.75rem;">
-        <label>Hotel Name or OTA Booking URL</label>
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-          <input type="text" id="audit-input" placeholder="Paste any Trip.com / Agoda / Booking.com link or type a hotel name..." oninput="onAuditInputChange()" onkeydown="if(event.key==='Enter') executeAudit()" style="flex: 1; min-width: 260px;">
-          <button class="btn-submit" id="btn-run-audit" onclick="executeAudit()" style="margin: 0; width: auto; min-width: 140px; white-space: nowrap; padding: 0.75rem 1.25rem;">🔍 Verify Property</button>
-          <button class="btn-submit" id="btn-run-ai-direct" onclick="handleAiVerificationClick()" style="margin: 0; width: auto; min-width: 160px; white-space: nowrap; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #7c3aed, #4f46e5); border: 1px solid #a78bfa;">🤖 DeepSeek AI Audit</button>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
+          <label style="margin-bottom: 0; font-weight: 700;" data-i18n="input_label">Paste OTA Booking Link (Recommended: Agoda, Booking.com, or Trip.com)</label>
         </div>
-        <div id="url-hint" style="display:none; font-size: 0.82rem; color: #60a5fa; margin-top: 0.4rem; font-weight: 500;"></div>
-      </div>
+        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.6rem;" data-i18n="input_help">OTA URLs contain deterministic statutory IDs and slugs, eliminating ambiguity from marketing names.</div>
+        
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <input type="text" id="audit-input" data-i18n-placeholder="input_placeholder" placeholder="Paste full OTA booking URL (Agoda, Booking.com, Trip.com) or enter hotel name..." oninput="onAuditInputChange()" onkeydown="if(event.key==='Enter') executeAudit()" style="flex: 1; min-width: 260px;">
+          <button class="btn-submit" id="btn-run-audit" onclick="executeAudit()" style="margin: 0; width: auto; min-width: 140px; white-space: nowrap; padding: 0.75rem 1.25rem;" data-i18n="btn_verify">🔍 Verify Property</button>
+          <button class="btn-submit" id="btn-run-ai-direct" onclick="handleAiVerificationClick()" style="margin: 0; width: auto; min-width: 160px; white-space: nowrap; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #7c3aed, #4f46e5); border: 1px solid #a78bfa;" data-i18n="btn_ai">🤖 Statutory AI Audit</button>
+        </div>
 
-      <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #94a3b8; margin-bottom: 1.25rem; background: rgba(30, 41, 59, 0.5); padding: 0.5rem 0.85rem; border-radius: 6px; border: 1px solid rgba(148, 163, 184, 0.15);">
-        <span style="color: #60a5fa; font-size: 1rem;">⚡</span>
-        <span><strong>Automated TCVN 4391:2015 Facility Check:</strong> Dormitory, hostel, and shared bunk bed disqualifications are detected automatically by the statutory engine.</span>
+        <!-- Claimed Star Tier Interactive Toggle Pills -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.65rem; padding: 0.5rem 0.75rem; background: rgba(15, 23, 42, 0.4); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.08);">
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1;" data-i18n="claimed_tier_label">Audited Star Tier:</span>
+            <div class="star-pill-group">
+              <button type="button" id="star-pill-auto" class="star-pill active" onclick="setAuditStarMode(0)" data-i18n="pill_auto">⚡ Auto-Detect</button>
+              <button type="button" id="star-pill-5" class="star-pill" onclick="setAuditStarMode(5)" data-i18n="pill_5star">⭐ 5★ Luxury (Hotel / Resort)</button>
+              <button type="button" id="star-pill-4" class="star-pill" onclick="setAuditStarMode(4)" data-i18n="pill_4star">⭐ 4★ Upscale (Residence / Boutique)</button>
+            </div>
+          </div>
+          <div id="star-detection-note" style="font-size: 0.78rem; color: #a78bfa; font-weight: 600; display: none;"></div>
+        </div>
+
+        <div id="url-hint" style="display:none; font-size: 0.82rem; color: #60a5fa; margin-top: 0.4rem; font-weight: 500;"></div>
       </div>
 
       <!-- Verdict Display -->
@@ -525,7 +619,7 @@
 
             <!-- Outbound OTA Deep Links with Affiliate Tags -->
             <div style="margin-top: 0.85rem;">
-              <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem;">Direct Outbound Property Verification Links:</div>
+              <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem;" data-i18n="outbound_links_title">Direct Outbound Property Verification Links:</div>
               <div id="verdict-ota-links" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
             </div>
           </div>
@@ -533,21 +627,21 @@
           <!-- Autonomous AI Hotel Verification Action Button -->
           <div style="text-align: right;">
             <button id="btn-ai-verify" class="btn-ai-verify" onclick="handleAiVerificationClick()">
-              <span>🤖 AI Hotel Verification</span>
+              <span data-i18n="ai_audit_btn">🤖 Statutory AI Verification</span>
             </button>
-            <div id="ai-verify-hint" style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem;">Model: Nous DeepSeek Flash 4.1<br>Zero Open Ports • TLS 1.3</div>
+            <div id="ai-verify-hint" style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem;" data-i18n="ai_model_tag">Statutory Intelligence Engine<br>Government Registry Cross-Examination</div>
           </div>
         </div>
 
         <!-- Reality Check Side-by-Side -->
         <div class="reality-check-grid">
           <div class="reality-card">
-            <div class="reality-label" style="color: #fbbf24;">Marketed on Platform</div>
+            <div class="reality-label" style="color: #fbbf24;" data-i18n="marketed_on_platform">Marketed on Platform</div>
             <div id="verdict-claimed-stars" class="gold-stars" style="font-size: 1.6rem; font-weight: 800;"></div>
             <div id="verdict-claimed-sub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;"></div>
           </div>
           <div class="reality-card" id="reality-official-card">
-            <div class="reality-label" id="reality-official-label" style="color: #ef4444;">Official State Registry</div>
+            <div class="reality-label" id="reality-official-label" style="color: #ef4444;" data-i18n="official_state_registry">Official State Registry</div>
             <div id="verdict-official-stars" style="font-size: 1.6rem; font-weight: 800;"></div>
             <div id="verdict-official-sub" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;"></div>
           </div>
@@ -571,8 +665,8 @@
             <div style="display: flex; align-items: center; gap: 0.6rem;">
               <span style="font-size: 1.6rem;">🤖</span>
               <div>
-                <strong style="font-size: 1.15rem; color: #fff;">DeepSeek Flash 4.1 Statutory AI Audit</strong>
-                <div style="font-size: 0.78rem; color: #a78bfa;">Zero Open Ports • TLS 1.3 Encrypted • Official VNAT Precedence</div>
+                <strong style="font-size: 1.15rem; color: #fff;">TrueStars Statutory AI Engine</strong>
+                <div style="font-size: 0.78rem; color: #a78bfa;">Autonomous Rebrand Investigation & Official Registry Cross-Examination</div>
               </div>
             </div>
             <div id="inline-ai-badge" style="display: none; padding: 0.4rem 0.9rem; border-radius: 6px; font-weight: 800; font-size: 0.85rem;"></div>
@@ -677,15 +771,15 @@
 
     <!-- Whitelist Explorer -->
     <div class="card">
-      <div class="card-title">📋 Official National Accreditation Whitelist (681 Certified Properties)</div>
+      <div class="card-title" data-i18n="tab_registry">📋 Official National Accreditation Whitelist (681 Certified Properties)</div>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
         Complete statutory registry of all 681 state-certified 4★ and 5★ hotels nationwide, verified by the Vietnam National Authority of Tourism (VNAT). Includes direct reverse lookup booking links to Agoda, Booking.com, and Trip.com.
       </p>
 
       <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-        <input type="text" id="search-q" placeholder="Search by English commercial name, Vietnamese title, or destination..." oninput="filterRegistry()">
+        <input type="text" id="search-q" data-i18n-placeholder="filter_search_placeholder" placeholder="Search by English commercial name, Vietnamese title, or destination..." oninput="filterRegistry()">
         <select id="search-prov" onchange="filterRegistry()">
-          <option value="">All Destinations (Nationwide)</option>
+          <option value="" data-i18n="filter_all_cities">All Destinations (Nationwide)</option>
           <option value="Da Nang">Da Nang</option>
           <option value="Hanoi">Hanoi</option>
           <option value="Ho Chi Minh City">Ho Chi Minh City</option>
@@ -702,7 +796,7 @@
           <option value="Quy Nhon">Quy Nhon</option>
         </select>
         <select id="search-star" onchange="filterRegistry()">
-          <option value="">All Star Ranks (4★ & 5★)</option>
+          <option value="" data-i18n="filter_all_stars">All Star Ranks (4★ & 5★)</option>
           <option value="5">5-Star Luxury (301)</option>
           <option value="4">4-Star Upscale (380)</option>
         </select>
@@ -711,23 +805,28 @@
       <div id="registry-results" style="max-height: 550px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.85rem;"></div>
     </div>
 
-    <!-- Hall of Shame -->
+    <!-- OTA Star Misclassifications — Algorithmic Rating Distortions -->
     <div class="card">
-      <div class="card-title">🚨 OTA Hall of Shame — Most Blatant Hostel Frauds</div>
-      <table>
-        <thead>
-          <tr>
-            <th>Property Name</th>
-            <th>Location</th>
-            <th>Platform</th>
-            <th>Marketed Stars</th>
-            <th>Official Status</th>
-            <th>Avg Price</th>
-            <th>Statutory Infraction</th>
-          </tr>
-        </thead>
-        <tbody id="shame-tbody"></tbody>
-      </table>
+      <div class="card-title" data-i18n="tab_shame">🚨 OTA Star Misclassifications — Algorithmic Rating Distortions</div>
+      <div style="background: rgba(30, 41, 59, 0.5); border-left: 4px solid #60a5fa; padding: 0.85rem 1.15rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.88rem; color: #cbd5e1; line-height: 1.5;" data-i18n="shame_explanation">
+        Online booking platforms assign star ratings based on internal heuristics — such as customer review aggregates, booking popularity, pricing tiers, and automated amenity checklists — in direct contravention of Vietnamese law (Article 50, Law on Tourism 2017). In most cases, accommodation operators are not directly involved, as platforms assign these badges unilaterally through automated algorithms.
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="col_name">Property Name</th>
+              <th data-i18n="col_location">Location</th>
+              <th data-i18n="col_marketed_stars">OTA Stars</th>
+              <th data-i18n="col_official_status">Statutory Reality</th>
+              <th data-i18n="col_avg_price">Avg Price</th>
+              <th data-i18n="col_infraction">Algorithmic Distortion / Statutory Infraction</th>
+              <th data-i18n="col_outbound">Direct OTA Listing</th>
+            </tr>
+          </thead>
+          <tbody id="shame-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -819,7 +918,7 @@
         <h2 style="font-size: 1.35rem; margin: 0;">Autonomous AI Verification Dossier</h2>
       </div>
       <div style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 1.25rem;">
-        Powered by <strong style="color: #a78bfa;">Nous DeepSeek Flash 4.1</strong> • End-to-End Encrypted over TLS 1.3 • Zero Exposed VPS Ports
+        Powered by <strong style="color: #a78bfa;">TrueStars Statutory AI Engine</strong> • Direct Cross-Examination of Official State Registers
       </div>
 
       <div style="background: #090d16; border: 1px solid var(--card-border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
@@ -871,12 +970,14 @@
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="matching_engine.js"></script>
   <script>
     let matcher = null;
     let whitelistData = [];
     let aiLog = {};
     let currentAudit = null;
+    let selectedClaimedStars = 0; // 0 = Auto-detect
 
     const HALL_OF_SHAME = [
       {
@@ -886,7 +987,13 @@
         claimed: 5,
         price: "$12 / night",
         details: "Offers 8-bed female & mixed dorms; narrow tube house with zero luxury amenities.",
-        violation: "Article 9, Clause 8, Law on Tourism 2017 & TCVN 4391:2015"
+        heuristic_reason: "Platform algorithm assigned 5★ based on high review volume & popularity, despite operating shared bunk beds.",
+        violation: "Article 9 Clause 8, Law on Tourism 2017 & TCVN 4391:2015",
+        ota_links: {
+          agoda: "https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=Hanoi+Old+Quarter+Backpacker+Oasis",
+          booking: "https://www.booking.com/searchresults.html?ss=Hanoi+Old+Quarter+Backpacker+Oasis&aid=8092145",
+          trip: "https://www.trip.com/hotels/list?keyword=Hanoi+Old+Quarter+Backpacker+Oasis&Allianceid=489210&SID=1983940"
+        }
       },
       {
         name: "Da Nang Backpacker & Surf Pods",
@@ -894,8 +1001,14 @@
         ota: "Agoda",
         claimed: 4,
         price: "$9 / night",
-        details: "Capsule bunk beds, shared common bathroom, claims 4 stars on Agoda mobile app.",
-        violation: "Article 9, Clause 8, Law on Tourism 2017"
+        details: "Capsule bunk beds, shared common bathroom; platform heuristics assigned 4-star tier.",
+        heuristic_reason: "Platform automated amenity checklist misattributed capsule pods as private rooms, granting 4★ badge.",
+        violation: "Article 9 Clause 8, Law on Tourism 2017",
+        ota_links: {
+          agoda: "https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=Da+Nang+Backpacker+Surf+Pods",
+          booking: "https://www.booking.com/searchresults.html?ss=Da+Nang+Backpacker+Surf+Pods&aid=8092145",
+          trip: "https://www.trip.com/hotels/list?keyword=Da+Nang+Backpacker+Surf+Pods&Allianceid=489210&SID=1983940"
+        }
       },
       {
         name: "Saigon D1 Party Hostel & Rooftop",
@@ -903,8 +1016,14 @@
         ota: "Trip.com",
         claimed: 5,
         price: "$14 / night",
-        details: "Pub hostel sporting 5 gold stars on Trip.com; no elevator, no emergency backup generator.",
-        violation: "Law on Consumer Protection 2023 - Deceptive Practice"
+        details: "Pub hostel awarded 5 gold stars by aggregator automated rating engine; no private luxury standard.",
+        heuristic_reason: "OTA pricing band & review velocity heuristic falsely scaled budget accommodation into luxury badge.",
+        violation: "Decree 85/2021/NĐ-CP & Law on Consumer Protection 2023",
+        ota_links: {
+          agoda: "https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=Saigon+D1+Party+Hostel+Rooftop",
+          booking: "https://www.booking.com/searchresults.html?ss=Saigon+D1+Party+Hostel+Rooftop&aid=8092145",
+          trip: "https://www.trip.com/hotels/list?keyword=Saigon+D1+Party+Hostel+Rooftop&Allianceid=489210&SID=1983940"
+        }
       },
       {
         name: "Hoi An Riverside Budget Homestay",
@@ -912,13 +1031,22 @@
         ota: "Booking.com",
         claimed: 4,
         price: "$18 / night",
-        details: "Family residence with 6 guest rooms self-reported as 4-star boutique villa.",
-        violation: "Decree 45/2019/NĐ-CP - False Star Self-Declaration"
+        details: "Family residence with 6 guest rooms tagged with 4-star hotel badge by automated ranking.",
+        heuristic_reason: "Booking.com Quality Rating machine-learning model assigned 4★ based on self-reported amenity forms.",
+        violation: "Article 50, Law on Tourism 2017 & Decree 45/2019/NĐ-CP",
+        ota_links: {
+          agoda: "https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=Hoi+An+Riverside+Budget+Homestay",
+          booking: "https://www.booking.com/searchresults.html?ss=Hoi+An+Riverside+Budget+Homestay&aid=8092145",
+          trip: "https://www.trip.com/hotels/list?keyword=Hoi+An+Riverside+Budget+Homestay&Allianceid=489210&SID=1983940"
+        }
       }
     ];
 
     async function init() {
       try {
+        if (typeof initLanguage === 'function') {
+          initLanguage();
+        }
         const [resWl, resLog] = await Promise.all([
           fetch('vnat_whitelist.json?v=' + Date.now()),
           fetch('ai_verification_log.json?v=' + Date.now()).catch(() => null)
@@ -939,15 +1067,51 @@
       }
     }
 
+    function setAuditStarMode(star) {
+      selectedClaimedStars = star;
+      document.getElementById('star-pill-auto').classList.toggle('active', star === 0);
+      document.getElementById('star-pill-5').classList.toggle('active', star === 5);
+      document.getElementById('star-pill-4').classList.toggle('active', star === 4);
+
+      const note = document.getElementById('star-detection-note');
+      if (star === 5) {
+        note.style.display = 'block';
+        note.textContent = '🔒 Manual Setting: Auditing against 5★ Luxury Standard';
+      } else if (star === 4) {
+        note.style.display = 'block';
+        note.textContent = '🔒 Manual Setting: Auditing against 4★ Upscale / Residence Standard';
+      } else {
+        onAuditInputChange();
+      }
+    }
+
     function onAuditInputChange() {
       const val = document.getElementById('audit-input').value.trim();
       const hint = document.getElementById('url-hint');
+      const note = document.getElementById('star-detection-note');
+
+      let parsed = { isUrl: false, name: val, platform: "Direct Input", city: "", otaId: "", otaSlug: "" };
       if (val.startsWith('http://') || val.startsWith('https://')) {
-        const parsed = parseOtaUrl(val);
+        parsed = parseOtaUrl(val);
         hint.style.display = 'block';
         hint.textContent = `✓ Detected ${parsed.platform} Link: Identified as "${parsed.name}"${parsed.city ? ` in ${parsed.city}` : ''}`;
       } else {
         hint.style.display = 'none';
+      }
+
+      if (selectedClaimedStars === 0) {
+        const comb = `${val} ${parsed.name} ${parsed.otaSlug}`.toLowerCase();
+        if (/\b(5-star|5 star|5star|5\*|5sao|5 sao)\b/i.test(comb)) {
+          note.style.display = 'block';
+          note.textContent = '🎯 Auto-detected 5★ Luxury Tier';
+        } else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(comb) || /\b(4-star|4 star|4star|4\*|4sao|4 sao)\b/i.test(comb)) {
+          note.style.display = 'block';
+          note.textContent = '🎯 Auto-detected 4★ Tier (Serviced Residence / Apartment tier)';
+        } else if (val.length > 3) {
+          note.style.display = 'none';
+        } else {
+          note.style.display = 'none';
+        }
       }
     }
 
@@ -955,7 +1119,7 @@
       const rawInput = document.getElementById('audit-input').value.trim();
 
       if (!rawInput) {
-        alert("Please enter a hotel name or booking URL.");
+        alert("Please enter a hotel booking link or property name.");
         return;
       }
 
@@ -964,7 +1128,7 @@
 
       currentAudit = matcher.classify({
         name: hotelName,
-        claimedStars: 0, // Automatically inferred by engine from official registry / listing cues
+        claimedStars: selectedClaimedStars, // 0 = Auto-detect by engine, or 4 / 5 from pills
         hasDorm: false,  // Evaluated automatically by engine via detectDormitoryFacility
         otaPlatform: parsed.platform,
         province: parsed.city,
@@ -984,32 +1148,33 @@
       const badge = document.getElementById('verdict-badge');
       const officialCard = document.getElementById('reality-official-card');
       const officialLabel = document.getElementById('reality-official-label');
+      const dict = (typeof I18N !== 'undefined' && I18N[currentLang]) ? I18N[currentLang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
 
       if (!r.is_violation) {
         badge.style.background = '#059669';
         badge.style.color = '#fff';
-        badge.textContent = '🟢 VERIFIED LEGITIMATE';
+        badge.textContent = dict.verdict_verified || '🟢 VERIFIED LEGITIMATE';
         officialLabel.style.color = '#10b981';
         document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#34d399;">${'★'.repeat(r.official_stars)} (${r.official_stars}★)</span>`;
         document.getElementById('verdict-official-sub').textContent = `VNAT Certificate #${r.matched_hotel ? r.matched_hotel.item_id : 'AUTH'}`;
       } else if (r.verdict === 'BLATANT_HOSTEL_FRAUD') {
         badge.style.background = '#7f1d1d';
         badge.style.color = '#fca5a5';
-        badge.textContent = '🚨 FAKE 5★ (BACKPACKER HOSTEL)';
+        badge.textContent = dict.verdict_fake_hostel || '🚨 FAKE 5★ (BACKPACKER HOSTEL)';
         officialLabel.style.color = '#ef4444';
         document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Disqualified Hostel)</span>';
         document.getElementById('verdict-official-sub').textContent = 'Sells Bunk / Dormitory Beds';
       } else if (r.verdict === 'STAR_INFLATION') {
         badge.style.background = '#d97706';
         badge.style.color = '#fff';
-        badge.textContent = '🟡 STAR INFLATION';
+        badge.textContent = dict.verdict_star_inflation || '🟡 STAR INFLATION';
         officialLabel.style.color = '#f59e0b';
         document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#f59e0b;">${'★'.repeat(r.official_stars)} (${r.official_stars}★)</span>`;
         document.getElementById('verdict-official-sub').textContent = `Accredited for only ${r.official_stars}★ (+${r.claimed_stars - r.official_stars}★ Inflated)`;
       } else {
         badge.style.background = '#e11d48';
         badge.style.color = '#fff';
-        badge.textContent = '🔴 UNACCREDITED HOTEL';
+        badge.textContent = (r.claimed_stars === 4 ? `${dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'} (4★)` : (dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'));
         officialLabel.style.color = '#ef4444';
         document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Unaccredited)</span>';
         document.getElementById('verdict-official-sub').textContent = 'Missing from National Registry';
@@ -1246,6 +1411,34 @@
       updateRefundLetter();
 
       box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function refreshAuditVerdictI18n(lang) {
+      if (!currentAudit) return;
+      const dict = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
+      const badge = document.getElementById('verdict-badge');
+      if (badge) {
+        if (!currentAudit.is_violation) {
+          badge.textContent = dict.verdict_verified || '🟢 VERIFIED LEGITIMATE';
+        } else if (currentAudit.verdict === 'BLATANT_HOSTEL_FRAUD') {
+          badge.textContent = dict.verdict_fake_hostel || '🚨 FAKE 5★ (BACKPACKER HOSTEL)';
+        } else if (currentAudit.verdict === 'STAR_INFLATION') {
+          badge.textContent = dict.verdict_star_inflation || '🟡 STAR INFLATION';
+        } else {
+          badge.textContent = (currentAudit.claimed_stars === 4 ? `${dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'} (4★)` : (dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'));
+        }
+      }
+      const facText = document.getElementById('verdict-facility-text');
+      const facBadge = document.getElementById('verdict-facility-badge');
+      if (facText && facBadge) {
+        if (currentAudit.has_dorm) {
+          facBadge.textContent = dict.dorm_disqualified_badge || 'DISQUALIFIED';
+          facText.innerHTML = dict.dorm_disqualified_text || '';
+        } else {
+          facBadge.textContent = dict.dorm_passed_badge || 'PASSED';
+          facText.innerHTML = dict.dorm_passed_text || '';
+        }
+      }
     }
 
     async function handleAiVerificationClick() {
@@ -1711,11 +1904,20 @@
         <tr>
           <td><strong>${h.name}</strong><br><small style="color: var(--text-muted); font-size: 0.75rem;">${h.details}</small></td>
           <td>${h.city}</td>
-          <td><span class="tag-platform">${h.ota}</span></td>
-          <td><span class="gold-stars">${'★'.repeat(h.claimed)}</span></td>
-          <td><span style="color: #ef4444; font-weight: 700;">❌ 0★ (Hostel)</span></td>
+          <td><span class="gold-stars">${'★'.repeat(h.claimed)}</span> <span class="tag-platform" style="margin-left: 4px;">${h.ota}</span></td>
+          <td><span style="color: #ef4444; font-weight: 700;">❌ 0★ (Unaccredited / Dormitory)</span></td>
           <td style="color: #34d399; font-weight: 600;">${h.price}</td>
-          <td><span style="color: #f87171; font-size: 0.75rem;">${h.violation}</span></td>
+          <td>
+            <div style="font-size: 0.78rem; color: #cbd5e1; margin-bottom: 0.25rem;">${h.heuristic_reason}</div>
+            <div style="color: #f87171; font-size: 0.72rem;">⚖️ ${h.violation}</div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+              <a href="${h.ota_links.booking}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-booking" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">🟦 Booking ↗</a>
+              <a href="${h.ota_links.agoda}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-agoda" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">🟧 Agoda ↗</a>
+              <a href="${h.ota_links.trip}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-trip" style="font-size: 0.72rem; padding: 0.25rem 0.5rem;">🟨 Trip ↗</a>
+            </div>
+          </td>
         </tr>
       `).join('');
     }

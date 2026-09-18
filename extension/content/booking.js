@@ -34,16 +34,19 @@
       const cardText = card.textContent.toLowerCase();
       if (cardText.includes('5-star') || cardText.includes('5 out of 5')) stars = 5;
       else if (cardText.includes('4-star') || cardText.includes('4 out of 5')) stars = 4;
+      else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name)) stars = 4;
     }
 
     // 3. Dorm bed detection
     const fullText = card.textContent.toLowerCase();
     const hasDorm = /\b(bunk bed|dormitory|dorm|bed in|shared bathroom|hostel)\b/i.test(fullText);
 
+    const defaultStars = /\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name) ? 4 : 5;
+
     if (titleEl && window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(titleEl.parentElement || titleEl, {
         name,
-        claimedStars: stars || 5,
+        claimedStars: stars || defaultStars,
         hasDorm
       });
     }
@@ -57,11 +60,29 @@
     headerTitle.dataset.truestarsScanned = 'true';
 
     const name = headerTitle.textContent.replace(/Hotel/i, ' Hotel').trim();
-    let stars = 5;
-    const starWrapper = document.querySelector('[data-testid="rating-stars"]') || document.querySelector('.bui-rating');
+    let stars = 0;
+    const starWrapper = document.querySelector('[data-testid="rating-stars"]') ||
+                        document.querySelector('[data-testid="quality-rating"]') ||
+                        document.querySelector('.bui-rating') ||
+                        document.querySelector('[aria-label*="star" i]') ||
+                        document.querySelector('[aria-label*="out of 5" i]');
     if (starWrapper) {
       const svgs = starWrapper.querySelectorAll('svg');
-      if (svgs && svgs.length > 0) stars = svgs.length;
+      if (svgs && svgs.length > 0) {
+        stars = svgs.length;
+      } else {
+        const aria = (starWrapper.getAttribute('aria-label') || '').toLowerCase();
+        const match = aria.match(/(\d)(\s*|\-)(star|out of 5|sao)/i) || aria.match(/(\d)/);
+        if (match) stars = parseInt(match[1], 10);
+      }
+    }
+
+    if (stars === 0) {
+      const pageText = document.body.textContent.toLowerCase();
+      if (pageText.includes('5-star') || pageText.includes('5 out of 5')) stars = 5;
+      else if (pageText.includes('4-star') || pageText.includes('4 out of 5')) stars = 4;
+      else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name)) stars = 4;
+      else stars = 5;
     }
 
     const pageText = document.body.textContent.toLowerCase();

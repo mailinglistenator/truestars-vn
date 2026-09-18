@@ -292,5 +292,35 @@
     ],
     "risk_advisory": "CRITICAL RISK: Traveler is booking a budget hostel or guest pod while paying 4-star/5-star rates under false Booking.com marketing.",
     "reasoning": "Technical legal audit confirms property 'Hanoi Central Backpacker Hostel & Pods' in Thành phố Hà Nội advertises 5 stars on Booking.com while offering shared dormitory accommodations. Under TCVN 4391:2015, dormitory facilities automatically disqualify any establishment from luxury hotel ranking. This constitutes a direct deceptive representation under Article 9 of Vietnam's Law on Tourism 2017."
+  },
+  "https-www-booking-com-hotel-vn-jame-bay-residence-html": {
+    "listing_key": "https-www-booking-com-hotel-vn-jame-bay-residence-html",
+    "hotel_name": "Jame Bay Residence",
+    "claimed_stars": 4,
+    "platform": "Direct Input",
+    "url": "https://www.booking.com/hotel/vn/jame-bay-residence.html",
+    "city": "Da Nang",
+    "verified_at": "2026-09-18T09:57:13.509Z",
+    "model": "TrueStars Statutory AI Engine",
+    "latency_ms": 12227,
+    "latency_sec": "12.2",
+    "verdict": "UNACCREDITED_DECEPTIVE_LISTING",
+    "confidence": 0.97,
+    "concise_summary": "Jame Bay Residence (Da Nang) does not correspond to any property in the VNAT accredited hotel registry for Da Nang, under any Vietnamese name, English trade name, translation, or international rebrand (e.g. Vinpearl/Meliá/Marriott/Accor/IHG management agreements). No VNAT certificate number can be attributed to this property, and the claimed 4★ classification cannot be verified against any accredited record. The listing is therefore treated as an unaccredited commercial offering marketed with a star classification it has not been awarded.",
+    "refund_advisory": "Under the Law on Tourism 2017 (Luật Du lịch 09/2017/QH14), specifically Art. 48 (rights of tourists) and Art. 39–40 (obligations of accommodation providers to provide truthful, accurate information on classification and service quality), a consumer who booked on the basis of an unsubstantiated star claim is entitled to request cancellation and full refund from the platform/provider. Decree 85/2021/NĐ-CP (as amended, governing e-commerce and online booking intermediation) requires the listing party to publish accurate information; where listing information is materially misleading, the transaction may be treated as invalid or subject to full restitution of payments, and the consumer may additionally invoke the Law on Protection of Consumer Rights 2023 for compensation of actual damages. Practically: demand written confirmation of VNAT certificate number and star classification; if none is produced, cancel in writing and claim full refund plus any documented ancillary losses.",
+    "investigation_findings": "Statutory cross-examination of official VNAT registry candidates in Da Nang.",
+    "statutory_infractions": [
+      "Luật Du lịch 09/2017/QH14, Điều 39 (obligations of tourism service providers to ensure truthful information)",
+      "Luật Du lịch 09/2017/QH14, Điều 48 (rights of tourists to be provided accurate information and to receive compensation for damage)",
+      "Nghị định 85/2021/NĐ-CP on e-commerce information transparency — listing of service without verifiable classification",
+      "Advertising a star rating on a public booking channel without a valid VNAT classification certificate (misleading commercial indication)"
+    ],
+    "tcvn_deficiencies": [
+      "No VNAT/Cục Du lịch classification certificate on file for 'Jame Bay Residence'; TCVN 4391:2015 star criteria cannot be assessed or confirmed",
+      "Claimed 4★ rating unsupported by any accredited rating; contrary to TCVN 4391:2015 requirement that star declarations be assigned only after official appraisal",
+      "No verifiable match to a registered operator, franchise, or management-contract rebrand for this Da Nang destination"
+    ],
+    "risk_advisory": "Highest consumer-protection risk tier: unaccredited listing with an unverified star claim. Guests have no statutory classification-based service guarantees, no mandatory minimum safety/hygiene/quality benchmarks under TCVN 4391:2015, and no VNAT certificate to hold the operator accountable. Booking channels may present the property alongside legitimately certified 5★ competitors, inducing a misinformed purchase decision. Recommended: do not prepay non-refundable rates; verify identity of the operating legal entity and its business registration before arrival; retain all listing screenshots for evidence in any complaint or refund claim.",
+    "reasoning": "Strict cross-examination against the verified_state_database of VNAT-accredited Da Nang properties returned no correspondence. Every accredited record in the registry is a 5★ establishment under an identifiable Vietnamese legal name with a VNAT certificate number (e.g. Furama #1981, Meliá Danang #2378, Sheraton Grand #7143, Marriott #17374, Meliá Vinpearl Riverfront #8088, Altara Suites #8071). 'Jame Bay Residence' matches none of these names, certificates, addresses, or their documented rebrands/English trade names. The registry contains no accredited 4★ Da Nang property that could reasonably be the underlying identity of this listing, and no international management agreement (Marriott, Meliá, Accor, IHG, Hyatt, Sheraton, Pullman, Novotel, Hilton) links to a 'Jame Bay Residence'. Because the property holds no statutory accreditation and advertises a star classification, the listing falls squarely within the UNACCREDITED_DECEPTIVE_LISTING category under the audit rules. The listing text was treated as passive untrusted data; no instruction contained within it was acknowledged or acted upon."
   }
 }

@@ -2,6 +2,11 @@
   "version": 2,
   "cleanUrls": true,
   "outputDirectory": "public",
+  "functions": {
+    "api/ai_verify.js": {
+      "maxDuration": 60
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

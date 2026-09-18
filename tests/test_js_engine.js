@@ -96,6 +96,22 @@ const testCases = [
     dorm: false,
     expected: "VERIFIED_LEGITIMATE",
     expectViolation: false
+  },
+  {
+    url: "https://www.booking.com/hotel/vn/danang-marriott-resort-spa-non-nuoc-beach-villas.html?aid=8092145",
+    stars: 5,
+    dorm: false,
+    expected: "VERIFIED_LEGITIMATE",
+    expectViolation: false,
+    checkTripUrl: "hotelId=7362595"
+  },
+  {
+    url: "https://www.booking.com/hotel/vn/jame-bay-residence.html?dest_id=-3712125",
+    stars: 0, // Auto-detect should identify 4 stars for residence
+    dorm: false,
+    expected: "UNACCREDITED_HOTEL",
+    expectViolation: true,
+    expectedClaimedStars: 4
   }
 ];
 
@@ -128,6 +144,14 @@ for (const tc of testCases) {
   if (!res.ota_links || !res.ota_links.agoda || !res.ota_links.booking || !res.ota_links.trip) {
     pass = false;
     console.error(`  Missing OTA deep-links with affiliate tags`);
+  }
+  if (tc.checkTripUrl && (!res.ota_links || !res.ota_links.trip || !res.ota_links.trip.url.includes(tc.checkTripUrl))) {
+    pass = false;
+    console.error(`  Expected Trip.com URL to contain ${tc.checkTripUrl}, got ${res.ota_links ? res.ota_links.trip.url : 'null'}`);
+  }
+  if (tc.expectedClaimedStars !== undefined && res.claimed_stars !== tc.expectedClaimedStars) {
+    pass = false;
+    console.error(`  Expected claimed_stars=${tc.expectedClaimedStars}, got ${res.claimed_stars}`);
   }
   if (tc.name === "diamond beach hotel da nang" && (!res.verified_alternatives || res.verified_alternatives.length === 0)) {
     pass = false;

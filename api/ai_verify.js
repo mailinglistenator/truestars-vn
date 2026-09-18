@@ -49,7 +49,7 @@ function loadLog() {
   return {};
 }
 
-function requestEndpoint(urlStr, postData, timeoutMs = 35000) {
+function requestEndpoint(urlStr, postData, timeoutMs = 50000) {
   return new Promise((resolve, reject) => {
     try {
       const parsedUrl = new URL(urlStr);
@@ -111,7 +111,7 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
   ].filter(Boolean);
 
   try {
-    const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 35000)));
+    const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 50000)));
     if (result && result.verdict) {
       return result;
     }
@@ -123,13 +123,13 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
   return {
     verdict: "AI_SERVICE_UNAVAILABLE",
     confidence: 0,
-    concise_summary: "Live statutory AI audit service on Hermes VPS is temporarily unreachable.",
+    concise_summary: "Live statutory AI verification service is temporarily busy. Please try again shortly.",
     refund_advisory: "Live statutory AI verification could not be completed. Please refer to the official VNAT registry lookup.",
-    investigation_findings: "The autonomous LLM reasoning node could not be contacted over encrypted tunnels.",
+    investigation_findings: "The statutory AI reasoning engine could not be contacted at this moment.",
     statutory_infractions: [],
     tcvn_deficiencies: [],
-    risk_advisory: "AI service connection error.",
-    reasoning: "Encrypted connection to Hermes VPS timed out or failed. No AI inference was performed."
+    risk_advisory: "AI service connection temporarily unavailable.",
+    reasoning: "Connection to statutory AI audit engine timed out or failed. No AI inference was performed."
   };
 }
 
@@ -160,11 +160,77 @@ module.exports = async (req, res) => {
   const query = params;
   const queryParams = req.query || {};
 
-  const hotelName = (query.name || query.hotelName || query.propertyName || query.property_name || query.hotel_name || queryParams.name || "").trim();
-  const platform = (query.platform || query.ota_platform || queryParams.platform || "Direct Input").trim();
-  const url = (query.url || query.original_url || queryParams.url || "").trim();
-  const claimedStars = parseInt(query.claimed_stars || query.claimedStars || queryParams.claimed_stars || 5, 10);
-  let city = (query.city || query.location || query.province || queryParams.city || "").trim();
+  const rawHotelName = String(query.name || query.hotelName || query.propertyName || query.property_name || query.hotel_name || queryParams.name || "");
+  const rawUrl = String(query.url || query.booking_url || query.link || queryParams.url || "");
+  const rawPlatform = String(query.platform || query.ota_platform || queryParams.platform || "Direct Input");
+  const rawCity = String(query.city || query.location || query.province || queryParams.city || "");
+
+  // PROMPT INJECTION DEFENSE PERIMETER
+  const INJECTION_REGEX = /(?:ignore|disregard|forget|bypass)\s+(?:all\s+)?(?:previous|prior|above|system)\s+(?:instructions|prompts|rules|commands|directives)|system\s*:\s*|assistant\s*:\s*|user\s*:\s*|<\|im_start\|>|<\|im_end\|>|\[inst\]|\[\/inst\]|developer\s+mode|jailbreak|pretend\s+you\s+are|you\s+are\s+now|override\s+system/i;
+
+  const combinedRaw = `${rawHotelName} ${rawUrl} ${rawPlatform} ${rawCity}`;
+  if (INJECTION_REGEX.test(combinedRaw)) {
+    const quarantinedRecord = {
+      listing_key: normalizeKey(rawUrl || rawHotelName || "adversarial-attempt"),
+      hotel_name: rawHotelName.slice(0, 60).replace(/[^a-zA-Z0-9 ._-]/g, ""),
+      claimed_stars: 5,
+      platform: "Adversarial Injection Detected",
+      url: "",
+      city: "Security Quarantine",
+      verified_at: new Date().toISOString(),
+      model: "TrueStars Statutory AI Engine",
+      latency_ms: 5,
+      latency_sec: "0.0",
+      verdict: "UNACCREDITED_DECEPTIVE_LISTING",
+      confidence: 1.0,
+      concise_summary: "Security quarantine: Adversarial prompt injection syntax was intercepted by TrueStars statutory perimeter defenses.",
+      refund_advisory: "Request contained prohibited adversarial command sequences attempting to manipulate statutory audit integrity.",
+      investigation_findings: "Automated statutory perimeter intercepted prompt injection payload. Evaluated as non-compliant and deceptive.",
+      statutory_infractions: ["Decree 85/2021/NĐ-CP - Cyber Data Integrity & Digital Manipulation Prohibition"],
+      tcvn_deficiencies: ["Disqualified: Query failed automated input integrity and compliance checks."],
+      risk_advisory: "Critical security risk: Adversarial query intercepted.",
+      reasoning: "The input contains explicit prompt injection tokens designed to override statutory evaluation instructions. Under statutory security protocols, adversarial inputs are categorically denied accreditation."
+    };
+
+    return res.status(200).json({
+      status: "ADVERSARIAL_INJECTION_QUARANTINED",
+      cached: false,
+      listing_key: quarantinedRecord.listing_key,
+      audit: quarantinedRecord
+    });
+  }
+
+  function sanitizeText(str, maxLen = 120) {
+    if (!str) return "";
+    return str
+      .normalize('NFKC')
+      .replace(/[\x00-\x1F\x7F-\x9F\u200B-\u200D\uFEFF]/g, '')
+      .replace(/[<>{}`[\]$"\\]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, maxLen);
+  }
+
+  const hotelName = sanitizeText(rawHotelName, 120);
+  let url = rawUrl.trim().slice(0, 250).replace(/[\x00-\x1F\x7F\r\n<>"`]/g, '');
+  const platform = sanitizeText(rawPlatform, 40) || "Direct Input";
+
+  let claimedStars = parseInt(query.claimed_stars || query.claimedStars || queryParams.claimed_stars || 0, 10);
+  if (!claimedStars || claimedStars < 1 || claimedStars > 5) {
+    const combined = `${hotelName} ${url}`.toLowerCase();
+    if (/\b(5-star|5 star|5star|5\*|5sao|5 sao)\b/i.test(combined)) {
+      claimedStars = 5;
+    } else if (/\b(4-star|4 star|4star|4\*|4sao|4 sao)\b/i.test(combined)) {
+      claimedStars = 4;
+    } else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(combined)) {
+      claimedStars = 4;
+    } else {
+      claimedStars = 5;
+    }
+  }
+  claimedStars = Math.max(1, Math.min(5, claimedStars));
+
+  let city = sanitizeText(rawCity, 60);
   if (!city || city.toLowerCase() === "vietnam" || city.toLowerCase() === "direct input") {
     if (inferCityFromText) {
       city = inferCityFromText(`${hotelName} ${url}`);
@@ -344,18 +410,18 @@ module.exports = async (req, res) => {
     url: url,
     city: city,
     verified_at: new Date().toISOString(),
-    model: aiAnalysis.model || "deepseek/deepseek-v4.1-flash (Hermes VPS)",
+    model: "TrueStars Statutory AI Engine",
     latency_ms: latencyMs,
     latency_sec: (latencyMs / 1000).toFixed(1),
     verdict: aiAnalysis.verdict,
     confidence: aiAnalysis.confidence,
     concise_summary: aiAnalysis.concise_summary,
     refund_advisory: aiAnalysis.refund_advisory,
-    investigation_findings: aiAnalysis.investigation_findings || `AI cross-examined official VNAT registry candidates in ${city || 'Vietnam'} via Hermes VPS.`,
+    investigation_findings: (aiAnalysis.investigation_findings || `Statutory cross-examination of official VNAT registry candidates in ${city || 'Vietnam'}.`).replace(/\s*(?:via\s+)?Hermes\s+VPS/gi, "").replace(/encrypted tunnels?/gi, "secure audit channels"),
     statutory_infractions: aiAnalysis.statutory_infractions || [],
     tcvn_deficiencies: aiAnalysis.tcvn_deficiencies || [],
     risk_advisory: aiAnalysis.risk_advisory,
-    reasoning: aiAnalysis.reasoning
+    reasoning: (aiAnalysis.reasoning || "").replace(/\s*(?:via\s+)?Hermes\s+VPS/gi, "")
   };
 
   // Cache permanently in memory

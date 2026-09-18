@@ -236,6 +236,28 @@ function parseOtaUrl(rawInput) {
       if (url.searchParams.get("ss")) {
         extractedName = url.searchParams.get("ss");
       }
+      const destId = url.searchParams.get("dest_id");
+      const BOOKING_DEST_MAP = {
+        "-3712125": "Da Nang",
+        "-3714993": "Hanoi",
+        "-3730078": "Ho Chi Minh City",
+        "-3723998": "Nha Trang",
+        "-3727195": "Phu Quoc",
+        "-3717540": "Hoi An",
+        "-3715340": "Ha Long",
+        "-3732608": "Vung Tau",
+        "-3712045": "Da Lat",
+        "-3717616": "Hue",
+        "-3725492": "Phan Thiet",
+        "-3711905": "Can Tho",
+        "-3728333": "Quy Nhon",
+        "-3727393": "Sapa",
+        "-3724392": "Ninh Binh",
+        "-3715011": "Hai Phong"
+      };
+      if (destId && BOOKING_DEST_MAP[destId] && !city) {
+        city = BOOKING_DEST_MAP[destId];
+      }
     } else if (host.includes("trip.com")) {
       platform = "Trip.com";
       city = url.searchParams.get("cityEnName") || "";
@@ -469,6 +491,9 @@ class TrueStarsMatcher {
         effectiveClaimedStars = 5;
       } else if (/\b(4-star|4 star|4star|4\*|4sao|4 sao)\b/i.test(combinedText)) {
         effectiveClaimedStars = 4;
+      } else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(combinedText)) {
+        // Serviced residences, apartments, condotels, and boutique suites market 4★ upscale accommodation on OTAs
+        effectiveClaimedStars = 4;
       } else if (matchedHotel) {
         // Matched certified hotel: default to its official rating
         effectiveClaimedStars = matchedHotel.stars;
@@ -486,10 +511,19 @@ class TrueStarsMatcher {
     let summary = "";
     const violations = [];
 
-    if (matchedHotel && officialStars >= effectiveClaimedStars && !effectiveHasDorm) {
+    if (matchedHotel && officialStars >= effectiveClaimedStars) {
       verdict = "VERIFIED_LEGITIMATE";
       severity = "NONE";
       summary = `Verified Legitimate: This property's identity is authenticated against official VNAT ${officialStars}-Star Accreditation #${matchedHotel.item_id} ("${matchedHotel.name}").`;
+    } else if (matchedHotel && officialStars < effectiveClaimedStars) {
+      verdict = "STAR_INFLATION";
+      severity = "HIGH";
+      summary = `Statutory Star Inflation: This property's identity maps to VNAT Accreditation #${matchedHotel.item_id}, which is officially certified for only ${officialStars} Stars, but marketed on ${otaPlatform} as ${effectiveClaimedStars} Stars (+${effectiveClaimedStars - officialStars}★).`;
+      violations.push({
+        law: "Luật Du lịch 2017 - Điều 9, Khoản 8 & Điều 50",
+        statute_title: "Quảng cáo sai thứ hạng được cơ quan nhà nước công nhận",
+        application: `Officially certified as ${officialStars} stars, but displayed on platform as ${effectiveClaimedStars} stars.`
+      });
     } else if (effectiveHasDorm && isHighRank) {
       verdict = "BLATANT_HOSTEL_FRAUD";
       severity = "CRITICAL";
@@ -508,15 +542,6 @@ class TrueStarsMatcher {
         law: "Luật Bảo vệ quyền lợi người tiêu dùng 2023 - Điều 10 & 39",
         statute_title: "Hành vi lừa dối người tiêu dùng & Trách nhiệm nền tảng số trung gian",
         application: `Platform renders gold star iconography misleading guests on safety and luxury standards.`
-      });
-    } else if (matchedHotel && officialStars < effectiveClaimedStars) {
-      verdict = "STAR_INFLATION";
-      severity = "HIGH";
-      summary = `Statutory Star Inflation: This property's identity maps to VNAT Accreditation #${matchedHotel.item_id}, which is officially certified for only ${officialStars} Stars, but marketed on ${otaPlatform} as ${effectiveClaimedStars} Stars (+${effectiveClaimedStars - officialStars}★).`;
-      violations.push({
-        law: "Luật Du lịch 2017 - Điều 9, Khoản 8 & Điều 50",
-        statute_title: "Quảng cáo sai thứ hạng được cơ quan nhà nước công nhận",
-        application: `Officially certified as ${officialStars} stars, but displayed on platform as ${effectiveClaimedStars} stars.`
       });
     } else if (isHighRank && (!matchedHotel || officialStars === 0)) {
       verdict = "UNACCREDITED_HOTEL";
