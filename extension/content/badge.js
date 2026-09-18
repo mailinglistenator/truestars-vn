@@ -131,6 +131,41 @@
       `;
     }
 
+    let otaPlatform = audit.ota_platform || 'Booking Platform';
+    const host = window.location.hostname.toLowerCase();
+    if (host.includes('agoda.com')) otaPlatform = 'Agoda';
+    else if (host.includes('booking.com')) otaPlatform = 'Booking.com';
+    else if (host.includes('trip.com')) otaPlatform = 'Trip.com';
+
+    let refundBannerHtml = '';
+    if (!isLegit) {
+      if (isInflation) {
+        refundBannerHtml = `
+          <div class="truestars-refund-card inflation-mode">
+            <div class="truestars-refund-tag">⚖️ STATUTORY REFUND ENTITLEMENT</div>
+            <div class="truestars-refund-title">ELIGIBLE FOR RATE REFUND OR FREE CANCELLATION FROM ${otaPlatform.toUpperCase()}</div>
+            <div class="truestars-refund-desc">
+              Advertised rating (${audit.claimed_stars}★) exceeds official VNAT accreditation (${audit.official_stars}★). Under Decree 85/2021/NĐ-CP & Consumer Protection Law 2023, you have the statutory right to claim a price adjustment refund or penalty-free cancellation from ${otaPlatform}.
+            </div>
+            <button id="truestars-copy-refund-letter" class="truestars-btn-refund">💰 Claim Rate Difference Refund (Copy Demand Letter)</button>
+            <div class="truestars-refund-subnote">Decree 85/2021/NĐ-CP • Chargeback Guaranteed</div>
+          </div>
+        `;
+      } else {
+        refundBannerHtml = `
+          <div class="truestars-refund-card">
+            <div class="truestars-refund-tag">🚨 STATUTORY 100% REFUND ENTITLEMENT</div>
+            <div class="truestars-refund-title">ELIGIBLE FOR 100% FULL REFUND FROM ${otaPlatform.toUpperCase()}</div>
+            <div class="truestars-refund-desc">
+              This property holds ZERO (0★) official government accreditation. Advertising unauthorized star ratings violates Article 50 of the Vietnam Tourism Law 2017 & Consumer Protection Law 2023. Under Decree 85/2021/NĐ-CP, ${otaPlatform} bears strict statutory liability. You have the legal right to cancel free of charge and demand a 100% immediate refund.
+            </div>
+            <button id="truestars-copy-refund-letter" class="truestars-btn-refund">💰 Claim 100% Full Refund (Copy Demand Letter)</button>
+            <div class="truestars-refund-subnote">Decree 85/2021/NĐ-CP • Chargeback Guaranteed</div>
+          </div>
+        `;
+      }
+    }
+
     // Dossier vs Infraction Box
     let legalDossierHtml = '';
     if (isLegit) {
@@ -150,12 +185,8 @@
         <div style="background: #070a12; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 11px;">
           <div style="font-weight: 800; color: #f87171; margin-bottom: 4px;">⚖️ DEMONSTRATION OF STATUTORY INFRACTION</div>
           <div style="color: #cbd5e1; line-height: 1.4;">
-            <strong>Luật Du lịch 2017 (Điều 9, Khoản 8 & Điều 50):</strong> Only VNAT has statutory authority to award 4★/5★ ratings in Vietnam (only 681 exist nationwide). Displaying unauthorized stars is a strict statutory violation.
+            <strong>Luật Du lịch 2017 (Điều 9, Khoản 8 & Điều 50):</strong> Only VNAT has statutory authority to award 4★/5★ ratings in Vietnam (only 681 exist nationwide). Displaying unauthorized stars is a strict statutory violation under Vietnamese law.
           </div>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
-          <button id="truestars-copy-platform-notice" class="truestars-btn-action" style="background: #2563eb; width: 100%; text-align: center;">📝 Copy Platform Cease & Desist Notice</button>
-          <button id="truestars-copy-refund-letter" class="truestars-btn-action" style="background: #059669; width: 100%; text-align: center;">💰 Copy Traveler Refund Demand Letter</button>
         </div>
       `;
     }
@@ -173,6 +204,7 @@
       <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.5;">
         ${audit.summary}
       </div>
+      ${refundBannerHtml}
       ${otaLinksHtml}
       ${matchedHtml}
       ${violationsHtml}
@@ -188,21 +220,13 @@
       if (e.target === backdrop) backdrop.remove();
     });
 
-    const noticeBtn = document.getElementById('truestars-copy-platform-notice');
-    if (noticeBtn) {
-      noticeBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(audit.platform_notice || audit.legal_notice || audit.summary);
-        noticeBtn.textContent = '✓ Platform Notice Copied!';
-        setTimeout(() => { noticeBtn.textContent = '📝 Copy Platform Cease & Desist Notice'; }, 2000);
-      });
-    }
-
     const refundBtn = document.getElementById('truestars-copy-refund-letter');
     if (refundBtn) {
       refundBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(audit.refund_demand_letter || audit.summary);
-        refundBtn.textContent = '✓ Refund Demand Letter Copied!';
-        setTimeout(() => { refundBtn.textContent = '💰 Copy Traveler Refund Demand Letter'; }, 2000);
+        const originalText = refundBtn.textContent;
+        refundBtn.textContent = '✓ Refund Demand Letter Copied to Clipboard!';
+        setTimeout(() => { refundBtn.textContent = originalText; }, 2500);
       });
     }
   }
@@ -210,6 +234,12 @@
   window.TrueStarsBadge = {
     async auditAndInject(targetElement, { name, claimedStars = 5, hasDorm = false, province = "" }) {
       if (!name || targetElement.querySelector('.truestars-badge-container')) return;
+
+      // Strict Vietnam-only scope guard
+      const isVn = (typeof isVietnamContext === 'function' ? isVietnamContext : (window.TrueStarsIsVietnam || (() => false)));
+      if (!isVn(window.location.href, `${name} ${province}`)) {
+        return;
+      }
 
       const m = await initMatcher();
       if (!m) return;

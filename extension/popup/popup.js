@@ -53,6 +53,18 @@ async function auditActiveTab() {
       return;
     }
 
+    const checkVn = typeof isVietnamContext === 'function' ? isVietnamContext : (window.TrueStarsIsVietnam || (() => false));
+    if (!checkVn(url, tab.title)) {
+      hotelNameEl.textContent = propName;
+      verdictEl.innerHTML = `
+        <div class="verdict-tag" style="background: #334155; color: #94a3b8; border: 1px solid #475569;">🌍 NON-VIETNAM PROPERTY</div>
+        <div style="color: #94a3b8; font-size: 11px; margin-top: 6px;">
+          TrueStars Watchdog operates exclusively within Vietnam. This listing is located outside Vietnam and is not subject to VNAT accreditation (Luật Du lịch 2017).
+        </div>
+      `;
+      return;
+    }
+
     hotelNameEl.textContent = propName;
 
     if (!matcher) return;
@@ -75,9 +87,27 @@ async function auditActiveTab() {
       tagLabel = `🟡 INFLATED (+${audit.claimed_stars - audit.official_stars}★)`;
     }
 
+    let refundCallout = '';
+    if (audit.is_violation) {
+      if (audit.verdict === 'STAR_INFLATION') {
+        refundCallout = `
+          <div style="background: rgba(217, 119, 6, 0.2); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 11px; color: #fde68a;">
+            <strong>⚖️ STATUTORY REFUND ENTITLEMENT:</strong> Eligible for price adjustment refund or penalty-free cancellation under Decree 85/2021/NĐ-CP.
+          </div>
+        `;
+      } else {
+        refundCallout = `
+          <div style="background: rgba(225, 29, 72, 0.2); border: 1px solid #f43f5e; border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 11px; color: #fecdd3;">
+            <strong>🚨 ELIGIBLE FOR 100% FULL REFUND:</strong> 0★ unaccredited listing. Strict liability under Decree 85/2021/NĐ-CP & Consumer Protection Law 2023.
+          </div>
+        `;
+      }
+    }
+
     verdictEl.innerHTML = `
       <div class="verdict-tag ${tagClass}">${tagLabel}</div>
       <div style="color: #cbd5e1; font-size: 11px; margin-top: 4px;">${audit.summary}</div>
+      ${refundCallout}
       ${audit.matched_hotel ? `<div style="color: #60a5fa; font-size: 10px; margin-top: 4px;">Matched: ${audit.matched_hotel.name} (${audit.matched_hotel.address})</div>` : ''}
     `;
   } catch (err) {

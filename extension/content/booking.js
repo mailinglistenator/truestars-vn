@@ -6,9 +6,35 @@
 (function () {
   if (!window.location.hostname.includes('booking.com')) return;
 
+  function checkVn(url = '', text = '') {
+    if (typeof isVietnamContext === 'function') return isVietnamContext(url, text);
+    if (window.TrueStarsIsVietnam) return window.TrueStarsIsVietnam(url, text);
+    const combined = `${url} ${text}`.toLowerCase();
+    return combined.includes('/hotel/vn/') || combined.includes('dest_id=233') || combined.includes('country=vn') || combined.includes('vietnam');
+  }
+
+  function isVietnamBookingPage() {
+    if (checkVn(window.location.href)) return true;
+    const breadcrumbs = document.querySelector('ol.bui-breadcrumb__list, nav[aria-label="breadcrumb"], [data-testid="breadcrumbs"]');
+    if (breadcrumbs && checkVn('', breadcrumbs.textContent)) return true;
+    const searchInput = document.querySelector('input[name="ss"], [data-testid="destination-container"] input');
+    if (searchInput && checkVn('', searchInput.value)) return true;
+    if (checkVn('', document.title)) return true;
+    const addressEl = document.querySelector('.hp_address_subtitle, [data-node_tt_id="location_score_tooltip"]');
+    if (addressEl && checkVn('', addressEl.textContent)) return true;
+    return false;
+  }
+
   function parseBookingCard(card) {
     if (card.dataset.truestarsScanned) return;
     card.dataset.truestarsScanned = 'true';
+
+    // Verify card is in Vietnam
+    const cardLink = card.querySelector('a')?.href || '';
+    const isPageVn = isVietnamBookingPage();
+    if (!isPageVn && !checkVn(cardLink, card.textContent)) {
+      return; // Skip non-Vietnam cards
+    }
 
     // 1. Hotel Name
     const titleEl = card.querySelector('[data-testid="title"]') || card.querySelector('h3');
@@ -53,6 +79,7 @@
   }
 
   function parseBookingHeader() {
+    if (!isVietnamBookingPage()) return; // Skip non-Vietnam single hotel pages
     const headerTitle = document.querySelector('#hp_hotel_name') ||
                         document.querySelector('[data-testid="header-title"]') ||
                         document.querySelector('h2.pp-header__title');

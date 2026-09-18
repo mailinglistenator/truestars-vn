@@ -6,9 +6,35 @@
 (function () {
   if (!window.location.hostname.includes('agoda.com')) return;
 
+  function checkVn(url = '', text = '') {
+    if (typeof isVietnamContext === 'function') return isVietnamContext(url, text);
+    if (window.TrueStarsIsVietnam) return window.TrueStarsIsVietnam(url, text);
+    const combined = `${url} ${text}`.toLowerCase();
+    return combined.includes('-vn.html') || combined.includes('/hotel/vn/') || combined.includes('countryid=38') || combined.includes('vietnam');
+  }
+
+  function isVietnamAgodaPage() {
+    if (checkVn(window.location.href)) return true;
+    const breadcrumb = document.querySelector('[data-selenium="breadcrumb"], .Breadcrumbs, nav[aria-label="breadcrumb"]');
+    if (breadcrumb && checkVn('', breadcrumb.textContent)) return true;
+    const searchInput = document.querySelector('[data-selenium="textInput"], input[name="ss"], input[type="search"]');
+    if (searchInput && checkVn('', searchInput.value)) return true;
+    if (checkVn('', document.title)) return true;
+    const addressEl = document.querySelector('[data-selenium="hotel-address"], .HeaderCms__address');
+    if (addressEl && checkVn('', addressEl.textContent)) return true;
+    return false;
+  }
+
   function parseAgodaCard(card) {
     if (card.dataset.truestarsScanned) return;
     card.dataset.truestarsScanned = 'true';
+
+    // Verify card is in Vietnam
+    const cardLink = card.querySelector('a')?.href || '';
+    const isPageVn = isVietnamAgodaPage();
+    if (!isPageVn && !checkVn(cardLink, card.textContent)) {
+      return; // Skip non-Vietnam hotel cards
+    }
 
     // 1. Hotel Name
     const titleEl = card.querySelector('[data-selenium="hotel-name"]') ||
@@ -58,6 +84,7 @@
   }
 
   function parseAgodaPropertyHeader() {
+    if (!isVietnamAgodaPage()) return; // Skip non-Vietnam single property pages
     const headerTitle = document.querySelector('[data-selenium="hotel-header-name"]') ||
                         document.querySelector('h1.HeaderCms__hotel-name') ||
                         document.querySelector('h1[data-selenium="hotel-header-name"]');

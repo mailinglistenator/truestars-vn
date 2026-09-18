@@ -357,6 +357,116 @@
       border-color: #34d399;
     }
 
+    /* Prominent 100% Refund Banner */
+    .refund-banner-card {
+      background: linear-gradient(135deg, rgba(225, 29, 72, 0.22) 0%, rgba(159, 18, 57, 0.42) 100%);
+      border: 2px solid #f43f5e;
+      border-radius: 12px;
+      padding: 1.25rem 1.4rem;
+      box-shadow: 0 0 25px rgba(244, 63, 94, 0.28);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+      animation: refundPulseGlow 3s infinite ease-in-out;
+    }
+    @keyframes refundPulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.25); }
+      50% { box-shadow: 0 0 35px rgba(244, 63, 94, 0.45); }
+    }
+    .refund-banner-card.inflation-mode {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.22) 0%, rgba(180, 83, 9, 0.42) 100%);
+      border-color: #f59e0b;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.28);
+      animation: refundPulseGlowAmber 3s infinite ease-in-out;
+    }
+    @keyframes refundPulseGlowAmber {
+      0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.25); }
+      50% { box-shadow: 0 0 35px rgba(245, 158, 11, 0.45); }
+    }
+    .refund-banner-left {
+      flex: 1;
+      min-width: 280px;
+    }
+    .refund-banner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(225, 29, 72, 0.35);
+      border: 1px solid #f43f5e;
+      color: #fecdd3;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 0.45rem;
+    }
+    .refund-banner-card.inflation-mode .refund-banner-badge {
+      background: rgba(217, 119, 6, 0.35);
+      border-color: #f59e0b;
+      color: #fde68a;
+    }
+    .refund-pulse-icon {
+      animation: pulse 1.5s infinite;
+      display: inline-block;
+    }
+    .refund-banner-title {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 0.4px;
+      margin: 0 0 0.4rem 0;
+      line-height: 1.25;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+    .refund-banner-desc {
+      font-size: 0.88rem;
+      color: #ffe4e6;
+      line-height: 1.55;
+      margin: 0;
+    }
+    .refund-banner-card.inflation-mode .refund-banner-desc {
+      color: #fef3c7;
+    }
+    .refund-banner-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.45rem;
+    }
+    .btn-claim-refund {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #ffffff;
+      border: 1px solid #34d399;
+      border-radius: 8px;
+      padding: 0.85rem 1.6rem;
+      font-size: 0.98rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+    .btn-claim-refund:hover {
+      background: linear-gradient(135deg, #047857 0%, #059669 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.65);
+    }
+    .refund-banner-note {
+      font-size: 0.74rem;
+      color: #94a3b8;
+      font-weight: 600;
+      text-align: right;
+    }
+
     /* Outbound OTA Deep Links */
     .btn-ota-link {
       display: inline-flex;
@@ -647,6 +757,32 @@
           </div>
         </div>
 
+        <!-- PROMINENT 100% REFUND ELIGIBILITY BANNER -->
+        <div id="refund-banner-box" style="display: none; margin-bottom: 1.25rem;">
+          <div id="refund-banner-inner" class="refund-banner-card">
+            <div class="refund-banner-left">
+              <div class="refund-banner-badge" id="refund-banner-badge">
+                <span class="refund-pulse-icon">💰</span>
+                <span id="refund-banner-tag" data-i18n="refund_banner_tag">STATUTORY REFUND ELIGIBILITY</span>
+              </div>
+              <h3 id="refund-banner-headline" class="refund-banner-title">
+                ELIGIBLE FOR 100% FULL REFUND FROM AGODA
+              </h3>
+              <p id="refund-banner-desc" class="refund-banner-desc">
+                This property possesses 0★ statutory accreditation. Advertising unaccredited luxury stars violates Article 50 of Vietnam's Law on Tourism 2017 & Consumer Protection Law 2023. You are legally entitled to cancel penalty-free and demand an immediate 100% full refund from Agoda.
+              </p>
+            </div>
+            <div class="refund-banner-right">
+              <button class="btn-claim-refund" onclick="openRefundDemandModal()">
+                <span>💰</span> <span id="refund-banner-btn-text" data-i18n="refund_banner_btn">Claim 100% Refund ↗</span>
+              </button>
+              <div class="refund-banner-note" id="refund-banner-note" data-i18n="refund_banner_note">
+                Decree 85/2021/NĐ-CP • Chargeback Guaranteed
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Summary -->
         <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 8px; margin-bottom: 1.25rem;">
           <p id="verdict-summary" style="font-size: 0.95rem; font-weight: 500;"></p>
@@ -732,13 +868,10 @@
           </div>
         </div>
 
-        <!-- FORM LETTER GENERATOR BUTTONS (For Violations) -->
-        <div id="action-buttons-row" class="action-buttons-row">
-          <button class="btn-action-outline" onclick="openPlatformNoticeModal()">
-            <span>📝 Generate Platform Cease & Desist Notice</span>
-          </button>
-          <button class="btn-action-outline btn-action-refund" onclick="openRefundDemandModal()">
-            <span>💰 Generate Traveler Refund Demand Letter</span>
+        <!-- FORM LETTER GENERATOR BUTTON (For Violations) -->
+        <div id="action-buttons-row" class="action-buttons-row" style="grid-template-columns: 1fr;">
+          <button class="btn-action-outline btn-action-refund" onclick="openRefundDemandModal()" style="font-size: 1.05rem; padding: 1rem 1.5rem; justify-content: center;">
+            <span data-i18n="btn_copy_refund">💰 Generate Traveler Refund Demand Letter</span>
           </button>
         </div>
 
@@ -830,23 +963,7 @@
     </div>
   </div>
 
-  <!-- MODAL 1: Platform Cease & Desist Takedown Notice -->
-  <div id="platform-notice-modal" class="modal-overlay">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('platform-notice-modal')">&times;</button>
-      <h2 style="font-size: 1.35rem; margin-bottom: 0.35rem;">📝 Formal Platform Cease & Desist Notice</h2>
-      <p style="color: var(--text-muted); font-size: 0.85rem;">
-        Pre-formatted legal notice citing Article 9 Clause 8 Law on Tourism 2017 and Decree 85/2021/NĐ-CP, ready to send to the platform's legal and compliance team.
-      </p>
 
-      <div id="platform-notice-text" class="letter-preview"></div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <button id="btn-copy-platform-notice" class="btn-submit" style="width: auto; padding: 0.75rem 1.5rem;" onclick="copyPlatformNotice()">📋 Copy Notice to Clipboard</button>
-        <span id="platform-copy-toast" style="color: #34d399; font-size: 0.85rem; display: none;">✓ Copied to clipboard!</span>
-      </div>
-    </div>
-  </div>
 
   <!-- MODAL 2: Traveler Refund Demand Letter -->
   <div id="refund-modal" class="modal-overlay">
@@ -1287,89 +1404,15 @@
         }
       }
 
-      // 3. Render Demonstration of Infraction vs Compliance Dossier
-      const demoContainer = document.getElementById('law-demo-content');
-      const demoTitleText = document.getElementById('law-demo-title-text');
-      const demoBox = document.getElementById('law-demo-box');
-      const proof = r.law_breaking_proof;
+      // 3. Render 100% Refund Banner & Demonstration of Law in Active Language
+      updateRefundBanner(r, currentLang);
+      renderDemonstrationOfLaw(r, currentLang);
 
       if (!r.is_violation) {
-        // Legitimate Dossier
-        demoTitleText.textContent = "🛡️ OFFICIAL STATUTORY COMPLIANCE DOSSIER";
-        demoTitleText.style.color = "#34d399";
-        demoBox.style.borderColor = "#10b981";
-
-        demoContainer.innerHTML = `
-          <div class="proof-item" style="border-left-color: #10b981;">
-            <div class="proof-law" style="color: #34d399;">1. Statutory Monopoly on Star Ratings</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.statute_monopoly.law}</div>
-            <div class="proof-finding" style="color: #cbd5e1;">${proof.statute_monopoly.analysis}</div>
-          </div>
-
-          <div class="proof-item" style="border-left-color: #10b981;">
-            <div class="proof-law" style="color: #34d399;">2. Official State Accreditation Authentication (Điều 50)</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.prohibition_clause.law}</div>
-            <div class="proof-quote" style="border-left: 2px solid #10b981; color: #a7f3d0;">"${proof.prohibition_clause.quote}"</div>
-            <div class="proof-finding" style="color: #34d399;">${proof.prohibition_clause.analysis}</div>
-          </div>
-
-          <div class="proof-item" style="border-left-color: #10b981;">
-            <div class="proof-law" style="color: #34d399;">3. Ground Truth Whitelist Authentication</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">Vietnam National Tourism Database: csdl.vietnamtourism.gov.vn</div>
-            <div class="proof-finding" style="color: #cbd5e1;">${proof.ground_truth_evidence.evidence_finding}</div>
-          </div>
-
-          <div class="proof-item" style="border-left-color: #10b981;">
-            <div class="proof-law" style="color: #34d399;">4. Full Statutory Clearance</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.regulatory_clearance.decree}</div>
-            <div class="proof-finding" style="color: #6ee7b7;">${proof.regulatory_clearance.analysis}</div>
-          </div>
-        `;
-
         document.getElementById('action-buttons-row').style.display = 'none';
         document.getElementById('compliance-banner').style.display = 'block';
         document.getElementById('verified-alternatives-container').style.display = 'none';
       } else {
-        // Infraction Proof
-        demoTitleText.textContent = "⚖️ DEMONSTRATION OF STATUTORY INFRACTION";
-        demoTitleText.style.color = "#f87171";
-        demoBox.style.borderColor = "#334155";
-
-        demoContainer.innerHTML = `
-          <div class="proof-item">
-            <div class="proof-law">1. Statutory Monopoly on Star Ratings</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.statute_monopoly.law}</div>
-            <div class="proof-finding">${proof.statute_monopoly.analysis}</div>
-          </div>
-
-          <div class="proof-item">
-            <div class="proof-law">2. Explicit Statutory Prohibition (Điều 9, Khoản 8)</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.prohibition_clause.law}</div>
-            <div class="proof-quote">"${proof.prohibition_clause.quote}"</div>
-            <div class="proof-finding">${proof.prohibition_clause.analysis}</div>
-          </div>
-
-          <div class="proof-item">
-            <div class="proof-law">3. Ground Truth Evidentiary Proof (The Smoking Gun)</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">Vietnam National Tourism Database: csdl.vietnamtourism.gov.vn</div>
-            <div class="proof-finding">${proof.ground_truth_evidence.evidence_finding}</div>
-          </div>
-
-          ${proof.facility_standards ? `
-            <div class="proof-item">
-              <div class="proof-law">4. National Facility Standards (TCVN 4391:2015)</div>
-              <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.facility_standards.standard}</div>
-              <div class="proof-finding">${proof.facility_standards.analysis}</div>
-            </div>
-          ` : ''}
-
-          <div class="proof-item" style="border-left-color: #f59e0b;">
-            <div class="proof-law" style="color: #fbbf24;">5. Platform Intermediary Strict Liability</div>
-            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${proof.platform_liability.decree}</div>
-            <div class="proof-finding" style="color: #fde68a;">${proof.platform_liability.analysis}</div>
-          </div>
-        `;
-
         document.getElementById('action-buttons-row').style.display = 'grid';
         document.getElementById('compliance-banner').style.display = 'none';
 
@@ -1380,7 +1423,10 @@
 
         if (r.verified_alternatives && r.verified_alternatives.length > 0) {
           const cityName = parsed.city || (r.matched_hotel ? r.matched_hotel.province : "Vietnam");
-          altTitle.textContent = `🛡️ Book Officially Certified 5★ Alternatives in ${cityName}`;
+          const altHeading = (dict.tab_registry && dict.tab_registry.includes('Danh Bạ'))
+            ? `🛡️ Khách sạn 5★ được nhà nước công nhận tại ${cityName}`
+            : `🛡️ Officially Certified 5★ Alternatives in ${cityName}`;
+          altTitle.textContent = altHeading;
           altGrid.innerHTML = r.verified_alternatives.map(alt => `
             <div class="alt-card">
               <div>
@@ -1406,11 +1452,167 @@
         }
       }
 
-      // Pre-fill Letters
-      document.getElementById('platform-notice-text').textContent = r.platform_notice || "";
+      // Pre-fill Refund Demand Letter
       updateRefundLetter();
-
       box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function getPlatformDisplayName(platform, url) {
+      if (platform && platform !== "Direct Input" && platform !== "Online Travel Agency") {
+        return platform.toUpperCase();
+      }
+      if (url) {
+        const low = url.toLowerCase();
+        if (low.includes("agoda.com")) return "AGODA";
+        if (low.includes("booking.com")) return "BOOKING.COM";
+        if (low.includes("trip.com")) return "TRIP.COM";
+        if (low.includes("traveloka.com")) return "TRAVELOKA";
+        if (low.includes("expedia.com")) return "EXPEDIA";
+        if (low.includes("hotels.com")) return "HOTELS.COM";
+      }
+      return "AGODA / BOOKING.COM / TRIP.COM";
+    }
+
+    function updateRefundBanner(r, lang = currentLang) {
+      const bannerBox = document.getElementById('refund-banner-box');
+      if (!bannerBox) return;
+
+      if (!r || !r.is_violation) {
+        bannerBox.style.display = 'none';
+        return;
+      }
+
+      bannerBox.style.display = 'block';
+      const inner = document.getElementById('refund-banner-inner');
+      const tag = document.getElementById('refund-banner-tag');
+      const headline = document.getElementById('refund-banner-headline');
+      const desc = document.getElementById('refund-banner-desc');
+      const btnText = document.getElementById('refund-banner-btn-text');
+      const note = document.getElementById('refund-banner-note');
+
+      const dict = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
+      const platformDisplay = getPlatformDisplayName(r.ota_platform, r.original_url);
+
+      if (r.verdict === 'STAR_INFLATION') {
+        if (inner) inner.className = 'refund-banner-card inflation-mode';
+        if (tag) tag.textContent = dict.refund_banner_tag_inflation || 'RATE INFLATION REFUND ELIGIBILITY';
+        const rawTitle = dict.refund_banner_title_inflation || 'ELIGIBLE FOR RATE DIFFERENCE REFUND / FULL CANCELLATION FROM {platform}';
+        if (headline) headline.textContent = rawTitle.replace('{platform}', platformDisplay);
+        const rawDesc = dict.refund_banner_desc_inflation || 'Marketed star rating exceeds official government accreditation (+{diff}★ inflation). Under Decree 85/2021/NĐ-CP and Consumer Protection Law 2023, you are legally entitled to a retroactive price adjustment or free cancellation from {platform}.';
+        const diff = (r.claimed_stars && r.official_stars) ? (r.claimed_stars - r.official_stars) : 1;
+        if (desc) desc.textContent = rawDesc.replace('{platform}', platformDisplay).replace('{diff}', diff);
+        if (btnText) btnText.textContent = dict.refund_banner_btn_rate || 'Claim Rate Refund ↗';
+      } else {
+        if (inner) inner.className = 'refund-banner-card';
+        if (tag) tag.textContent = dict.refund_banner_tag || 'STATUTORY REFUND ELIGIBILITY';
+        const rawTitle = dict.refund_banner_title_100 || 'ELIGIBLE FOR 100% FULL REFUND FROM {platform}';
+        if (headline) headline.textContent = rawTitle.replace('{platform}', platformDisplay);
+        const rawDesc = dict.refund_banner_desc_100 || "This property possesses 0★ statutory accreditation. Advertising unaccredited star ratings violates Article 50 of Vietnam's Law on Tourism 2017 & Consumer Protection Law 2023. You are legally entitled to cancel penalty-free and demand an immediate 100% full refund from {platform}.";
+        if (desc) desc.textContent = rawDesc.replace('{platform}', platformDisplay);
+        if (btnText) btnText.textContent = dict.refund_banner_btn || 'Claim 100% Refund ↗';
+      }
+      if (note) note.textContent = dict.refund_banner_note || 'Decree 85/2021/NĐ-CP • Chargeback Guaranteed';
+    }
+
+    function renderDemonstrationOfLaw(r, lang = currentLang) {
+      if (!r) return;
+      const demoContainer = document.getElementById('law-demo-content');
+      const demoTitleText = document.getElementById('law-demo-title-text');
+      const demoBox = document.getElementById('law-demo-box');
+      if (!demoContainer || !demoTitleText || !demoBox) return;
+
+      const dict = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
+      const hotelName = r.property_name || (r.matched_hotel ? r.matched_hotel.name : "Property");
+      const cert = r.matched_hotel ? (r.matched_hotel.item_id || r.matched_hotel.decision_code || 'VNAT-AUTH') : 'VNAT-AUTH';
+      const claimed = r.claimed_stars || 5;
+      const official = r.official_stars || 0;
+      const diff = Math.max(1, claimed - official);
+      const platformDisplay = getPlatformDisplayName(r.ota_platform, r.original_url);
+
+      if (!r.is_violation) {
+        demoTitleText.textContent = dict.proof_title_compliance || "🛡️ OFFICIAL STATUTORY COMPLIANCE DOSSIER";
+        demoTitleText.style.color = "#34d399";
+        demoBox.style.borderColor = "#10b981";
+
+        const sec2Desc = (dict.proof_sec2_desc_compliant || "").replace('{official}', official).replace('{cert}', cert).replace('{hotel}', hotelName);
+        const sec3Desc = (dict.proof_sec3_desc_compliant || "").replace('{official}', official).replace('{cert}', cert).replace('{hotel}', hotelName);
+        const sec4Desc = (dict.proof_sec4_clearance_desc || "").replace('{claimed}', claimed).replace('{platform}', platformDisplay);
+
+        demoContainer.innerHTML = `
+          <div class="proof-item" style="border-left-color: #10b981;">
+            <div class="proof-law" style="color: #34d399;">${dict.proof_sec1_title || "1. Statutory Monopoly on Star Ratings"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec1_law || "Luật Du lịch 2017 - Điều 50, Khoản 3"}</div>
+            <div class="proof-finding" style="color: #cbd5e1;">${dict.proof_sec1_desc_compliant || "Under Vietnamese law, the 1-to-5 star classification is an official state title."}</div>
+          </div>
+
+          <div class="proof-item" style="border-left-color: #10b981;">
+            <div class="proof-law" style="color: #34d399;">${dict.proof_sec2_title_compliant || "2. Official State Accreditation Authentication (Điều 50)"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec2_law_compliant || "Luật Du lịch 2017 - Điều 50"}</div>
+            <div class="proof-quote" style="border-left: 2px solid #10b981; color: #a7f3d0;">"${dict.proof_sec2_quote_compliant || "Cơ sở lưu trú du lịch được công nhận hạng được quyền gắn biển hiệu, biểu trưng sao và quảng cáo đúng với hạng đã được công nhận."}"</div>
+            <div class="proof-finding" style="color: #34d399;">${sec2Desc}</div>
+          </div>
+
+          <div class="proof-item" style="border-left-color: #10b981;">
+            <div class="proof-law" style="color: #34d399;">${dict.proof_sec3_title || "3. Ground Truth Evidentiary Proof (National Registry)"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec3_law || "Vietnam National Tourism Database: csdl.vietnamtourism.gov.vn"}</div>
+            <div class="proof-finding" style="color: #cbd5e1;">${sec3Desc}</div>
+          </div>
+
+          <div class="proof-item" style="border-left-color: #10b981;">
+            <div class="proof-law" style="color: #34d399;">${dict.proof_sec4_clearance_title || "4. Full Statutory Clearance"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec4_clearance_law || "Luật Du lịch 2017 (Điều 9, Khoản 8)"}</div>
+            <div class="proof-finding" style="color: #6ee7b7;">${sec4Desc}</div>
+          </div>
+        `;
+      } else {
+        demoTitleText.textContent = dict.proof_title_infraction || "⚖️ DEMONSTRATION OF STATUTORY INFRACTION";
+        demoTitleText.style.color = "#f87171";
+        demoBox.style.borderColor = "#334155";
+
+        const sec2Desc = (dict.proof_sec2_desc_infraction || "").replace('{claimed}', claimed).replace('{hotel}', hotelName);
+        let sec3Desc = "";
+        if (r.verdict === 'STAR_INFLATION') {
+          sec3Desc = (dict.proof_sec3_desc_inflated || "").replace('{cert}', cert).replace('{hotel}', hotelName).replace('{official}', official).replace('{claimed}', claimed).replace('{diff}', diff);
+        } else {
+          sec3Desc = dict.proof_sec3_desc_unaccredited || "Exhaustive cross-reference confirms ZERO statutory accreditation across all 681 official luxury certificates.";
+        }
+        const sec5Desc = (dict.proof_sec5_desc || "").replace('{platform}', platformDisplay);
+
+        demoContainer.innerHTML = `
+          <div class="proof-item">
+            <div class="proof-law">${dict.proof_sec1_title || "1. Statutory Monopoly on Star Ratings"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec1_law || "Luật Du lịch 2017 - Điều 50, Khoản 3"}</div>
+            <div class="proof-finding">${dict.proof_sec1_desc_infraction || "Under Vietnamese law, the 1-to-5 star classification is a STATE-CONTROLLED statutory title."}</div>
+          </div>
+
+          <div class="proof-item">
+            <div class="proof-law">${dict.proof_sec2_title_infraction || "2. Explicit Statutory Prohibition (Điều 9, Khoản 8)"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec2_law_infraction || "Luật Du lịch 2017 - Điều 9, Khoản 8"}</div>
+            <div class="proof-quote">"${dict.proof_sec2_quote_infraction || "Quảng cáo cơ sở lưu trú du lịch khi chưa có văn bản công nhận hạng của cơ quan nhà nước có thẩm quyền hoặc quảng cáo không đúng với hạng đã được công nhận."}"</div>
+            <div class="proof-finding">${sec2Desc}</div>
+          </div>
+
+          <div class="proof-item">
+            <div class="proof-law">${dict.proof_sec3_title || "3. Ground Truth Evidentiary Proof (The Smoking Gun)"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec3_law || "Vietnam National Tourism Database: csdl.vietnamtourism.gov.vn"}</div>
+            <div class="proof-finding">${sec3Desc}</div>
+          </div>
+
+          ${r.has_dorm ? `
+            <div class="proof-item">
+              <div class="proof-law">${dict.proof_sec4_title || "4. National Facility Standards (TCVN 4391:2015)"}</div>
+              <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec4_law || "TCVN 4391:2015"}</div>
+              <div class="proof-finding">${dict.proof_sec4_desc || "Facilities offering shared dormitory or bunk bed rooms cannot legally qualify as luxury hotels."}</div>
+            </div>
+          ` : ''}
+
+          <div class="proof-item" style="border-left-color: #f59e0b;">
+            <div class="proof-law" style="color: #fbbf24;">${dict.proof_sec5_title || "5. Platform Intermediary Strict Liability"}</div>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec5_law || "Nghị định 85/2021/NĐ-CP & Luật BVQLNTD 2023"}</div>
+            <div class="proof-finding" style="color: #fde68a;">${sec5Desc}</div>
+          </div>
+        `;
+      }
     }
 
     function refreshAuditVerdictI18n(lang) {
@@ -1439,6 +1641,9 @@
           facText.innerHTML = dict.dorm_passed_text || '';
         }
       }
+
+      updateRefundBanner(currentAudit, lang);
+      renderDemonstrationOfLaw(currentAudit, lang);
     }
 
     async function handleAiVerificationClick() {
@@ -1770,6 +1975,23 @@
       }
       infractions.innerHTML = infHtml;
 
+      if (currentAudit) {
+        if (audit.verdict === 'VERIFIED_COMPLIANT') {
+          currentAudit.is_violation = false;
+          currentAudit.verdict = 'VERIFIED_COMPLIANT';
+          const actRow = document.getElementById('action-buttons-row');
+          const compBanner = document.getElementById('compliance-banner');
+          const altCont = document.getElementById('verified-alternatives-container');
+          if (actRow) actRow.style.display = 'none';
+          if (compBanner) compBanner.style.display = 'block';
+          if (altCont) altCont.style.display = 'none';
+        } else if (audit.verdict === 'PROBABLE_STAR_INFLATION') {
+          currentAudit.verdict = 'STAR_INFLATION';
+        }
+        updateRefundBanner(currentAudit, currentLang);
+        renderDemonstrationOfLaw(currentAudit, currentLang);
+      }
+
       findingsBox.style.display = 'block';
       dossier.style.display = 'block';
     }
@@ -1834,9 +2056,7 @@
       document.getElementById('ai-modal').style.display = 'flex';
     }
 
-    function openPlatformNoticeModal() {
-      document.getElementById('platform-notice-modal').style.display = 'flex';
-    }
+
 
     function openRefundDemandModal() {
       updateRefundLetter();
@@ -1867,13 +2087,7 @@
       document.getElementById('refund-letter-text').textContent = text;
     }
 
-    function copyPlatformNotice() {
-      const text = document.getElementById('platform-notice-text').textContent;
-      navigator.clipboard.writeText(text);
-      const toast = document.getElementById('platform-copy-toast');
-      toast.style.display = 'inline';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
-    }
+
 
     function copyRefundLetter() {
       const text = document.getElementById('refund-letter-text').textContent;

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { TrueStarsMatcher, parseOtaUrl } = require('../public/matching_engine.js');
+const { TrueStarsMatcher, parseOtaUrl, isVietnamContext } = require('../public/matching_engine.js');
 
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../public/vnat_whitelist.json'), 'utf8'));
 const matcher = new TrueStarsMatcher(data);
@@ -168,9 +168,48 @@ for (const tc of testCases) {
 }
 
 console.log("==================================================");
-if (!allPassed) {
-  console.error("Parity test suite FAILED.");
+console.log("VIETNAM GEOGRAPHY ISOLATION SUITE (STRICT VN SCOPE)");
+console.log("==================================================");
+
+const vnGeographyCases = [
+  // Legitimate Vietnam URLs
+  { url: "https://www.agoda.com/furama-resort-danang/hotel/da-nang-vn.html", text: "", expected: true, desc: "Agoda Danang URL" },
+  { url: "https://www.agoda.com/alansea-hotel/hotel/da-nang-vn.html", text: "", expected: true, desc: "Agoda Alan Sea Danang URL" },
+  { url: "https://www.booking.com/hotel/vn/caravelle.html", text: "", expected: true, desc: "Booking.com VN URL" },
+  { url: "https://www.trip.com/hotels/detail/?cityEnName=Hanoi&hotelId=678508", text: "", expected: true, desc: "Trip.com Hanoi URL" },
+  { url: "https://www.trip.com/hotels/da-nang-hotel-detail-6842851/alan-sea-hotel-danang/", text: "", expected: true, desc: "Trip.com Danang URL" },
+  { url: "https://www.agoda.com/city/da-nang-vn.html", text: "", expected: true, desc: "Agoda Da Nang city search" },
+  
+  // Text with Vietnamese cities/provinces
+  { url: "", text: "InterContinental Danang Sun Peninsula Resort", expected: true, desc: "Da Nang resort name" },
+  { url: "", text: "Khách sạn Mường Thanh Luxury Nha Trang", expected: true, desc: "Nha Trang hotel text" },
+  { url: "", text: "Phú Quốc Eco Beach Resort", expected: true, desc: "Phu Quoc resort text" },
+
+  // Foreign properties & URLs (MUST BE REJECTED - STRICT VN ONLY)
+  { url: "https://www.agoda.com/siam-kempinski-hotel-bangkok/hotel/bangkok-th.html", text: "", expected: false, desc: "Agoda Bangkok Thailand" },
+  { url: "https://www.agoda.com/hotel-gracery-shinjuku/hotel/tokyo-jp.html", text: "", expected: false, desc: "Agoda Tokyo Japan" },
+  { url: "https://www.agoda.com/marina-bay-sands/hotel/singapore-sg.html", text: "", expected: false, desc: "Agoda Singapore" },
+  { url: "https://www.booking.com/hotel/fr/the-peninsula-paris.html", text: "", expected: false, desc: "Booking.com Paris France" },
+  { url: "https://www.booking.com/hotel/gb/the-ritz-london.html", text: "", expected: false, desc: "Booking.com London UK" },
+  { url: "https://www.booking.com/hotel/it/hotel-daniel-venice.html", text: "", expected: false, desc: "Booking.com Venice Italy" },
+  { url: "https://www.trip.com/hotels/tokyo-hotel-detail-12345/imperial-hotel/", text: "", expected: false, desc: "Trip.com Tokyo Japan" },
+  { url: "https://www.trip.com/hotels/rome-hotel-detail-998877/rome-cavalieri/", text: "", expected: false, desc: "Trip.com Rome Italy" },
+  { url: "", text: "Hilton Tokyo Shinjuku Japan", expected: false, desc: "Tokyo text without VN" },
+  { url: "", text: "The Ritz-Carlton New York Central Park", expected: false, desc: "New York text without VN" }
+];
+
+let geoPassed = true;
+for (const tc of vnGeographyCases) {
+  const actual = isVietnamContext(tc.url, tc.text);
+  const match = actual === tc.expected;
+  if (!match) geoPassed = false;
+  console.log(`[${match ? 'PASS' : 'FAIL'}] [${tc.expected ? 'IN-VN' : 'FOREIGN'}] ${tc.desc}: expected=${tc.expected}, got=${actual}`);
+}
+
+console.log("==================================================");
+if (!allPassed || !geoPassed) {
+  console.error("Test suites FAILED.");
   process.exit(1);
 } else {
-  console.log(`Parity test suite PASSED (${testCases.length}/${testCases.length}).`);
+  console.log(`All Parity & Geography Isolation Tests PASSED (${testCases.length + vnGeographyCases.length}/${testCases.length + vnGeographyCases.length}).`);
 }

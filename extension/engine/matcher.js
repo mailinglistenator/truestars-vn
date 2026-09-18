@@ -151,6 +151,47 @@ function inferCityFromText(text) {
   return "";
 }
 
+/**
+ * Strict Vietnam Geography Guard:
+ * Determines if a given URL, page title, breadcrumbs, or hotel text refers to a location in Vietnam.
+ * Used across content scripts to guarantee the extension ONLY operates on Vietnamese listings.
+ */
+function isVietnamContext(url = "", text = "") {
+  const target = `${url || ""} ${text || ""}`.toLowerCase();
+  if (!target.trim()) return false;
+
+  // 1. Explicit country-level OTA URL / Query indicators
+  // Agoda: -vn.html, /hotel/vn/, countryId=38, country=38, /vietnam/
+  // Booking: /hotel/vn/, dest_id=233, country=vn
+  // Trip.com: countryId=31, /vietnam-hotels, /hotels/list?city=... (VN cities)
+  if (
+    target.includes("-vn.html") ||
+    target.includes("/hotel/vn/") ||
+    target.includes("countryid=38") ||
+    target.includes("country=38") ||
+    target.includes("dest_id=233") ||
+    target.includes("countryid=31") ||
+    target.includes("/vietnam-hotels") ||
+    target.includes("/vietnam/") ||
+    target.includes("dest_type=country;dest_id=233") ||
+    /\b(vietnam|viet\s*nam|vi[eệ]t\s*nam)\b/i.test(target)
+  ) {
+    return true;
+  }
+
+  // 2. City / Province inference
+  if (typeof inferCityFromText === "function" && inferCityFromText(target)) {
+    return true;
+  }
+
+  // 3. Administrative / geographic keywords for Vietnamese destinations
+  if (/\b(da\s*nang|danang|hanoi|ha\s*noi|saigon|sai\s*gon|ho\s*chi\s*minh|tphcm|hcmc|nha\s*trang|nhatrang|phu\s*quoc|phuquoc|hoi\s*an|hoian|hue|ha\s*long|halong|da\s*lat|dalat|vung\s*tau|vungtau|phan\s*thiet|sapa|sa\s*pa|quy\s*nhon|can\s*tho|ninh\s*binh|hai\s*phong|cam\s*ranh|tam\s*dao|con\s*dao|bac\s*ninh|quang\s*ninh|quang\s*nam|khanh\s*hoa|kien\s*giang|lam\s*dong|thua\s*thien|ba\s*ria|binh\s*dinh|binh\s*thuan|lao\s*cai)\b/i.test(target)) {
+    return true;
+  }
+
+  return false;
+}
+
 const DORM_PATTERNS = [
   /\b(hostels?|backpackers?|dorm|dorms|dormitory|dormitories)\b/i,
   /\b(bunks?|bunk\s*beds?|capsules?|capsule\s*hotel|pod\s*hotel|bed\s*in\s*dorm)\b/i,
@@ -1066,6 +1107,12 @@ Sincerely,
 [Insert Phone Number]`;
 }
 
+if (typeof window !== 'undefined') {
+  window.TrueStarsIsVietnam = isVietnamContext;
+  window.TrueStarsInferCity = inferCityFromText;
+  window.TrueStarsMatcher = TrueStarsMatcher;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     TrueStarsMatcher,
@@ -1073,6 +1120,8 @@ if (typeof module !== 'undefined' && module.exports) {
     extractCoreTokens,
     sequenceRatio,
     inferCityFromText,
+    isVietnamContext,
+    detectDormitoryFacility,
     parseOtaUrl,
     generatePlatformNotice,
     generateRefundDemandLetter,
