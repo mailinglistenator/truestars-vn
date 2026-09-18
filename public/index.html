@@ -177,7 +177,7 @@
       padding: 1.75rem;
       display: none;
     }
-    .verdict-CRITICAL, .verdict-BLATANT_HOSTEL_FRAUD {
+    .verdict-CRITICAL {
       background: var(--danger-bg);
       border: 2px solid var(--danger);
     }
@@ -788,11 +788,6 @@
           <p id="verdict-summary" style="font-size: 0.95rem; font-weight: 500;"></p>
         </div>
 
-        <!-- Automated Facility Screening Banner (TCVN 4391:2015) -->
-        <div id="verdict-facility-banner" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.86rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-          <div id="verdict-facility-text"></div>
-          <span id="verdict-facility-badge" style="padding: 0.25rem 0.65rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem;"></span>
-        </div>
 
         <!-- INLINE AUTONOMOUS AI AUDIT DOSSIER -->
         <div id="inline-ai-dossier" style="display: none; background: rgba(124, 58, 237, 0.08); border: 1px solid #7c3aed; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
@@ -801,8 +796,8 @@
             <div style="display: flex; align-items: center; gap: 0.6rem;">
               <span style="font-size: 1.6rem;">🤖</span>
               <div>
-                <strong style="font-size: 1.15rem; color: #fff;">TrueStars Statutory AI Engine</strong>
-                <div style="font-size: 0.78rem; color: #a78bfa;">Autonomous Rebrand Investigation & Official Registry Cross-Examination</div>
+                <strong id="inline-ai-title" style="font-size: 1.15rem; color: #fff;" data-i18n="ai_engine_name">TrueStars Statutory AI Engine</strong>
+                <div id="inline-ai-subtitle" style="font-size: 0.78rem; color: #a78bfa;" data-i18n="ai_dossier_subtitle">Autonomous Rebrand Investigation & Official Registry Cross-Examination</div>
               </div>
             </div>
             <div id="inline-ai-badge" style="display: none; padding: 0.4rem 0.9rem; border-radius: 6px; font-weight: 800; font-size: 0.85rem;"></div>
@@ -812,20 +807,20 @@
           <div id="ai-progress-terminal" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(124, 58, 237, 0.4); border-radius: 8px; padding: 1.15rem; margin-bottom: 1rem;">
             <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
               <span id="ai-live-spinner" class="pulse-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #a78bfa;"></span>
-              <span id="ai-live-status-title" style="font-weight: 700; color: #c4b5fd; font-size: 0.92rem;">Autonomous AI Statutory Inspection in Progress...</span>
+              <span id="ai-live-status-title" style="font-weight: 700; color: #c4b5fd; font-size: 0.92rem;" data-i18n="ai_terminal_title">Autonomous AI Statutory Inspection in Progress...</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 0.65rem;">
               <div id="ai-step-1" style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.88rem; color: #94a3b8; transition: all 0.3s ease;">
                 <span id="ai-step-1-icon">⏳</span>
-                <span id="ai-step-1-text">AI is checking the property listing & aggregator marketing claims...</span>
+                <span id="ai-step-1-text" data-i18n="ai_step1_text">AI is checking the property listing & aggregator marketing claims...</span>
               </div>
               <div id="ai-step-2" style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.88rem; color: #94a3b8; transition: all 0.3s ease;">
                 <span id="ai-step-2-icon">⏳</span>
-                <span id="ai-step-2-text">AI is gathering information & official VNAT statutory accreditation records...</span>
+                <span id="ai-step-2-text" data-i18n="ai_step2_text">AI is gathering information & official VNAT statutory accreditation records...</span>
               </div>
               <div id="ai-step-3" style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.88rem; color: #94a3b8; transition: all 0.3s ease;">
                 <span id="ai-step-3-icon">⏳</span>
-                <span id="ai-step-3-text">AI is evaluating statutory compliance under Vietnam Law on Tourism 2017 & TCVN 4391:2015...</span>
+                <span id="ai-step-3-text" data-i18n="ai_step3_text">AI is evaluating statutory compliance under Vietnam Law on Tourism 2017 & TCVN 4391:2015...</span>
               </div>
             </div>
           </div>
@@ -835,7 +830,7 @@
             <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid #3b82f6; border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid rgba(59, 130, 246, 0.25); padding-bottom: 0.65rem;">
                 <strong style="color: #60a5fa; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
-                  <span>📋</span> Concise Summary of Findings
+                  <span>📋</span> <span id="ai-findings-heading-text" data-i18n="ai_findings_heading">Concise Summary of Findings</span>
                 </strong>
                 <span id="ai-findings-confidence" style="font-size: 0.78rem; background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 0.25rem 0.65rem; border-radius: 4px; font-weight: 700;"></span>
               </div>
@@ -853,7 +848,7 @@
 
             <!-- Modal Trigger Button -->
             <div style="text-align: right; margin-top: 0.75rem;">
-              <button class="btn-action-outline" style="font-size: 0.82rem; padding: 0.4rem 0.95rem; width: auto; display: inline-flex;" onclick="openAiModalDirectly()">📋 View Full Statutory Dossier Modal</button>
+              <button id="btn-view-full-dossier" class="btn-action-outline" style="font-size: 0.82rem; padding: 0.4rem 0.95rem; width: auto; display: inline-flex;" onclick="openAiModalDirectly()" data-i18n="btn_view_full_dossier">📋 View Full Statutory Dossier Modal</button>
             </div>
           </div>
         </div>
@@ -1032,58 +1027,58 @@
       <button class="modal-close" onclick="closeModal('ai-modal')">&times;</button>
       <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
         <span style="font-size: 1.5rem;">🤖</span>
-        <h2 style="font-size: 1.35rem; margin: 0;">Autonomous AI Verification Dossier</h2>
+        <h2 id="ai-modal-title" style="font-size: 1.35rem; margin: 0;" data-i18n="ai_modal_title">Autonomous AI Verification Dossier</h2>
       </div>
-      <div style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 1.25rem;">
+      <div id="ai-modal-subtitle" style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 1.25rem;" data-i18n="ai_modal_subtitle">
         Powered by <strong style="color: #a78bfa;">TrueStars Statutory AI Engine</strong> • Direct Cross-Examination of Official State Registers
       </div>
 
       <div style="background: #090d16; border: 1px solid var(--card-border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
           <div>
-            <div style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Audited Property</div>
+            <div id="ai-modal-prop-label" style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;" data-i18n="ai_modal_property_label">Audited Property</div>
             <div id="ai-modal-hotel-name" style="font-size: 1.2rem; font-weight: 800; color: #fff;"></div>
           </div>
           <div id="ai-modal-verdict-badge" style="padding: 0.35rem 0.85rem; border-radius: 6px; font-weight: 800; font-size: 0.85rem;"></div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.82rem; color: #94a3b8;">
-          <div>Location: <strong id="ai-modal-location" style="color: #e2e8f0;"></strong></div>
-          <div>Confidence: <strong id="ai-modal-confidence" style="color: #38bdf8;"></strong></div>
-          <div>Logged At: <strong id="ai-modal-timestamp" style="color: #e2e8f0;"></strong></div>
-          <div>Precedence: <strong style="color: #34d399;">VNAT Statutory Whitelist (681)</strong></div>
+          <div><span id="ai-modal-loc-label" data-i18n="ai_modal_location_label">Location:</span> <strong id="ai-modal-location" style="color: #e2e8f0;"></strong></div>
+          <div><span id="ai-modal-conf-label" data-i18n="ai_modal_confidence_label">Confidence:</span> <strong id="ai-modal-confidence" style="color: #38bdf8;"></strong></div>
+          <div><span id="ai-modal-log-label" data-i18n="ai_modal_logged_label">Logged At:</span> <strong id="ai-modal-timestamp" style="color: #e2e8f0;"></strong></div>
+          <div><span id="ai-modal-prec-label" data-i18n="ai_modal_precedence_label">Precedence:</span> <strong id="ai-modal-precedence-val" style="color: #34d399;" data-i18n="ai_modal_precedence_val">VNAT Statutory Whitelist (681)</strong></div>
         </div>
       </div>
 
       <!-- Risk Advisory -->
       <div style="background: rgba(225, 29, 72, 0.1); border-left: 4px solid #f43f5e; padding: 1rem; border-radius: 0 8px 8px 0; margin-bottom: 1rem;">
-        <div style="font-weight: 800; color: #fb7185; font-size: 0.85rem; margin-bottom: 0.25rem;">TRAVELER RISK ADVISORY</div>
+        <div id="ai-modal-risk-title" style="font-weight: 800; color: #fb7185; font-size: 0.85rem; margin-bottom: 0.25rem;" data-i18n="ai_modal_risk_title">TRAVELER RISK ADVISORY</div>
         <div id="ai-modal-risk" style="font-size: 0.88rem; color: #ffe4e6; line-height: 1.5;"></div>
       </div>
 
       <!-- Statutory Infractions -->
       <div style="margin-bottom: 1rem;">
-        <div style="font-size: 0.82rem; font-weight: 800; color: #60a5fa; text-transform: uppercase; margin-bottom: 0.5rem;">Statutory Infractions Under Vietnamese Law:</div>
+        <div id="ai-modal-infractions-title" style="font-size: 0.82rem; font-weight: 800; color: #60a5fa; text-transform: uppercase; margin-bottom: 0.5rem;" data-i18n="ai_modal_infractions_title">Statutory Infractions Under Vietnamese Law:</div>
         <div id="ai-modal-infractions" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
       </div>
 
       <!-- TCVN Deficiencies -->
       <div style="margin-bottom: 1rem;">
-        <div style="font-size: 0.82rem; font-weight: 800; color: #f59e0b; text-transform: uppercase; margin-bottom: 0.5rem;">Physical Standard Deficiencies (TCVN 4391:2015):</div>
+        <div id="ai-modal-deficiencies-title" style="font-size: 0.82rem; font-weight: 800; color: #f59e0b; text-transform: uppercase; margin-bottom: 0.5rem;" data-i18n="ai_modal_deficiencies_title">Physical Standard Deficiencies (TCVN 4391:2015):</div>
         <div id="ai-modal-deficiencies" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
       </div>
 
       <!-- Legal Reasoning -->
       <div style="background: #070a12; border: 1px solid #334155; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
-        <div style="font-size: 0.8rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.4rem;">Model Technical & Legal Reasoning:</div>
+        <div id="ai-modal-reasoning-title" style="font-size: 0.8rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.4rem;" data-i18n="ai_modal_reasoning_title">Model Technical & Legal Reasoning:</div>
         <div id="ai-modal-reasoning" style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;"></div>
       </div>
 
       <!-- Precedence Alert -->
-      <div style="font-size: 0.78rem; color: #94a3b8; background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.25rem;">
+      <div id="ai-modal-precedence-rule" style="font-size: 0.78rem; color: #94a3b8; background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.25rem;" data-i18n="ai_modal_precedence_rule">
         ⚖️ <strong>Legal Rule of Precedence:</strong> Vietnam's Law on Tourism 2017 (Article 50) grants exclusive authority over 4★/5★ ratings to VNAT. If this establishment is officially accredited by VNAT, official state certification takes absolute precedence over any algorithmic or AI analysis.
       </div>
 
-      <button class="btn-submit" onclick="closeModal('ai-modal')">Close Audit Dossier</button>
+      <button id="ai-modal-close-btn" class="btn-submit" onclick="closeModal('ai-modal')" data-i18n="ai_modal_close_btn">Close Audit Dossier</button>
     </div>
   </div>
 
@@ -1103,9 +1098,9 @@
         ota: "Agoda",
         claimed: 5,
         price: "$12 / night",
-        details: "Offers 8-bed female & mixed dorms; narrow tube house with zero luxury amenities.",
-        heuristic_reason: "Platform algorithm assigned 5★ based on high review volume & popularity, despite operating shared bunk beds.",
-        violation: "Article 9 Clause 8, Law on Tourism 2017 & TCVN 4391:2015",
+        details: "Budget guest lodging; narrow tube house with zero luxury amenities.",
+        heuristic_reason: "Platform algorithm assigned 5★ based on high review volume & popularity without statutory accreditation.",
+        violation: "Article 9 Clause 8, Law on Tourism 2017",
         ota_links: {
           agoda: "https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=Hanoi+Old+Quarter+Backpacker+Oasis",
           booking: "https://www.booking.com/searchresults.html?ss=Hanoi+Old+Quarter+Backpacker+Oasis&aid=8092145",
@@ -1118,8 +1113,8 @@
         ota: "Agoda",
         claimed: 4,
         price: "$9 / night",
-        details: "Capsule bunk beds, shared common bathroom; platform heuristics assigned 4-star tier.",
-        heuristic_reason: "Platform automated amenity checklist misattributed capsule pods as private rooms, granting 4★ badge.",
+        details: "Budget capsule pods, shared common bathroom; unaccredited lodging.",
+        heuristic_reason: "Platform automated amenity checklist misattributed budget pods as accredited private rooms, granting 4★ badge.",
         violation: "Article 9 Clause 8, Law on Tourism 2017",
         ota_links: {
           agoda: "https://www.agoda.com/partners/partnersearch.aspx?cid=1924567&hl=en-us&pcs=1&text=Da+Nang+Backpacker+Surf+Pods",
@@ -1246,15 +1241,153 @@
       currentAudit = matcher.classify({
         name: hotelName,
         claimedStars: selectedClaimedStars, // 0 = Auto-detect by engine, or 4 / 5 from pills
-        hasDorm: false,  // Evaluated automatically by engine via detectDormitoryFacility
         otaPlatform: parsed.platform,
         province: parsed.city,
         originalUrl: parsed.originalUrl || "",
         otaId: parsed.otaId || "",
         otaSlug: parsed.otaSlug || ""
       });
+      currentAudit.parsed = parsed;
 
       renderAuditResult(currentAudit, parsed);
+    }
+
+    function getLocalizedSummary(r, lang = currentLang) {
+      if (!r) return "";
+      const dict = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
+      const claimed = r.claimed_stars || 5;
+      const official = r.official_stars || 0;
+      const diff = Math.max(1, claimed - official);
+      const platform = r.ota_platform || "OTA Platform";
+      const otaId = r.ota_id ? `Hotel ID #${r.ota_id}` : (r.ota_slug || "unlinked listing");
+      const cert = r.matched_hotel ? (r.matched_hotel.item_id || r.matched_hotel.decision_code || 'AUTH') : 'AUTH';
+      const name = r.matched_hotel ? r.matched_hotel.name : (r.property_name || 'Property');
+
+      if (!r.is_violation) {
+        return (dict.summary_verified || "Verified Legitimate: This property's identity is authenticated against official VNAT {stars}-Star Accreditation #{cert} (\"{name}\").")
+          .replace('{stars}', official)
+          .replace('{cert}', cert)
+          .replace('{name}', name);
+      } else if (r.verdict === 'STAR_INFLATION') {
+        return (dict.summary_star_inflation || "Statutory Star Inflation: This property's identity maps to VNAT Accreditation #{cert}, which is officially certified for only {official} Stars, but marketed on {platform} as {claimed} Stars (+{diff}★).")
+          .replace('{cert}', cert)
+          .replace('{official}', official)
+          .replace('{platform}', platform)
+          .replace('{claimed}', claimed)
+          .replace('{diff}', diff);
+      } else {
+        if (r.original_url) {
+          return (dict.summary_unaccredited_url || "Exhaustive Identity Verification: Out of all 681 statutory 4★ and 5★ hotel accreditations issued by VNAT nationwide, this {platform} property ({ota_id}) does NOT match any accredited certificate. Displaying {claimed} stars violates Article 9, Clause 8 of Vietnam's Law on Tourism 2017.")
+            .replace('{platform}', platform)
+            .replace('{ota_id}', otaId)
+            .replace('{claimed}', claimed);
+        } else {
+          return (dict.summary_unaccredited_text || "Commercial property claims {claimed} stars on {platform} but was NOT found in the direct VNAT National Accreditation Registry under this exact title. Run AI Rebrand Investigation to determine if it is an officially accredited hotel operating under an international management contract / commercial rebrand (e.g. Marriott, Meliá), or a truly unaccredited listing.")
+            .replace('{platform}', platform)
+            .replace('{claimed}', claimed);
+        }
+      }
+    }
+
+    function renderLocalizedOtaLinks(r, lang = currentLang) {
+      const linksContainer = document.getElementById('verdict-ota-links');
+      if (!linksContainer || !r || !r.ota_links) return;
+      const dict = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
+      const agodaLabel = dict.btn_view_agoda || "View on Agoda ↗";
+      const bookingLabel = dict.btn_view_booking || "View on Booking.com ↗";
+      const tripLabel = dict.btn_view_trip || "View on Trip.com ↗";
+      const mapsLabel = dict.btn_view_maps || "Google Maps ↗";
+
+      linksContainer.innerHTML = `
+        <a href="${r.ota_links.agoda.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-agoda">${agodaLabel}</a>
+        <a href="${r.ota_links.booking.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-booking">${bookingLabel}</a>
+        <a href="${r.ota_links.trip.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-trip">${tripLabel}</a>
+        <a href="${r.ota_links.google_maps.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-maps">${mapsLabel}</a>
+      `;
+    }
+
+    function updateAiButtonsDisplay(r, lang = currentLang) {
+      const aiBtn = document.getElementById('btn-ai-verify');
+      const directAiBtn = document.getElementById('btn-run-ai-direct');
+      const aiHint = document.getElementById('ai-verify-hint');
+      const dict = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
+
+      if (!r) return;
+
+      if (r.is_verified && !r.is_violation) {
+        if (aiBtn) {
+          aiBtn.className = "btn-ai-verify";
+          aiBtn.style.background = "rgba(16, 185, 129, 0.2)";
+          aiBtn.style.border = "1px solid #10b981";
+          aiBtn.style.color = "#34d399";
+          aiBtn.style.cursor = "default";
+          aiBtn.disabled = true;
+          aiBtn.innerHTML = `<span>✓ ${dict.ai_btn_verified || 'Officially Verified by VNAT'}</span>`;
+        }
+        if (aiHint) {
+          const cert = r.matched_hotel ? (r.matched_hotel.item_id || r.matched_hotel.decision_code || 'AUTH') : 'AUTH';
+          aiHint.innerHTML = (dict.ai_hint_verified || "VNAT Certificate #{cert}<br><span style='color: #34d399;'>No AI investigation needed</span>").replace('{cert}', cert);
+        }
+        if (directAiBtn) {
+          directAiBtn.style.opacity = '0.6';
+          directAiBtn.innerHTML = `✓ ${dict.ai_btn_verified_short || 'Statutorily Verified'}`;
+          directAiBtn.disabled = true;
+        }
+        const inlineDossier = document.getElementById('inline-ai-dossier');
+        if (inlineDossier) inlineDossier.style.display = 'none';
+      } else {
+        const logEntry = window.latestAiAudit || aiLog[r.ai_verification_key];
+        if (directAiBtn) {
+          directAiBtn.style.opacity = '1';
+          directAiBtn.disabled = false;
+        }
+        if (logEntry) {
+          let badgeLabel = dict.ai_badge_unaccredited_deceptive || '🔴 UNACCREDITED DECEPTIVE';
+          if (logEntry.verdict === 'VERIFIED_COMPLIANT') {
+            badgeLabel = dict.ai_badge_rebrand_verified || '🟢 REBRAND VERIFIED BY AI';
+          } else if (logEntry.verdict === 'PROBABLE_STAR_INFLATION') {
+            badgeLabel = dict.ai_badge_star_inflation || '🟡 PROBABLE STAR INFLATION';
+          } else if (logEntry.verdict === 'AI_SERVICE_UNAVAILABLE') {
+            badgeLabel = dict.ai_badge_unavailable || '⚪ AI AUDIT UNAVAILABLE';
+          }
+
+          if (aiBtn) {
+            aiBtn.disabled = false;
+            aiBtn.className = "btn-ai-verify btn-ai-verified";
+            aiBtn.style.background = "";
+            aiBtn.style.border = "";
+            aiBtn.style.color = "";
+            aiBtn.style.cursor = "pointer";
+            const reauditSuffix = dict.ai_btn_reaudit_suffix || '(Click to Re-Audit)';
+            aiBtn.innerHTML = `<span>🤖 ${badgeLabel} ${reauditSuffix}</span>`;
+          }
+          if (directAiBtn) {
+            directAiBtn.innerHTML = `🤖 ${badgeLabel}`;
+          }
+          if (aiHint) {
+            aiHint.innerHTML = `${dict.ai_engine_name || 'TrueStars Statutory AI Engine'}<br><span style="color: #94a3b8;">${logEntry.latency_sec ? `${logEntry.latency_sec}s` : '0.0s'}</span>`;
+          }
+          renderInlineAiDossier(logEntry, lang);
+        } else {
+          if (aiBtn) {
+            aiBtn.disabled = false;
+            aiBtn.className = "btn-ai-verify";
+            aiBtn.style.background = "linear-gradient(135deg, #7c3aed, #4f46e5)";
+            aiBtn.style.border = "1px solid #a78bfa";
+            aiBtn.style.color = "#fff";
+            aiBtn.style.cursor = "pointer";
+            aiBtn.innerHTML = `<span>🤖 ${dict.ai_btn_investigate || 'Investigate Rebrand with AI'}</span>`;
+          }
+          if (directAiBtn) {
+            directAiBtn.innerHTML = `🤖 ${dict.ai_btn_investigate_short || 'Investigate Rebrand (AI)'}`;
+          }
+          if (aiHint) {
+            aiHint.innerHTML = dict.ai_hint_unknown || `<span style="color: #c4b5fd; font-weight: 600;">Unknown in direct registry</span><br>AI checks if operating under rebrand / contract`;
+          }
+          const inlineDossier = document.getElementById('inline-ai-dossier');
+          if (inlineDossier) inlineDossier.style.display = 'none';
+        }
+      }
     }
 
     function renderAuditResult(r, parsed) {
@@ -1273,136 +1406,46 @@
         badge.textContent = dict.verdict_verified || '🟢 VERIFIED LEGITIMATE';
         officialLabel.style.color = '#10b981';
         document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#34d399;">${'★'.repeat(r.official_stars)} (${r.official_stars}★)</span>`;
-        document.getElementById('verdict-official-sub').textContent = `VNAT Certificate #${r.matched_hotel ? r.matched_hotel.item_id : 'AUTH'}`;
-      } else if (r.verdict === 'BLATANT_HOSTEL_FRAUD') {
-        badge.style.background = '#7f1d1d';
-        badge.style.color = '#fca5a5';
-        badge.textContent = dict.verdict_fake_hostel || '🚨 FAKE 5★ (BACKPACKER HOSTEL)';
-        officialLabel.style.color = '#ef4444';
-        document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Disqualified Hostel)</span>';
-        document.getElementById('verdict-official-sub').textContent = 'Sells Bunk / Dormitory Beds';
+        const cert = r.matched_hotel ? (r.matched_hotel.item_id || 'AUTH') : 'AUTH';
+        document.getElementById('verdict-official-sub').textContent = (dict.vnat_cert_num || 'VNAT Certificate #{cert}').replace('{cert}', cert);
       } else if (r.verdict === 'STAR_INFLATION') {
         badge.style.background = '#d97706';
         badge.style.color = '#fff';
         badge.textContent = dict.verdict_star_inflation || '🟡 STAR INFLATION';
         officialLabel.style.color = '#f59e0b';
         document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#f59e0b;">${'★'.repeat(r.official_stars)} (${r.official_stars}★)</span>`;
-        document.getElementById('verdict-official-sub').textContent = `Accredited for only ${r.official_stars}★ (+${r.claimed_stars - r.official_stars}★ Inflated)`;
+        const diff = r.claimed_stars - r.official_stars;
+        document.getElementById('verdict-official-sub').textContent = (dict.official_sub_inflated || 'Accredited for only {official}★ (+{diff}★ Inflated)')
+          .replace('{official}', r.official_stars)
+          .replace('{diff}', diff);
       } else {
         badge.style.background = '#e11d48';
         badge.style.color = '#fff';
         badge.textContent = (r.claimed_stars === 4 ? `${dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'} (4★)` : (dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'));
         officialLabel.style.color = '#ef4444';
-        document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Unaccredited)</span>';
-        document.getElementById('verdict-official-sub').textContent = 'Missing from National Registry';
+        document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#ef4444;">${dict.official_stars_unaccredited || '❌ 0★ (Unaccredited)'}</span>`;
+        document.getElementById('verdict-official-sub').textContent = dict.official_sub_missing || 'Missing from National Registry';
       }
 
       document.getElementById('verdict-platform-tag').textContent = r.ota_platform;
       document.getElementById('verdict-prop-name').textContent = r.property_name;
-      document.getElementById('verdict-location').textContent = parsed.city ? `Location: ${parsed.city}, Vietnam` : 'Location: Vietnam';
+
+      const cityName = parsed.city || (r.province !== 'Vietnam' ? r.province : '');
+      if (cityName) {
+        document.getElementById('verdict-location').textContent = (dict.location_label || 'Location: {city}, Vietnam').replace('{city}', cityName);
+      } else {
+        document.getElementById('verdict-location').textContent = dict.location_vietnam_only || 'Location: Vietnam';
+      }
+
       document.getElementById('verdict-claimed-stars').textContent = `${'★'.repeat(r.claimed_stars)} (${r.claimed_stars}★)`;
-      document.getElementById('verdict-claimed-sub').textContent = `Displayed on ${r.ota_platform}`;
-      document.getElementById('verdict-summary').textContent = r.summary;
+      document.getElementById('verdict-claimed-sub').textContent = (dict.displayed_on_platform || 'Displayed on {platform}').replace('{platform}', r.ota_platform);
+      document.getElementById('verdict-summary').textContent = getLocalizedSummary(r, currentLang);
 
-      // Automated Facility Inspection Banner (TCVN 4391:2015)
-      const facBanner = document.getElementById('verdict-facility-banner');
-      const facText = document.getElementById('verdict-facility-text');
-      const facBadge = document.getElementById('verdict-facility-badge');
-      if (facBanner && facText && facBadge) {
-        facBanner.style.display = 'flex';
-        if (r.has_dorm) {
-          facBanner.style.background = 'rgba(225, 29, 72, 0.15)';
-          facBanner.style.border = '1px solid #f43f5e';
-          facBanner.style.color = '#ffe4e6';
-          facText.innerHTML = '🚨 <strong>Automated Facility Screening (TCVN 4391:2015):</strong> <span style="color:#f87171;font-weight:700;">Disqualified</span> — Shared dormitory / bunk bed facilities detected in property listing. Under TCVN 4391:2015, luxury 4★ and 5★ hotels must provide 100% private guest rooms.';
-          facBadge.style.background = '#e11d48';
-          facBadge.style.color = '#fff';
-          facBadge.textContent = 'DISQUALIFIED';
-        } else {
-          facBanner.style.background = 'rgba(16, 185, 129, 0.1)';
-          facBanner.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-          facBanner.style.color = '#d1fae5';
-          facText.innerHTML = '✓ <strong>Automated Facility Screening (TCVN 4391:2015):</strong> <span style="color:#34d399;font-weight:700;">Passed</span> — No shared dormitory or bunk bed facilities detected. Meets private luxury accommodation standards.';
-          facBadge.style.background = 'rgba(16, 185, 129, 0.2)';
-          facBadge.style.color = '#34d399';
-          facBadge.textContent = 'PASSED';
-        }
-      }
-
-      // 1. Render Outbound Deep Links with Affiliate Tags
-      const linksContainer = document.getElementById('verdict-ota-links');
-      if (r.ota_links) {
-        linksContainer.innerHTML = `
-          <a href="${r.ota_links.agoda.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-agoda">${r.ota_links.agoda.badge}</a>
-          <a href="${r.ota_links.booking.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-booking">${r.ota_links.booking.badge}</a>
-          <a href="${r.ota_links.trip.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-trip">${r.ota_links.trip.badge}</a>
-          <a href="${r.ota_links.google_maps.url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-maps">${r.ota_links.google_maps.badge}</a>
-        `;
-      }
+      // 1. Render Outbound Deep Links with Affiliate Tags & Localized Labels
+      renderLocalizedOtaLinks(r, currentLang);
 
       // 2. Render AI Verification / Rebrand Investigation State
-      const aiBtn = document.getElementById('btn-ai-verify');
-      const directAiBtn = document.getElementById('btn-run-ai-direct');
-      const aiHint = document.getElementById('ai-verify-hint');
-      const logEntry = aiLog[r.ai_verification_key];
-
-      if (r.is_verified && !r.is_violation) {
-        // Property is ALREADY verified by statutory registry - NO AI NEEDED!
-        if (aiBtn) {
-          aiBtn.className = "btn-ai-verify";
-          aiBtn.style.background = "rgba(16, 185, 129, 0.2)";
-          aiBtn.style.border = "1px solid #10b981";
-          aiBtn.style.color = "#34d399";
-          aiBtn.style.cursor = "default";
-          aiBtn.disabled = true;
-          aiBtn.innerHTML = `<span>✓ Officially Verified by VNAT</span>`;
-        }
-        if (aiHint) {
-          const cert = r.matched_hotel ? (r.matched_hotel.item_id || r.matched_hotel.decision_code || 'AUTH') : 'AUTH';
-          aiHint.innerHTML = `VNAT Certificate #${cert}<br><span style="color: #34d399;">No AI investigation needed</span>`;
-        }
-        if (directAiBtn) {
-          directAiBtn.style.opacity = '0.6';
-          directAiBtn.innerHTML = `✓ Statutorily Verified`;
-          directAiBtn.disabled = true;
-        }
-        const inlineDossier = document.getElementById('inline-ai-dossier');
-        if (inlineDossier) inlineDossier.style.display = 'none';
-      } else {
-        // Property is UNKNOWN or UNACCREDITED - This is where AI Rebrand Investigation is needed!
-        if (directAiBtn) {
-          directAiBtn.style.opacity = '1';
-          directAiBtn.disabled = false;
-        }
-        if (logEntry) {
-          aiBtn.disabled = false;
-          aiBtn.className = "btn-ai-verify btn-ai-verified";
-          aiBtn.style.background = "";
-          aiBtn.style.border = "";
-          aiBtn.style.color = "";
-          aiBtn.style.cursor = "pointer";
-          const isRebrandFound = logEntry.verdict === 'VERIFIED_COMPLIANT';
-          const badgeText = isRebrandFound ? '🟢 AI Rebrand Found' : '🔴 AI Confirmed Unaccredited';
-          aiBtn.innerHTML = `<span>🤖 ${badgeText} (Click to Re-Audit)</span>`;
-          if (directAiBtn) directAiBtn.innerHTML = `🤖 DeepSeek AI (${badgeText})`;
-          if (aiHint) aiHint.innerHTML = `Model: ${logEntry.model || 'Nous DeepSeek Flash 4.1'}<br>Latency: ${logEntry.latency_sec || '0'}s`;
-          renderInlineAiDossier(logEntry);
-        } else {
-          aiBtn.disabled = false;
-          aiBtn.className = "btn-ai-verify";
-          aiBtn.style.background = "linear-gradient(135deg, #7c3aed, #4f46e5)";
-          aiBtn.style.border = "1px solid #a78bfa";
-          aiBtn.style.color = "#fff";
-          aiBtn.style.cursor = "pointer";
-          aiBtn.innerHTML = `<span>🤖 Investigate Rebrand with AI</span>`;
-          if (directAiBtn) directAiBtn.innerHTML = `🤖 Investigate Rebrand (AI)`;
-          if (aiHint) {
-            aiHint.innerHTML = `<span style="color: #c4b5fd; font-weight: 600;">Unknown in direct registry</span><br>AI checks if operating under rebrand / contract`;
-          }
-          const inlineDossier = document.getElementById('inline-ai-dossier');
-          if (inlineDossier) inlineDossier.style.display = 'none';
-        }
-      }
+      updateAiButtonsDisplay(r, currentLang);
 
       // 3. Render 100% Refund Banner & Demonstration of Law in Active Language
       updateRefundBanner(r, currentLang);
@@ -1422,11 +1465,8 @@
         const altTitle = document.getElementById('alternatives-title');
 
         if (r.verified_alternatives && r.verified_alternatives.length > 0) {
-          const cityName = parsed.city || (r.matched_hotel ? r.matched_hotel.province : "Vietnam");
-          const altHeading = (dict.tab_registry && dict.tab_registry.includes('Danh Bạ'))
-            ? `🛡️ Khách sạn 5★ được nhà nước công nhận tại ${cityName}`
-            : `🛡️ Officially Certified 5★ Alternatives in ${cityName}`;
-          altTitle.textContent = altHeading;
+          const targetCity = parsed.city || (r.matched_hotel ? r.matched_hotel.province : "Vietnam");
+          altTitle.textContent = (dict.verified_alt_heading || "🛡️ Officially Certified 5★ Alternatives in {city}").replace('{city}', targetCity);
           altGrid.innerHTML = r.verified_alternatives.map(alt => `
             <div class="alt-card">
               <div>
@@ -1440,9 +1480,9 @@
                 </div>
               </div>
               <div style="display: flex; gap: 0.4rem; margin-top: 0.85rem; flex-wrap: wrap;">
-                <a href="${alt.agoda_url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-agoda" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">Agoda ↗</a>
-                <a href="${alt.booking_url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-booking" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">Booking.com ↗</a>
-                <a href="${alt.trip_url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-trip" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">Trip.com ↗</a>
+                <a href="${alt.agoda_url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-agoda" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">${dict.btn_view_agoda || 'Agoda ↗'}</a>
+                <a href="${alt.booking_url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-booking" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">${dict.btn_view_booking || 'Booking.com ↗'}</a>
+                <a href="${alt.trip_url}" target="_blank" rel="noopener noreferrer" class="btn-ota-link btn-ota-trip" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">${dict.btn_view_trip || 'Trip.com ↗'}</a>
               </div>
             </div>
           `).join('');
@@ -1455,6 +1495,7 @@
       // Pre-fill Refund Demand Letter
       updateRefundLetter();
       box.scrollIntoView({ behavior: 'smooth' });
+    }
     }
 
     function getPlatformDisplayName(platform, url) {
@@ -1598,16 +1639,8 @@
             <div class="proof-finding">${sec3Desc}</div>
           </div>
 
-          ${r.has_dorm ? `
-            <div class="proof-item">
-              <div class="proof-law">${dict.proof_sec4_title || "4. National Facility Standards (TCVN 4391:2015)"}</div>
-              <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec4_law || "TCVN 4391:2015"}</div>
-              <div class="proof-finding">${dict.proof_sec4_desc || "Facilities offering shared dormitory or bunk bed rooms cannot legally qualify as luxury hotels."}</div>
-            </div>
-          ` : ''}
-
           <div class="proof-item" style="border-left-color: #f59e0b;">
-            <div class="proof-law" style="color: #fbbf24;">${dict.proof_sec5_title || "5. Platform Intermediary Strict Liability"}</div>
+            <div class="proof-law" style="color: #fbbf24;">${dict.proof_sec5_title || "4. Platform Intermediary Strict Liability"}</div>
             <div style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.25rem;">${dict.proof_sec5_law || "Nghị định 85/2021/NĐ-CP & Luật BVQLNTD 2023"}</div>
             <div class="proof-finding" style="color: #fde68a;">${sec5Desc}</div>
           </div>
@@ -1617,43 +1650,95 @@
 
     function refreshAuditVerdictI18n(lang) {
       if (!currentAudit) return;
-      const dict = (typeof I18N !== 'undefined' && I18N[lang]) ? I18N[lang] : ((typeof I18N !== 'undefined' && I18N['en']) || {});
-      const badge = document.getElementById('verdict-badge');
+      const dict = (typeof I18N !== "undefined" && I18N[lang]) ? I18N[lang] : ((typeof I18N !== "undefined" && I18N["en"]) || {});
+      const badge = document.getElementById("verdict-badge");
       if (badge) {
         if (!currentAudit.is_violation) {
-          badge.textContent = dict.verdict_verified || '🟢 VERIFIED LEGITIMATE';
-        } else if (currentAudit.verdict === 'BLATANT_HOSTEL_FRAUD') {
-          badge.textContent = dict.verdict_fake_hostel || '🚨 FAKE 5★ (BACKPACKER HOSTEL)';
-        } else if (currentAudit.verdict === 'STAR_INFLATION') {
-          badge.textContent = dict.verdict_star_inflation || '🟡 STAR INFLATION';
+          badge.textContent = dict.verdict_verified || "🟢 VERIFIED LEGITIMATE";
+        } else if (currentAudit.verdict === "STAR_INFLATION") {
+          badge.textContent = dict.verdict_star_inflation || "🟡 STAR INFLATION";
         } else {
-          badge.textContent = (currentAudit.claimed_stars === 4 ? `${dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'} (4★)` : (dict.verdict_unaccredited || '🔴 UNACCREDITED HOTEL'));
-        }
-      }
-      const facText = document.getElementById('verdict-facility-text');
-      const facBadge = document.getElementById('verdict-facility-badge');
-      if (facText && facBadge) {
-        if (currentAudit.has_dorm) {
-          facBadge.textContent = dict.dorm_disqualified_badge || 'DISQUALIFIED';
-          facText.innerHTML = dict.dorm_disqualified_text || '';
-        } else {
-          facBadge.textContent = dict.dorm_passed_badge || 'PASSED';
-          facText.innerHTML = dict.dorm_passed_text || '';
+          badge.textContent = (currentAudit.claimed_stars === 4 ? `${dict.verdict_unaccredited || "🔴 UNACCREDITED HOTEL"} (4★)` : (dict.verdict_unaccredited || "🔴 UNACCREDITED HOTEL"));
         }
       }
 
+      // 1. Official Stars & Subtitle in Reality card
+      const officialLabel = document.getElementById("reality-official-label");
+      const officialStarsEl = document.getElementById("verdict-official-stars");
+      const officialSubEl = document.getElementById("verdict-official-sub");
+      if (!currentAudit.is_violation) {
+        if (officialLabel) officialLabel.style.color = "#10b981";
+        if (officialStarsEl) officialStarsEl.innerHTML = `<span style="color:#34d399;">${"★".repeat(currentAudit.official_stars)} (${currentAudit.official_stars}★)</span>`;
+        const cert = currentAudit.matched_hotel ? (currentAudit.matched_hotel.item_id || currentAudit.matched_hotel.decision_code || "AUTH") : "AUTH";
+        if (officialSubEl) officialSubEl.textContent = (dict.vnat_cert_num || "VNAT Certificate #{cert}").replace("{cert}", cert);
+      } else if (currentAudit.verdict === "STAR_INFLATION") {
+        if (officialLabel) officialLabel.style.color = "#f59e0b";
+        if (officialStarsEl) officialStarsEl.innerHTML = `<span style="color:#f59e0b;">${"★".repeat(currentAudit.official_stars)} (${currentAudit.official_stars}★)</span>`;
+        const diff = currentAudit.claimed_stars - currentAudit.official_stars;
+        if (officialSubEl) officialSubEl.textContent = (dict.official_sub_inflated || "Accredited for only {official}★ (+{diff}★ Inflated)")
+          .replace("{official}", currentAudit.official_stars)
+          .replace("{diff}", diff);
+      } else {
+        if (officialLabel) officialLabel.style.color = "#ef4444";
+        if (officialStarsEl) officialStarsEl.innerHTML = `<span style="color:#ef4444;">${dict.official_stars_unaccredited || "❌ 0★ (Unaccredited)"}</span>`;
+        if (officialSubEl) officialSubEl.textContent = dict.official_sub_missing || "Missing from National Registry";
+      }
+
+      // 2. Location & Claimed card
+      const parsed = currentAudit.parsed || {};
+      const cityName = parsed.city || (currentAudit.province !== "Vietnam" ? currentAudit.province : "");
+      const locEl = document.getElementById("verdict-location");
+      if (locEl) {
+        if (cityName) {
+          locEl.textContent = (dict.location_label || "Location: {city}, Vietnam").replace("{city}", cityName);
+        } else {
+          locEl.textContent = dict.location_vietnam_only || "Location: Vietnam";
+        }
+      }
+      const claimedSubEl = document.getElementById("verdict-claimed-sub");
+      if (claimedSubEl) {
+        claimedSubEl.textContent = (dict.displayed_on_platform || "Displayed on {platform}").replace("{platform}", currentAudit.ota_platform);
+      }
+
+      // 3. Summary
+      const summaryEl = document.getElementById("verdict-summary");
+      if (summaryEl) {
+        summaryEl.textContent = getLocalizedSummary(currentAudit, lang);
+      }
+
+      // 4. Outbound deep links with localized buttons
+      renderLocalizedOtaLinks(currentAudit, lang);
+
+      // 5. AI buttons and hint
+      updateAiButtonsDisplay(currentAudit, lang);
+
+      // 6. Refund banner & proof of law
       updateRefundBanner(currentAudit, lang);
       renderDemonstrationOfLaw(currentAudit, lang);
+
+      // 7. Verified alternatives title
+      const altTitle = document.getElementById("alternatives-title");
+      if (altTitle && currentAudit.verified_alternatives && currentAudit.verified_alternatives.length > 0) {
+        const targetCity = parsed.city || (currentAudit.matched_hotel ? currentAudit.matched_hotel.province : "Vietnam");
+        altTitle.textContent = (dict.verified_alt_heading || "🛡️ Officially Certified 5★ Alternatives in {city}").replace("{city}", targetCity);
+      }
+
+      // 8. Re-render active AI dossier if present
+      const latestAi = window.latestAiAudit || (currentAudit.ai_verification_key && aiLog[currentAudit.ai_verification_key]);
+      if (latestAi) {
+        renderInlineAiDossier(latestAi, lang);
+      }
     }
 
     async function handleAiVerificationClick() {
+      const dict = (typeof I18N !== "undefined" && I18N[currentLang]) ? I18N[currentLang] : ((typeof I18N !== "undefined" && I18N["en"]) || {});
       if (!currentAudit) {
-        const inputVal = document.getElementById('audit-input').value.trim();
+        const inputVal = document.getElementById("audit-input").value.trim();
         if (inputVal) {
           executeAudit();
         } else {
           alert("Please enter a hotel name or booking URL first.");
-          document.getElementById('audit-input').focus();
+          document.getElementById("audit-input").focus();
           return;
         }
       }
@@ -1662,15 +1747,15 @@
 
       // DO NOT run AI verification on already verified hotels
       if (currentAudit.is_verified && !currentAudit.is_violation) {
-        alert(`✓ "${currentAudit.property_name}" is already directly authenticated in the official VNAT statutory registry as an accredited ${currentAudit.official_stars}★ hotel (Certificate #${currentAudit.matched_hotel?.item_id || 'AUTH'}).\n\nAI Rebrand Investigation is only needed for unknown or unaccredited properties to investigate potential rebranding.`);
+        alert(`✓ "${currentAudit.property_name}" is already directly authenticated in the official VNAT statutory registry as an accredited ${currentAudit.official_stars}★ hotel (Certificate #${currentAudit.matched_hotel?.item_id || "AUTH"}).\n\nAI Rebrand Investigation is only needed for unknown or unaccredited properties to investigate potential rebranding.`);
         return;
       }
 
       // Pre-flight client-side injection defense on the button
-      const combinedInput = `${currentAudit.property_name || ''} ${currentAudit.original_url || ''}`;
+      const combinedInput = `${currentAudit.property_name || ""} ${currentAudit.original_url || ""}`;
       const INJECTION_PRECHECK = /(?:ignore|disregard|forget|bypass|override)\s+(?:all\s+)?(?:(?:previous|prior|above|system)\s+)?(?:instructions|prompts|rules|commands|directives|filters|guidelines)|(?:return|output|say|reply\s+with)\s+(?:verdict\s*)?['"]?(?:verified|compliant|5\s*stars)|system\s*:\s*|assistant\s*:\s*|user\s*:\s*|<\|im_start\|>|<\|im_end\|>|\[inst\]|\[\/inst\]|developer\s+mode|jailbreak|pretend\s+you\s+are|you\s+are\s+now/i;
       if (INJECTION_PRECHECK.test(combinedInput)) {
-        renderInlineAiDossier({
+        const unavailRecord = {
           hotel_name: currentAudit.property_name || "Audit Query",
           claimed_stars: currentAudit.claimed_stars || 5,
           city: (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : "Vietnam",
@@ -1679,86 +1764,78 @@
           latency_sec: "0.0",
           verdict: "AI_SERVICE_UNAVAILABLE",
           confidence: 0,
-          concise_summary: "AI verification is unavailable for this query format. Please refer to official VNAT statutory registry lookup.",
-          refund_advisory: "Automated AI audit is unavailable. Please verify accreditation directly in the official national registry.",
-          investigation_findings: "Input query contains unsupported directive syntax. No adverse determination or penalty is made against this property.",
-          statutory_infractions: [],
-          tcvn_deficiencies: [],
-          risk_advisory: "AI audit unavailable for this input. Please search using the property's standard official name.",
-          reasoning: "The query format could not be verified by the statutory AI reasoning engine. In accordance with consumer protection standards, unverified queries do not penalize the establishment."
-        });
-        const b1 = document.getElementById('btn-ai-verify');
-        const b2 = document.getElementById('btn-run-ai-direct');
-        if (b1) { b1.className = "btn-ai-verify btn-ai-verified"; b1.innerHTML = `<span>🤖 ⚪ AI UNAVAILABLE (0.0s)</span>`; }
-        if (b2) { b2.innerHTML = `🤖 ⚪ AI UNAVAILABLE`; }
+          lang: currentLang
+        };
+        renderInlineAiDossier(unavailRecord, currentLang);
+        updateAiButtonsDisplay(currentAudit, currentLang);
         return;
       }
 
-      const dossier = document.getElementById('inline-ai-dossier');
+      const dossier = document.getElementById("inline-ai-dossier");
       if (dossier) {
-        dossier.style.display = 'block';
-        dossier.scrollIntoView({ behavior: 'smooth' });
+        dossier.style.display = "block";
+        dossier.scrollIntoView({ behavior: "smooth" });
       }
 
-      const terminal = document.getElementById('ai-progress-terminal');
-      const findingsBox = document.getElementById('ai-findings-summary-box');
-      const step1 = document.getElementById('ai-step-1');
-      const step2 = document.getElementById('ai-step-2');
-      const step3 = document.getElementById('ai-step-3');
-      const icon1 = document.getElementById('ai-step-1-icon');
-      const icon2 = document.getElementById('ai-step-2-icon');
-      const icon3 = document.getElementById('ai-step-3-icon');
-      const statusTitle = document.getElementById('ai-live-status-title');
-      const spinner = document.getElementById('ai-live-spinner');
+      const terminal = document.getElementById("ai-progress-terminal");
+      const findingsBox = document.getElementById("ai-findings-summary-box");
+      const step1 = document.getElementById("ai-step-1");
+      const step2 = document.getElementById("ai-step-2");
+      const step3 = document.getElementById("ai-step-3");
+      const icon1 = document.getElementById("ai-step-1-icon");
+      const icon2 = document.getElementById("ai-step-2-icon");
+      const icon3 = document.getElementById("ai-step-3-icon");
+      const statusTitle = document.getElementById("ai-live-status-title");
+      const spinner = document.getElementById("ai-live-spinner");
 
-      terminal.style.display = 'block';
-      findingsBox.style.display = 'none';
+      terminal.style.display = "block";
+      findingsBox.style.display = "none";
 
       // Stage 1: Checking listing details
-      icon1.innerHTML = '🔄'; step1.style.color = '#38bdf8'; step1.style.fontWeight = '700';
-      icon2.innerHTML = '⏳'; step2.style.color = '#94a3b8'; step2.style.fontWeight = 'normal';
-      icon3.innerHTML = '⏳'; step3.style.color = '#94a3b8'; step3.style.fontWeight = 'normal';
-      statusTitle.textContent = "AI is inspecting listing claims & trade name...";
-      spinner.style.background = '#a78bfa';
+      icon1.innerHTML = "🔄"; step1.style.color = "#38bdf8"; step1.style.fontWeight = "700";
+      icon2.innerHTML = "⏳"; step2.style.color = "#94a3b8"; step2.style.fontWeight = "normal";
+      icon3.innerHTML = "⏳"; step3.style.color = "#94a3b8"; step3.style.fontWeight = "normal";
+      statusTitle.textContent = dict.ai_step1_text || "AI is inspecting listing claims & trade name...";
+      spinner.style.background = "#a78bfa";
 
-      const btn1 = document.getElementById('btn-ai-verify');
-      const btn2 = document.getElementById('btn-run-ai-direct');
-      const origText1 = btn1 ? btn1.innerHTML : '';
-      const origText2 = btn2 ? btn2.innerHTML : '';
+      const btn1 = document.getElementById("btn-ai-verify");
+      const btn2 = document.getElementById("btn-run-ai-direct");
+      const origText1 = btn1 ? btn1.innerHTML : "";
+      const origText2 = btn2 ? btn2.innerHTML : "";
 
-      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>⏳ Investigating Rebrand via Statutory AI...</span>`; }
-      if (btn2) { btn2.disabled = true; btn2.innerHTML = `⏳ AI Investigating Rebrand...`; }
+      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>${dict.ai_running_btn1 || "⏳ Investigating Rebrand via Statutory AI..."}</span>`; }
+      if (btn2) { btn2.disabled = true; btn2.innerHTML = dict.ai_running_btn2 || "⏳ AI Investigating Rebrand..."; }
 
       const key = currentAudit.ai_verification_key;
       const startTime = performance.now();
       const cityName = (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : (currentAudit.matched_hotel ? currentAudit.matched_hotel.province : "") || "";
 
-      // Dispatch fetch immediately with force: true to guarantee live statutory AI inference
-      const fetchPromise = fetch('/api/ai_verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      // Dispatch fetch immediately with force: true and active language
+      const fetchPromise = fetch("/api/ai_verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: currentAudit.property_name,
           claimed_stars: currentAudit.claimed_stars,
           platform: currentAudit.ota_platform,
           url: currentAudit.original_url,
           city: cityName,
-          has_dorm: currentAudit.has_dorm,
+          lang: currentLang,
           force: true
         })
       });
 
       // Advance stages naturally while the live LLM inference is running
       const stageTimer1 = setTimeout(() => {
-        icon1.innerHTML = '✅'; step1.style.color = '#34d399'; step1.style.fontWeight = 'normal';
-        icon2.innerHTML = '🔄'; step2.style.color = '#38bdf8'; step2.style.fontWeight = '700';
-        statusTitle.textContent = `AI is gathering official VNAT registry candidates in ${cityName || 'destination'}...`;
+        icon1.innerHTML = "✅"; step1.style.color = "#34d399"; step1.style.fontWeight = "normal";
+        icon2.innerHTML = "🔄"; step2.style.color = "#38bdf8"; step2.style.fontWeight = "700";
+        statusTitle.textContent = (dict.ai_stage2_status || "AI is gathering official VNAT registry candidates in {city}...").replace("{city}", cityName || "destination");
       }, 700);
 
       const stageTimer2 = setTimeout(() => {
-        icon2.innerHTML = '✅'; step2.style.color = '#34d399'; step2.style.fontWeight = 'normal';
-        icon3.innerHTML = '🔄'; step3.style.color = '#38bdf8'; step3.style.fontWeight = '700';
-        statusTitle.textContent = "TrueStars AI investigating commercial rebranding, operator contracts, & statutory compliance...";
+        icon2.innerHTML = "✅"; step2.style.color = "#34d399"; step2.style.fontWeight = "normal";
+        icon3.innerHTML = "🔄"; step3.style.color = "#38bdf8"; step3.style.fontWeight = "700";
+        statusTitle.textContent = dict.ai_step3_text || "TrueStars AI investigating commercial rebranding, operator contracts, & statutory compliance...";
       }, 1800);
 
       let auditRecord = null;
@@ -1767,14 +1844,14 @@
         clearTimeout(stageTimer1);
         clearTimeout(stageTimer2);
 
-        // Ensure stages 1 & 2 are marked done
-        icon1.innerHTML = '✅'; step1.style.color = '#34d399'; step1.style.fontWeight = 'normal';
-        icon2.innerHTML = '✅'; step2.style.color = '#34d399'; step2.style.fontWeight = 'normal';
-        icon3.innerHTML = '🔄'; step3.style.color = '#38bdf8'; step3.style.fontWeight = '700';
+        icon1.innerHTML = "✅"; step1.style.color = "#34d399"; step1.style.fontWeight = "normal";
+        icon2.innerHTML = "✅"; step2.style.color = "#34d399"; step2.style.fontWeight = "normal";
+        icon3.innerHTML = "🔄"; step3.style.color = "#38bdf8"; step3.style.fontWeight = "700";
 
         const data = await res.json();
         if (data && data.audit) {
           auditRecord = data.audit;
+          auditRecord.lang = currentLang;
           aiLog[key] = auditRecord;
         }
       } catch (err) {
@@ -1786,26 +1863,14 @@
       const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
 
       // Stage 3 complete
-      icon3.innerHTML = '✅'; step3.style.color = '#34d399'; step3.style.fontWeight = 'normal';
+      icon3.innerHTML = "✅"; step3.style.color = "#34d399"; step3.style.fontWeight = "normal";
       const latencyDisplay = auditRecord && auditRecord.latency_sec ? auditRecord.latency_sec : elapsedSec;
-      statusTitle.textContent = `✅ Statutory AI Audit Complete (${latencyDisplay}s • Statutory AI Engine)`;
-      spinner.style.background = '#10b981';
+      statusTitle.textContent = (dict.ai_complete_status || "✅ Statutory AI Audit Complete ({sec}s • Statutory AI Engine)").replace("{sec}", latencyDisplay);
+      spinner.style.background = "#10b981";
 
       if (auditRecord) {
-        let badgeLabel = '🔴 UNACCREDITED DECEPTIVE';
-        if (auditRecord.verdict === 'VERIFIED_COMPLIANT') {
-          badgeLabel = '🟢 REBRAND VERIFIED';
-        } else if (auditRecord.verdict === 'AI_SERVICE_UNAVAILABLE') {
-          badgeLabel = '⚪ AI UNAVAILABLE';
-        }
-        if (btn1) {
-          btn1.className = "btn-ai-verify btn-ai-verified";
-          btn1.innerHTML = `<span>🤖 ${badgeLabel} (${latencyDisplay}s)</span>`;
-        }
-        if (btn2) {
-          btn2.innerHTML = `🤖 ${badgeLabel}`;
-        }
-        renderInlineAiDossier(auditRecord);
+        updateAiButtonsDisplay(currentAudit, currentLang);
+        renderInlineAiDossier(auditRecord, currentLang);
       } else {
         alert("AI verification server request failed. Please check network connection.");
         if (btn1) btn1.innerHTML = origText1;
@@ -1816,184 +1881,297 @@
       if (btn2) btn2.disabled = false;
     }
 
-    function renderInlineAiDossier(audit) {
+    function renderInlineAiDossier(audit, lang = currentLang) {
+      if (!audit) return;
       window.latestAiAudit = audit;
-      const dossier = document.getElementById('inline-ai-dossier');
+      const dossier = document.getElementById("inline-ai-dossier");
       if (!dossier) return;
 
-      const badge = document.getElementById('inline-ai-badge');
-      const findingsBox = document.getElementById('ai-findings-summary-box');
-      const confidence = document.getElementById('ai-findings-confidence');
-      const bullets = document.getElementById('ai-findings-bullets');
-      const risk = document.getElementById('inline-ai-risk');
-      const reasoning = document.getElementById('inline-ai-reasoning');
-      const infractions = document.getElementById('inline-ai-infractions');
+      const dict = (typeof I18N !== "undefined" && I18N[lang]) ? I18N[lang] : ((typeof I18N !== "undefined" && I18N["en"]) || {});
+
+      const badge = document.getElementById("inline-ai-badge");
+      const findingsBox = document.getElementById("ai-findings-summary-box");
+      const confidence = document.getElementById("ai-findings-confidence");
+      const bullets = document.getElementById("ai-findings-bullets");
+      const risk = document.getElementById("inline-ai-risk");
+      const reasoning = document.getElementById("inline-ai-reasoning");
+      const infractions = document.getElementById("inline-ai-infractions");
 
       const confPercent = Math.round((audit.confidence || 0.95) * 100);
-      const latencySec = audit.latency_sec ? `${audit.latency_sec}s` : (audit.latency_ms ? `${(audit.latency_ms/1000).toFixed(1)}s` : '');
-      const modelLabel = audit.model || 'TrueStars Statutory AI Engine';
-      confidence.innerHTML = `<span>🛡️ ${confPercent}% Statutory Confidence</span> &bull; <span style="color: #c4b5fd;">⚡ ${modelLabel}${latencySec ? ` (${latencySec})` : ''}</span>`;
+      const latencySec = audit.latency_sec ? `${audit.latency_sec}s` : (audit.latency_ms ? `${(audit.latency_ms/1000).toFixed(1)}s` : "");
+      const modelLabel = dict.ai_engine_name || "TrueStars Statutory AI Engine";
+      const confText = dict.statutory_confidence || "Statutory Confidence";
+      confidence.innerHTML = `<span>🛡️ ${confPercent}% ${confText}</span> &bull; <span style="color: #c4b5fd;">⚡ ${modelLabel}${latencySec ? ` (${latencySec})` : ""}</span>`;
 
-      if (audit.verdict === 'VERIFIED_COMPLIANT') {
-        badge.style.display = 'inline-block';
-        badge.style.background = '#059669';
-        badge.style.color = '#fff';
-        badge.textContent = '🟢 REBRAND VERIFIED BY AI';
+      // Badge & 3 Key Bullets
+      let bulletsHtml = "";
+      if (audit.verdict === "VERIFIED_COMPLIANT") {
+        badge.style.display = "inline-block";
+        badge.style.background = "#059669";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_rebrand_verified || "🟢 REBRAND VERIFIED BY AI";
 
-        bullets.innerHTML = `
-          <div>
-            <strong>🏛️ State Accreditation & Rebrand Identification:</strong>
-            <span style="color: #34d399; font-weight: 700;">AUTHENTICATED REBRAND / OPERATOR CONTRACT</span> — The AI cross-referenced destination records and confirmed this property is an officially accredited luxury hotel operating under a commercial rebrand or international operator agreement.
-          </div>
-          <div>
-            <strong>⚖️ Statutory Law Compliance:</strong>
-            <span style="color: #34d399; font-weight: 700;">FULL STATUTORY COMPLIANCE</span> with Article 50 of Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14). No deceptive advertising under Decree 85/2021/NĐ-CP.
-          </div>
-          <div>
-            <strong>🛡️ Traveler Advisory:</strong>
-            <span style="color: #6ee7b7;">SAFE LUXURY BOOKING</span> — Verified luxury infrastructure, physical facilities, safety protocols, and emergency backup power in accordance with TCVN 4391:2015 national standards.
-          </div>
+        bulletsHtml = `
+          ${dict.ai_bullet_comp_registry || ""}
+          ${dict.ai_bullet_comp_law || ""}
+          ${dict.ai_bullet_comp_advisory || ""}
         `;
+        risk.style.background = "rgba(16, 185, 129, 0.15)";
+        risk.style.borderLeftColor = "#10b981";
+        risk.style.color = "#d1fae5";
+      } else if (audit.verdict === "PROBABLE_STAR_INFLATION") {
+        badge.style.display = "inline-block";
+        badge.style.background = "#d97706";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_star_inflation || "🟡 PROBABLE STAR INFLATION";
 
-        risk.style.background = 'rgba(16, 185, 129, 0.15)';
-        risk.style.borderLeftColor = '#10b981';
-        risk.style.color = '#d1fae5';
-      } else if (audit.verdict === 'PROBABLE_STAR_INFLATION') {
-        badge.style.display = 'inline-block';
-        badge.style.background = '#d97706';
-        badge.style.color = '#fff';
-        badge.textContent = '🟡 PROBABLE STAR INFLATION';
-
-        bullets.innerHTML = `
-          <div>
-            <strong>🏛️ State Accreditation Registry:</strong>
-            <span style="color: #fbbf24; font-weight: 700;">ACCREDITATION MISMATCH</span> — Property is officially certified for a lower star rank in government records. Marketing on aggregator exceeds state authorization.
-          </div>
-          <div>
-            <strong>⚖️ Statutory Law Compliance:</strong>
-            <span style="color: #f87171; font-weight: 700;">STATUTORY INFRACTION</span> — Violates Article 9, Clause 8 of Vietnam's Law on Tourism 2017 (prohibition on advertising inconsistent with accredited rank).
-          </div>
-          <div>
-            <strong>🛡️ Traveler Advisory:</strong>
-            <span style="color: #fde68a;">RATE INFLATION RISK</span> — You are paying higher rates for an inflated tier. Under Decree 85/2021/NĐ-CP and Consumer Protection Law 2023, travelers can demand a rate adjustment or partial refund.
-          </div>
+        bulletsHtml = `
+          ${dict.ai_bullet_infl_registry || ""}
+          ${dict.ai_bullet_infl_law || ""}
+          ${dict.ai_bullet_infl_advisory || ""}
         `;
+        risk.style.background = "rgba(217, 119, 6, 0.15)";
+        risk.style.borderLeftColor = "#f59e0b";
+        risk.style.color = "#fef3c7";
+      } else if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
+        badge.style.display = "inline-block";
+        badge.style.background = "#64748b";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_unavailable || "⚪ AI AUDIT UNAVAILABLE";
 
-        risk.style.background = 'rgba(217, 119, 6, 0.15)';
-        risk.style.borderLeftColor = '#f59e0b';
-        risk.style.color = '#fef3c7';
-      } else if (audit.verdict === 'AI_SERVICE_UNAVAILABLE') {
-        badge.style.display = 'inline-block';
-        badge.style.background = '#64748b';
-        badge.style.color = '#fff';
-        badge.textContent = '⚪ AI AUDIT UNAVAILABLE';
-
-        bullets.innerHTML = `
-          <div>
-            <strong>ℹ️ Automated Verification Notice:</strong>
-            <span style="color: #94a3b8; font-weight: 700;">AUDIT UNAVAILABLE FOR THIS QUERY</span> — The automated AI audit is unavailable for this query format. In accordance with consumer protection standards, no adverse determination or penalty is assessed against this property.
-          </div>
-          <div>
-            <strong>🏛️ National Registry Recommendation:</strong>
-            Please search using the establishment's standard trade or legal name to consult the official 681-hotel National VNAT Registry directly.
-          </div>
+        bulletsHtml = `
+          ${dict.ai_bullet_unav_registry || ""}
+          ${dict.ai_bullet_unav_law || ""}
         `;
-
-        risk.style.background = 'rgba(100, 116, 139, 0.15)';
-        risk.style.borderLeftColor = '#64748b';
-        risk.style.color = '#cbd5e1';
+        risk.style.background = "rgba(100, 116, 139, 0.15)";
+        risk.style.borderLeftColor = "#64748b";
+        risk.style.color = "#cbd5e1";
       } else {
-        badge.style.display = 'inline-block';
-        badge.style.background = '#e11d48';
-        badge.style.color = '#fff';
-        badge.textContent = '🔴 UNACCREDITED DECEPTIVE';
+        badge.style.display = "inline-block";
+        badge.style.background = "#e11d48";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_unaccredited_deceptive || "🔴 UNACCREDITED DECEPTIVE";
 
-        bullets.innerHTML = `
-          <div>
-            <strong>🏛️ State Accreditation Registry:</strong>
-            <span style="color: #ef4444; font-weight: 700;">MISSING FROM NATIONAL REGISTRY</span> — Property possesses ZERO statutory accreditation across the entire 681-hotel National VNAT Registry (csdl.vietnamtourism.gov.vn).
-          </div>
-          <div>
-            <strong>⚖️ Statutory Law Compliance:</strong>
-            <span style="color: #ef4444; font-weight: 700;">EXPLICIT STATUTORY INFRACTION</span> — Severe breach of Article 9, Clause 8 & Article 50 of Vietnam's Law on Tourism 2017 (statutory monopoly on star classifications). Aggregators share joint liability under Decree 85/2021/NĐ-CP.
-          </div>
-          <div>
-            <strong>🛡️ Traveler Advisory:</strong>
-            <span style="color: #fca5a5;">HIGH CONSUMER RISK</span> — Commercial star rating is uncertified marketing. Property has not passed government safety audits, backup generator inspections, or TCVN 4391:2015 luxury standards. Eligible for 100% refund.
-          </div>
+        bulletsHtml = `
+          ${dict.ai_bullet_unacc_registry || ""}
+          ${dict.ai_bullet_unacc_law || ""}
+          ${dict.ai_bullet_unacc_advisory || ""}
         `;
-
-        risk.style.background = 'rgba(225, 29, 72, 0.15)';
-        risk.style.borderLeftColor = '#f43f5e';
-        risk.style.color = '#ffe4e6';
+        risk.style.background = "rgba(225, 29, 72, 0.15)";
+        risk.style.borderLeftColor = "#f43f5e";
+        risk.style.color = "#ffe4e6";
       }
 
-      if (audit.concise_summary) {
-        const isCompliant = audit.verdict === 'VERIFIED_COMPLIANT';
-        const isUnavailable = audit.verdict === 'AI_SERVICE_UNAVAILABLE';
-        const boxBg = isCompliant ? 'rgba(16, 185, 129, 0.15)' : (isUnavailable ? 'rgba(100, 116, 139, 0.15)' : 'rgba(225, 29, 72, 0.18)');
-        const boxBorder = isCompliant ? '#10b981' : (isUnavailable ? '#64748b' : '#ef4444');
-        const boxColor = isCompliant ? '#6ee7b7' : (isUnavailable ? '#e2e8f0' : '#fca5a5');
-        const boxIcon = isCompliant ? '✅' : (isUnavailable ? 'ℹ️' : '🚨');
+      // Determine localized text for dynamic summary box, refund guidance, investigation findings, risk, and reasoning
+      const isCompliant = audit.verdict === "VERIFIED_COMPLIANT";
+      const isInflation = audit.verdict === "PROBABLE_STAR_INFLATION";
+      const isUnavailable = audit.verdict === "AI_SERVICE_UNAVAILABLE";
 
-        bullets.innerHTML = `
-          <div style="background: ${boxBg}; border-left: 4px solid ${boxBorder}; padding: 1rem 1.15rem; border-radius: 0 8px 8px 0; margin-bottom: 0.5rem;">
-            <div style="font-size: 1.02rem; font-weight: 700; color: ${boxColor}; line-height: 1.45; margin-bottom: 0.4rem;">
-              ${boxIcon} "${audit.concise_summary}"
+      let conciseSummary = "";
+      let refundAdvisory = "";
+      let investigationFindings = "";
+      let riskAdvisory = "";
+      let reasoningText = "";
+
+      const auditLang = audit.lang || (audit.model && audit.model.includes("Korean") ? "ko" : "en");
+      const isTargetLang = (auditLang === lang) && (lang !== "en" || !audit.lang);
+
+      if (isTargetLang && audit.concise_summary) {
+        conciseSummary = audit.concise_summary;
+        refundAdvisory = audit.refund_advisory || "";
+        investigationFindings = audit.investigation_findings || "";
+        riskAdvisory = audit.risk_advisory || "";
+        reasoningText = audit.reasoning || "";
+      } else {
+        // Use localized dictionary entries for the active language
+        if (isCompliant) {
+          conciseSummary = dict.ai_summary_comp || audit.concise_summary;
+          refundAdvisory = dict.ai_refund_comp || audit.refund_advisory;
+          investigationFindings = dict.ai_findings_comp || audit.investigation_findings;
+          riskAdvisory = dict.ai_risk_comp || audit.risk_advisory;
+          reasoningText = dict.ai_reasoning_comp || audit.reasoning;
+        } else if (isInflation) {
+          conciseSummary = dict.ai_summary_infl || audit.concise_summary;
+          refundAdvisory = dict.ai_refund_infl || audit.refund_advisory;
+          investigationFindings = dict.ai_findings_infl || audit.investigation_findings;
+          riskAdvisory = dict.ai_risk_infl || audit.risk_advisory;
+          reasoningText = dict.ai_reasoning_infl || audit.reasoning;
+        } else if (isUnavailable) {
+          conciseSummary = dict.ai_summary_unav || audit.concise_summary;
+          refundAdvisory = dict.ai_refund_unav || audit.refund_advisory;
+          investigationFindings = dict.ai_findings_unav || audit.investigation_findings;
+          riskAdvisory = dict.ai_risk_unav || audit.risk_advisory;
+          reasoningText = dict.ai_reasoning_unav || audit.reasoning;
+        } else {
+          conciseSummary = dict.ai_summary_unacc || audit.concise_summary;
+          refundAdvisory = dict.ai_refund_unacc || audit.refund_advisory;
+          investigationFindings = dict.ai_findings_unacc || audit.investigation_findings;
+          riskAdvisory = dict.ai_risk_unacc || audit.risk_advisory;
+          reasoningText = dict.ai_reasoning_unacc || audit.reasoning;
+        }
+      }
+
+      const boxBg = isCompliant ? "rgba(16, 185, 129, 0.15)" : (isUnavailable ? "rgba(100, 116, 139, 0.15)" : "rgba(225, 29, 72, 0.18)");
+      const boxBorder = isCompliant ? "#10b981" : (isUnavailable ? "#64748b" : "#ef4444");
+      const boxColor = isCompliant ? "#6ee7b7" : (isUnavailable ? "#e2e8f0" : "#fca5a5");
+      const boxIcon = isCompliant ? "✅" : (isUnavailable ? "ℹ️" : "🚨");
+
+      const refundLabel = dict.ai_label_refund_guidance || "Refund Guidance:";
+      const findingsLabel = dict.ai_label_registry_investigation || "AI Registry Investigation:";
+      const riskLabel = dict.ai_label_risk_advisory || "Risk Advisory:";
+      const reasoningLabel = dict.ai_label_legal_analysis || "Statutory Legal Analysis:";
+
+      bullets.innerHTML = `
+        <div style="background: ${boxBg}; border-left: 4px solid ${boxBorder}; padding: 1rem 1.15rem; border-radius: 0 8px 8px 0; margin-bottom: 0.5rem;">
+          <div style="font-size: 1.02rem; font-weight: 700; color: ${boxColor}; line-height: 1.45; margin-bottom: 0.4rem;">
+            ${boxIcon} "${conciseSummary}"
+          </div>
+          ${refundAdvisory ? `
+            <div style="font-size: 0.88rem; color: ${isCompliant ? "#a7f3d0" : (isUnavailable ? "#cbd5e1" : "#fecdd3")}; line-height: 1.5; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.1);">
+              🛡️ <strong>${refundLabel}</strong> ${refundAdvisory}
             </div>
-            ${audit.refund_advisory ? `
-              <div style="font-size: 0.88rem; color: ${isCompliant ? '#a7f3d0' : (isUnavailable ? '#cbd5e1' : '#fecdd3')}; line-height: 1.5; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                🛡️ <strong>Refund Guidance:</strong> ${audit.refund_advisory}
-              </div>
-            ` : ''}
-            ${audit.investigation_findings ? `
-              <div style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5; margin-top: 0.45rem;">
-                🔍 <strong>AI Registry Investigation:</strong> ${audit.investigation_findings}
-              </div>
-            ` : ''}
-          </div>
-        ` + bullets.innerHTML;
-      }
+          ` : ""}
+          ${investigationFindings ? `
+            <div style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5; margin-top: 0.45rem;">
+              🔍 <strong>${findingsLabel}</strong> ${investigationFindings}
+            </div>
+          ` : ""}
+        </div>
+      ` + bulletsHtml;
 
-      risk.innerHTML = `<strong>⚠️ Risk Advisory:</strong> ${audit.risk_advisory || 'Consumer protection alert under Vietnamese Law on Tourism 2017.'}`;
-      reasoning.innerHTML = `<strong>⚖️ Statutory Legal Analysis:</strong> ${audit.reasoning}`;
+      risk.innerHTML = `<strong>⚠️ ${riskLabel}</strong> ${riskAdvisory}`;
+      reasoning.innerHTML = `<strong>⚖️ ${reasoningLabel}</strong> ${reasoningText}`;
 
-      let infHtml = '';
-      if (audit.statutory_infractions && audit.statutory_infractions.length > 0) {
-        infHtml += audit.statutory_infractions.map(i => `
-          <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1;">
-            ${i}
-          </div>
-        `).join('');
-      }
-      if (audit.tcvn_deficiencies && audit.tcvn_deficiencies.length > 0) {
-        infHtml += audit.tcvn_deficiencies.map(d => `
-          <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1;">
-            ${d}
-          </div>
-        `).join('');
+      // Localized Infractions & Deficiencies
+      let infHtml = "";
+      if (isCompliant) {
+        infHtml = `<div style="color: #34d399; font-size: 0.85rem; padding: 0.5rem 0.8rem;">${dict.ai_modal_none_infractions || "✓ None — Property strictly adheres to all statutory tourism mandates."}</div>`;
+      } else if (isUnavailable) {
+        infHtml = `<div style="color: #94a3b8; font-size: 0.85rem; padding: 0.5rem 0.8rem;">${dict.ai_modal_none_infractions || "✓ No adverse infractions assessed."}</div>`;
+      } else {
+        if (lang === "ko") {
+          infHtml = `
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              베트남 관광법 2017 제50조 제3항: 4성 및 5성 호텔 성급 공인 권한은 베트남 관광국(VNAT)의 국가 전속 권한입니다.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              베트남 관광법 2017 제9조 제8항: 국가 주무 관청의 인가 결정 없이 숙박업소 성급을 광고하는 행위 엄격 금지.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              시행령 85/2021/NĐ-CP 및 2023 소비자보호법: 온라인 예약 플랫폼의 허위 광고 연대 법적 책임 및 100% 환불 의무.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1;">
+              국가 기준 TCVN 4391:2015: 국가 검증 럭셔리 시설, 비상 발전기 및 안전 규격 심사 미필.
+            </div>
+          `;
+        } else if (lang === "vi") {
+          infHtml = `
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Luật Du lịch 2017 - Điều 50, Khoản 3: Thẩm quyền thẩm định, công nhận hạng 4 sao và 5 sao thuộc về Cục Du lịch Quốc gia Việt Nam.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Luật Du lịch 2017 - Điều 9, Khoản 8: Nghiêm cấm quảng cáo cơ sở lưu trú khi chưa có quyết định công nhận của cơ quan nhà nước có thẩm quyền.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Nghị định 85/2021/NĐ-CP & Luật BVQLNTD 2023: Trách nhiệm liên đới của sàn thương mại điện tử về quảng cáo sai lệch.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1;">
+              TCVN 4391:2015: Cơ sở chưa qua kiểm định an toàn, máy phát điện dự phòng và quy chuẩn khách sạn cao cấp.
+            </div>
+          `;
+        } else if (lang === "zh") {
+          infHtml = `
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              越南《旅游法2017》第五十条第三款：四星及五星级饭店评审认定专属越南国家旅游局法定职权。
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              越南《旅游法2017》第九条第八款：严禁在未获国家主管机关评定决定的情况下宣传星级。
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              第 85/2021/NĐ-CP 号法令及消费者保护法：预订平台对虚假欺诈广告承担连带责任，旅客享全额退款权。
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1;">
+              国家标准 TCVN 4391:2015：豪华设施、应急备用发电设备及安全规程未获国家验收。
+            </div>
+          `;
+        } else if (lang === "ja") {
+          infHtml = `
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              ベトナム観光法2017第50条第3項：4つ星および5つ星ホテルの審査・認定権限はベトナム国家観光局に専属。
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              ベトナム観光法2017第9条第8項：管轄国家機関の公認決定なしに宿泊施設の星数を宣伝することを厳禁。
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              政令第85/2021/NĐ-CP号および消費者保護法：OTAの虚偽表示連帯責任および全額返金請求権。
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1;">
+              国家規格 TCVN 4391:2015：安全基準、非常用発電設備、高級インフラの国家検査未完了。
+            </div>
+          `;
+        } else if (lang === "es") {
+          infHtml = `
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Ley de Turismo de Vietnam 2017 - Art. 50, Cl. 3: La autoridad de certificar 4★ y 5★ corresponde a VNAT.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Ley de Turismo de Vietnam 2017 - Art. 9, Cl. 8: Prohibición expresa de publicidad sin certificación estatal.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              Decreto 85/2021/NĐ-CP y Ley de Consumidor 2023: Responsabilidad solidaria de plataformas y derecho al reembolso del 100%.
+            </div>
+            <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1;">
+              Norma TCVN 4391:2015: Instalaciones de lujo, generador de emergencia y protocolos de seguridad no verificados.
+            </div>
+          `;
+        } else {
+          const infs = (audit.statutory_infractions && audit.statutory_infractions.length > 0)
+            ? audit.statutory_infractions
+            : [
+                "Vietnam Law on Tourism 2017 - Article 50, Clause 3: Authority to evaluate and accredit 4-star and 5-star hotels belongs exclusively to VNAT.",
+                "Vietnam Law on Tourism 2017 - Article 9, Clause 8: Strictly prohibited to advertise accommodation facilities without an official accreditation decision.",
+                "Decree 85/2021/NĐ-CP & Consumer Protection Law 2023: Digital platform strict liability for deceptive rating marketing and 100% refund entitlement."
+              ];
+          infHtml = infs.map(i => `
+            <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+              ${i}
+            </div>
+          `).join("");
+          if (audit.tcvn_deficiencies && audit.tcvn_deficiencies.length > 0) {
+            infHtml += audit.tcvn_deficiencies.map(d => `
+              <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.5rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+                ${d}
+              </div>
+            `).join("");
+          }
+        }
       }
       infractions.innerHTML = infHtml;
 
-      if (currentAudit) {
-        if (audit.verdict === 'VERIFIED_COMPLIANT') {
-          currentAudit.is_violation = false;
-          currentAudit.verdict = 'VERIFIED_COMPLIANT';
-          const actRow = document.getElementById('action-buttons-row');
-          const compBanner = document.getElementById('compliance-banner');
-          const altCont = document.getElementById('verified-alternatives-container');
-          if (actRow) actRow.style.display = 'none';
-          if (compBanner) compBanner.style.display = 'block';
-          if (altCont) altCont.style.display = 'none';
-        } else if (audit.verdict === 'PROBABLE_STAR_INFLATION') {
-          currentAudit.verdict = 'STAR_INFLATION';
-        }
-        updateRefundBanner(currentAudit, currentLang);
-        renderDemonstrationOfLaw(currentAudit, currentLang);
+      const modalBtn = document.getElementById("btn-view-full-dossier");
+      if (modalBtn) {
+        modalBtn.textContent = dict.btn_view_full_dossier || "📋 View Full Statutory Dossier Modal";
       }
 
-      findingsBox.style.display = 'block';
-      dossier.style.display = 'block';
+      if (currentAudit) {
+        if (audit.verdict === "VERIFIED_COMPLIANT") {
+          currentAudit.is_violation = false;
+          currentAudit.verdict = "VERIFIED_COMPLIANT";
+          const actRow = document.getElementById("action-buttons-row");
+          const compBanner = document.getElementById("compliance-banner");
+          const altCont = document.getElementById("verified-alternatives-container");
+          if (actRow) actRow.style.display = "none";
+          if (compBanner) compBanner.style.display = "block";
+          if (altCont) altCont.style.display = "none";
+        } else if (audit.verdict === "PROBABLE_STAR_INFLATION") {
+          currentAudit.verdict = "STAR_INFLATION";
+        }
+        updateRefundBanner(currentAudit, lang);
+        renderDemonstrationOfLaw(currentAudit, lang);
+      }
+
+      findingsBox.style.display = "block";
+      dossier.style.display = "block";
     }
 
     function openAiModalDirectly() {
@@ -2005,55 +2183,134 @@
     }
 
     function showAiModal(audit) {
-      document.getElementById('ai-modal-hotel-name').textContent = audit.hotel_name;
-      const badge = document.getElementById('ai-modal-verdict-badge');
-      if (audit.verdict === 'VERIFIED_COMPLIANT') {
-        badge.style.background = '#059669';
-        badge.style.color = '#fff';
-        badge.textContent = '🟢 VERIFIED COMPLIANT';
-      } else if (audit.verdict === 'PROBABLE_STAR_INFLATION') {
-        badge.style.background = '#d97706';
-        badge.style.color = '#fff';
-        badge.textContent = '🟡 PROBABLE STAR INFLATION';
-      } else if (audit.verdict === 'AI_SERVICE_UNAVAILABLE') {
-        badge.style.background = '#64748b';
-        badge.style.color = '#fff';
-        badge.textContent = '⚪ AI UNAVAILABLE';
+      if (!audit) return;
+      const dict = (typeof I18N !== "undefined" && I18N[currentLang]) ? I18N[currentLang] : ((typeof I18N !== "undefined" && I18N["en"]) || {});
+      
+      document.getElementById("ai-modal-hotel-name").textContent = audit.hotel_name;
+      const badge = document.getElementById("ai-modal-verdict-badge");
+      if (audit.verdict === "VERIFIED_COMPLIANT") {
+        badge.style.background = "#059669";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_rebrand_verified || "🟢 REBRAND VERIFIED BY AI";
+      } else if (audit.verdict === "PROBABLE_STAR_INFLATION") {
+        badge.style.background = "#d97706";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_star_inflation || "🟡 PROBABLE STAR INFLATION";
+      } else if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
+        badge.style.background = "#64748b";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_unavailable || "⚪ AI AUDIT UNAVAILABLE";
       } else {
-        badge.style.background = '#e11d48';
-        badge.style.color = '#fff';
-        badge.textContent = '🔴 UNACCREDITED DECEPTIVE';
+        badge.style.background = "#e11d48";
+        badge.style.color = "#fff";
+        badge.textContent = dict.ai_badge_unaccredited_deceptive || "🔴 UNACCREDITED DECEPTIVE";
       }
 
-      document.getElementById('ai-modal-location').textContent = audit.city || 'Vietnam';
-      document.getElementById('ai-modal-confidence').textContent = `${Math.round((audit.confidence || 0.95) * 100)}% Statutory Confidence`;
-      document.getElementById('ai-modal-timestamp').textContent = new Date(audit.verified_at).toLocaleString();
-      document.getElementById('ai-modal-risk').textContent = audit.risk_advisory;
+      const parsedCity = audit.city || (currentAudit && currentAudit.province) || "Vietnam";
+      document.getElementById("ai-modal-location").textContent = parsedCity;
+      document.getElementById("ai-modal-confidence").textContent = `${Math.round((audit.confidence || 0.95) * 100)}% ${dict.statutory_confidence || "Statutory Confidence"}`;
+      document.getElementById("ai-modal-timestamp").textContent = new Date(audit.verified_at).toLocaleString();
 
-      const infContainer = document.getElementById('ai-modal-infractions');
-      if (audit.statutory_infractions && audit.statutory_infractions.length > 0) {
-        infContainer.innerHTML = audit.statutory_infractions.map(i => `
-          <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.6rem 0.85rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; color: #cbd5e1;">
+      // Risk advisory & reasoning
+      let riskText = audit.risk_advisory;
+      let reasoningText = audit.reasoning;
+      if (audit.verdict === "VERIFIED_COMPLIANT") {
+        riskText = dict.ai_risk_comp || riskText;
+        reasoningText = dict.ai_reasoning_comp || reasoningText;
+      } else if (audit.verdict === "PROBABLE_STAR_INFLATION") {
+        riskText = dict.ai_risk_infl || riskText;
+        reasoningText = dict.ai_reasoning_infl || reasoningText;
+      } else if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
+        riskText = dict.ai_risk_unav || riskText;
+        reasoningText = dict.ai_reasoning_unav || reasoningText;
+      } else {
+        riskText = dict.ai_risk_unacc || riskText;
+        reasoningText = dict.ai_reasoning_unacc || reasoningText;
+      }
+      document.getElementById("ai-modal-risk").textContent = riskText;
+      document.getElementById("ai-modal-reasoning").textContent = reasoningText;
+
+      // Infractions container
+      const infContainer = document.getElementById("ai-modal-infractions");
+      if (audit.verdict === "VERIFIED_COMPLIANT") {
+        infContainer.innerHTML = `<div style="color: #34d399; font-size: 0.85rem;">${dict.ai_modal_none_infractions || "✓ None — Property strictly adheres to all statutory tourism mandates."}</div>`;
+      } else if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
+        infContainer.innerHTML = `<div style="color: #94a3b8; font-size: 0.85rem;">${dict.ai_modal_none_infractions || "✓ No adverse infractions assessed."}</div>`;
+      } else {
+        const infractionsList = (currentLang === "ko") ? [
+          "베트남 관광법 2017 제50조 제3항: 4성 및 5성 호텔 성급 공인 권한은 베트남 관광국(VNAT)의 국가 전속 권한입니다.",
+          "베트남 관광법 2017 제9조 제8항: 국가 주무 관청의 인가 결정 없이 숙박업소 성급을 광고하는 행위 엄격 금지.",
+          "시행령 85/2021/NĐ-CP 및 2023 소비자보호법: 온라인 예약 플랫폼의 허위 광고 연대 법적 책임 및 100% 환불 의무."
+        ] : (currentLang === "vi") ? [
+          "Luật Du lịch 2017 - Điều 50, Khoản 3: Thẩm quyền thẩm định, công nhận hạng 4 sao và 5 sao thuộc về Cục Du lịch Quốc gia Việt Nam.",
+          "Luật Du lịch 2017 - Điều 9, Khoản 8: Nghiêm cấm quảng cáo cơ sở lưu trú khi chưa có quyết định công nhận của cơ quan nhà nước có thẩm quyền.",
+          "Nghị định 85/2021/NĐ-CP & Luật BVQLNTD 2023: Trách nhiệm liên đới của sàn thương mại điện tử về quảng cáo sai lệch."
+        ] : (currentLang === "zh") ? [
+          "越南《旅游法2017》第五十条第三款：四星及五星级饭店评审认定专属越南国家旅游局法定职权。",
+          "越南《旅游法2017》第九条第八款：严禁在未获国家主管机关评定决定的情况下宣传星级。",
+          "第 85/2021/NĐ-CP 号法令及消费者保护法：预订平台对虚假欺诈广告承担连带责任，旅客享全额退款权。"
+        ] : (currentLang === "ja") ? [
+          "ベトナム観光法2017第50条第3項：4つ星および5つ星ホテルの審査・認定権限はベトナム国家観光局に専属。",
+          "ベトナム観光法2017第9条第8項：管轄国家機関の公認決定なしに宿泊施設の星数を宣伝することを厳禁。",
+          "政令第85/2021/NĐ-CP号および消費者保護法：OTAの虚偽表示連帯責任および全額返金請求権。"
+        ] : (currentLang === "es") ? [
+          "Ley de Turismo de Vietnam 2017 - Art. 50, Cl. 3: La autoridad de certificar 4★ y 5★ corresponde a VNAT.",
+          "Ley de Turismo de Vietnam 2017 - Art. 9, Cl. 8: Prohibición expresa de publicidad sin certificación estatal.",
+          "Decreto 85/2021/NĐ-CP y Ley de Consumidor 2023: Responsabilidad solidaria de plataformas y derecho al reembolso del 100%."
+        ] : (audit.statutory_infractions && audit.statutory_infractions.length > 0 ? audit.statutory_infractions : [
+          "Vietnam Law on Tourism 2017 - Article 50, Clause 3: Authority to evaluate and accredit 4-star and 5-star hotels belongs exclusively to VNAT.",
+          "Vietnam Law on Tourism 2017 - Article 9, Clause 8: Strictly prohibited to advertise accommodation facilities without an official accreditation decision.",
+          "Decree 85/2021/NĐ-CP & Consumer Protection Law 2023: Platform strict liability for publishing unverified star claims."
+        ]);
+
+        infContainer.innerHTML = infractionsList.map(i => `
+          <div style="background: #0d1322; border-left: 3px solid #3b82f6; padding: 0.6rem 0.85rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.4rem;">
             ${i}
           </div>
-        `).join('');
-      } else {
-        infContainer.innerHTML = '<div style="color: #34d399; font-size: 0.85rem;">✓ None — Property strictly adheres to all statutory tourism mandates.</div>';
+        `).join("");
       }
 
-      const defContainer = document.getElementById('ai-modal-deficiencies');
-      if (audit.tcvn_deficiencies && audit.tcvn_deficiencies.length > 0) {
-        defContainer.innerHTML = audit.tcvn_deficiencies.map(d => `
-          <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.6rem 0.85rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; color: #cbd5e1;">
+      // Deficiencies container
+      const defContainer = document.getElementById("ai-modal-deficiencies");
+      if (audit.verdict === "VERIFIED_COMPLIANT") {
+        defContainer.innerHTML = `<div style="color: #34d399; font-size: 0.85rem;">${dict.ai_modal_none_deficiencies || "✓ None — Full compliance with TCVN 4391:2015 national physical criteria."}</div>`;
+      } else if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
+        defContainer.innerHTML = `<div style="color: #94a3b8; font-size: 0.85rem;">${dict.ai_modal_none_deficiencies || "✓ No physical criteria assessed."}</div>`;
+      } else {
+        const defsList = (currentLang === "ko") ? [
+          "베트남 국가 관광 데이터베이스(csdl.vietnamtourism.gov.vn) 내 공식 VNAT 법정 등급 결정 누락.",
+          "독립형 미공인 숙박업소로서 자체 표방 성급을 사용한 허위 마케팅.",
+          "국가 검증 안전 설비, 비상 발전 설비 및 럭셔리 서비스 기준 미충족."
+        ] : (currentLang === "vi") ? [
+          "Thiếu quyết định công nhận hạng sao chính thức của VNAT trên cơ sở dữ liệu quốc gia (csdl.vietnamtourism.gov.vn).",
+          "Cơ sở lưu trú tư nhân chưa được xếp hạng, tự gắn biển hiệu sao thương mại.",
+          "Chưa qua kiểm định an toàn, máy phát điện dự phòng và quy chuẩn TCVN 4391:2015."
+        ] : (currentLang === "zh") ? [
+          "国家官方旅游数据库（csdl.vietnamtourism.gov.vn）中缺少官方 VNAT 法定评定决定。",
+          "属于未获评级的私营住宿，进行自封星级的虚假商业营销。",
+          "未通过国家安全标准、应急备用发电设备及豪华硬件验收。"
+        ] : (currentLang === "ja") ? [
+          "国家観光データベース（csdl.vietnamtourism.gov.vn）における公式VNAT法定決定の欠落。",
+          "自己申告の星数を宣伝する未認定の私営宿泊施設。",
+          "国家基準の安全、非常用発電機、高級インフラ基準の審査未完了。"
+        ] : (currentLang === "es") ? [
+          "Ausencia de decisión oficial de clasificación de VNAT en la base de datos nacional (csdl.vietnamtourism.gov.vn).",
+          "Propiedad privada sin acreditar que utiliza estrellas autoproclamadas con fines comerciales.",
+          "Sin auditoría estatal de seguridad, generador eléctrico de respaldo ni estándares de lujo TCVN 4391:2015."
+        ] : (audit.tcvn_deficiencies && audit.tcvn_deficiencies.length > 0 ? audit.tcvn_deficiencies : [
+          "Missing official VNAT statutory classification decision in national database (csdl.vietnamtourism.gov.vn).",
+          "Property appears to be an unaccredited private hotel marketing self-proclaimed stars.",
+          "Absence of state-audited luxury compliance for safety, backup emergency generator, and service protocols."
+        ]);
+
+        defContainer.innerHTML = defsList.map(d => `
+          <div style="background: #0d1322; border-left: 3px solid #f59e0b; padding: 0.6rem 0.85rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 0.4rem;">
             ${d}
           </div>
-        `).join('');
-      } else {
-        defContainer.innerHTML = '<div style="color: #34d399; font-size: 0.85rem;">✓ None — Full compliance with TCVN 4391:2015 national physical criteria.</div>';
+        `).join("");
       }
 
-      document.getElementById('ai-modal-reasoning').textContent = audit.reasoning;
-      document.getElementById('ai-modal').style.display = 'flex';
+      document.getElementById("ai-modal").style.display = "flex";
     }
 
 
@@ -2182,7 +2439,7 @@
           <td><strong>${h.name}</strong><br><small style="color: var(--text-muted); font-size: 0.75rem;">${h.details}</small></td>
           <td>${h.city}</td>
           <td><span class="gold-stars">${'★'.repeat(h.claimed)}</span> <span class="tag-platform" style="margin-left: 4px;">${h.ota}</span></td>
-          <td><span style="color: #ef4444; font-weight: 700;">❌ 0★ (Unaccredited / Dormitory)</span></td>
+          <td><span style="color: #ef4444; font-weight: 700;">❌ 0★ (Unaccredited)</span></td>
           <td style="color: #34d399; font-weight: 600;">${h.price}</td>
           <td>
             <div style="font-size: 0.78rem; color: #cbd5e1; margin-bottom: 0.25rem;">${h.heuristic_reason}</div>

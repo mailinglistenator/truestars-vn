@@ -70,8 +70,7 @@ async function auditActiveTab() {
     if (!matcher) return;
     const audit = matcher.classify({
       name: propName,
-      claimedStars: 5, // default inspect high
-      hasDorm: /\b(bunk|dorm|hostel)\b/i.test(tab.title || '')
+      claimedStars: 5 // default inspect high
     });
 
     let tagClass = 'tag-unaccredited';
@@ -79,9 +78,6 @@ async function auditActiveTab() {
     if (audit.verdict === 'VERIFIED_LEGITIMATE') {
       tagClass = 'tag-legit';
       tagLabel = `🟢 OFFICIAL VNAT ${audit.official_stars}★`;
-    } else if (audit.verdict === 'BLATANT_HOSTEL_FRAUD') {
-      tagClass = 'tag-fraud';
-      tagLabel = '🚨 BLATANT HOSTEL FRAUD';
     } else if (audit.verdict === 'STAR_INFLATION') {
       tagClass = 'tag-inflation';
       tagLabel = `🟡 INFLATED (+${audit.claimed_stars - audit.official_stars}★)`;

@@ -53,16 +53,12 @@
       else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name)) stars = 4;
     }
 
-    const fullText = card.textContent.toLowerCase();
-    const hasDorm = /\b(bunk bed|dormitory|dorm|hostel|shared bathroom)\b/i.test(fullText);
-
     const defaultStars = /\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name) ? 4 : 5;
 
     if (titleEl && window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(titleEl.parentElement || titleEl, {
         name,
-        claimedStars: stars || defaultStars,
-        hasDorm
+        claimedStars: stars || defaultStars
       });
     }
   }
@@ -86,13 +82,10 @@
       else if (text.includes('4 star') || text.includes('4 diamond')) stars = 4;
       else stars = 5;
     }
-    const hasDorm = /\b(bunk bed|dormitory|dorm|hostel)\b/i.test(document.body.textContent);
-
     if (window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(headerTitle.parentElement || headerTitle, {
         name,
-        claimedStars: stars,
-        hasDorm
+        claimedStars: stars
       });
     }
   }

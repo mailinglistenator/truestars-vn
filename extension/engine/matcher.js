@@ -192,28 +192,6 @@ function isVietnamContext(url = "", text = "") {
   return false;
 }
 
-const DORM_PATTERNS = [
-  /\b(hostels?|backpackers?|dorm|dorms|dormitory|dormitories)\b/i,
-  /\b(bunks?|bunk\s*beds?|capsules?|capsule\s*hotel|pod\s*hotel|bed\s*in\s*dorm)\b/i,
-  /\b(shared\s*room|shared\s*dorm|mixed\s*dorm|female\s*dorm|male\s*dorm)\b/i,
-  /\b(bed\s*in\s*\d+[- ]bed|bed\s*in\s*dormitory)\b/i,
-  /\b(gi[uư][oờ]ng\s*t[aầ]ng|ph[oò]ng\s*t[aậ]p\s*th[eể]|k[yý]\s*t[uú]c\s*x[aá]|ph[oò]ng\s*dorm)\b/i
-];
-
-function detectDormitoryFacility(text) {
-  if (!text) return { hasDorm: false, reason: "" };
-  for (const pattern of DORM_PATTERNS) {
-    const match = text.match(pattern);
-    if (match) {
-      return {
-        hasDorm: true,
-        reason: `Automated detection: Identified dormitory/bunk bed indicator "${match[0]}"`
-      };
-    }
-  }
-  return { hasDorm: false, reason: "No dormitory or bunk bed indicators detected." };
-}
-
 /**
  * Smart OTA URL Parser: Extracts platform, hotelId, canonical slug, city, and clean display name
  */
@@ -450,7 +428,7 @@ class TrueStarsMatcher {
    * First tests exact deterministic aggregator identity.
    * Falls back to high-speed token/fuzzy sequence matching.
    */
-  classify({ name, claimedStars = 5, hasDorm = false, province = "", otaPlatform = "Direct Input", originalUrl = "", otaId = "", otaSlug = "" }) {
+  classify({ name, claimedStars = 5, province = "", otaPlatform = "Direct Input", originalUrl = "", otaId = "", otaSlug = "" }) {
     let matchedHotel = null;
     let matchType = "NONE";
     let matchScore = 0.0;
@@ -519,12 +497,10 @@ class TrueStarsMatcher {
       }
     }
 
-    // 3. AUTO-DETECT CLAIMED STARS & DORM CRITERIA
+    // 3. AUTO-DETECT CLAIMED STARS
     let effectiveClaimedStars = parseInt(claimedStars, 10) || 0;
 
     const combinedText = `${name} ${originalUrl} ${otaSlug} ${province}`.toLowerCase();
-    const dormInspection = detectDormitoryFacility(combinedText);
-    let effectiveHasDorm = Boolean(hasDorm || dormInspection.hasDorm);
 
     // Auto-detect star rating
     if (effectiveClaimedStars === 0) {
@@ -565,25 +541,6 @@ class TrueStarsMatcher {
         statute_title: "Quảng cáo sai thứ hạng được cơ quan nhà nước công nhận",
         application: `Officially certified as ${officialStars} stars, but displayed on platform as ${effectiveClaimedStars} stars.`
       });
-    } else if (effectiveHasDorm && isHighRank) {
-      verdict = "BLATANT_HOSTEL_FRAUD";
-      severity = "CRITICAL";
-      summary = `Backpacker hostel or budget lodging falsely marketing as ${effectiveClaimedStars} stars. Offers dormitory/bunk beds. TCVN 4391:2015 strictly prohibits dorms and requires minimum 80-100 private guest rooms.`;
-      violations.push({
-        law: "Luật Du lịch 2017 - Điều 9, Khoản 8",
-        statute_title: "Các hành vi bị nghiêm cấm trong hoạt động du lịch",
-        application: `Displaying ${effectiveClaimedStars} stars without VNAT statutory accreditation.`
-      });
-      violations.push({
-        law: "TCVN 4391:2015 - Tiêu chuẩn Xếp hạng Khách sạn",
-        statute_title: "Quy chuẩn cơ sở vật chất tối thiểu cho Khách sạn 4-5 sao",
-        application: "Dormitory and bunk beds physically and legally disqualify establishment from 4-star or 5-star hotel status."
-      });
-      violations.push({
-        law: "Luật Bảo vệ quyền lợi người tiêu dùng 2023 - Điều 10 & 39",
-        statute_title: "Hành vi lừa dối người tiêu dùng & Trách nhiệm nền tảng số trung gian",
-        application: `Platform renders gold star iconography misleading guests on safety and luxury standards.`
-      });
     } else if (isHighRank && (!matchedHotel || officialStars === 0)) {
       verdict = "UNACCREDITED_HOTEL";
       severity = "HIGH";
@@ -623,7 +580,6 @@ class TrueStarsMatcher {
       originalUrl,
       violations,
       matchedHotel,
-      hasDorm: effectiveHasDorm,
       otaId
     }) : "";
 
@@ -631,15 +587,13 @@ class TrueStarsMatcher {
       propertyName: name,
       claimedStars: effectiveClaimedStars,
       officialStars,
-      otaPlatform,
-      hasDorm: effectiveHasDorm
+      otaPlatform
     }) : "";
 
     const lawBreakingProof = generateDemonstrationOfLawBreaking({
       propertyName: name,
       claimedStars: effectiveClaimedStars,
       officialStars,
-      hasDorm: effectiveHasDorm,
       otaPlatform,
       matchedHotel,
       otaId,
@@ -663,7 +617,6 @@ class TrueStarsMatcher {
       property_name: name,
       claimed_stars: effectiveClaimedStars,
       official_stars: officialStars,
-      has_dorm: effectiveHasDorm,
       province: province || (matchedHotel ? matchedHotel.province : ""),
       ota_platform: otaPlatform,
       original_url: originalUrl,
@@ -901,7 +854,6 @@ async function triggerAiVerification(propertyData) {
         platform: propertyData.ota_platform || propertyData.platform || "Direct Input",
         url: propertyData.original_url || propertyData.url || "",
         city: propertyData.province || propertyData.city || (propertyData.matched_hotel ? propertyData.matched_hotel.province : "") || "",
-        has_dorm: Boolean(propertyData.has_dorm || propertyData.hasDorm),
         force: true
       })
     });
@@ -918,7 +870,7 @@ async function triggerAiVerification(propertyData) {
 /**
  * Generates the Formal Statutory Demonstration of Law Breaking (or Compliance Dossier for legitimate hotels)
  */
-function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, officialStars, hasDorm, otaPlatform, matchedHotel, otaId, matchType, isLegitimate }) {
+function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, officialStars, otaPlatform, matchedHotel, otaId, matchType, isLegitimate }) {
   if (isLegitimate) {
     const certCode = matchedHotel ? (matchedHotel.item_id || matchedHotel.decision_code || 'VNAT-AUTH') : 'VNAT-AUTH';
     const hotelName = matchedHotel ? matchedHotel.name : propertyName;
@@ -943,7 +895,6 @@ function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, offici
         total_4star: 380,
         evidence_finding: `Deterministic State Authentication: Matched official VNAT Accreditation #${certCode} ("${hotelName}"). Rating of ${officialStars} Stars is officially authenticated and legally authorized under state law.`
       },
-      facility_standards: null,
       regulatory_clearance: {
         decree: "Luật Du lịch 2017 (Điều 9, Khoản 8) & Nghị định 45/2019/NĐ-CP",
         analysis: `FULL STATUTORY CLEARANCE: Neither the property nor ${otaPlatform} are in violation of advertising or consumer protection statutes. Commercial marketing of ${claimedStars} stars is lawful and authenticated by the state.`
@@ -955,7 +906,6 @@ function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, offici
     };
   }
 
-  const isHostel = hasDorm;
   const isInflated = matchedHotel && officialStars < claimedStars;
 
   let evidenceFinding = "";
@@ -974,7 +924,7 @@ function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, offici
   return {
     is_violation: true,
     title: "DEMONSTRATION OF STATUTORY INFRACTION",
-    status_badge: isHostel ? "🚨 BLATANT HOSTEL FRAUD" : (isInflated ? "🟡 STATUTORY STAR INFLATION" : "🔴 UNACCREDITED HOTEL LISTING"),
+    status_badge: isInflated ? "🟡 STATUTORY STAR INFLATION" : "🔴 UNACCREDITED HOTEL LISTING",
     statute_monopoly: {
       law: "Luật Du lịch 2017 (Law No. 09/2017/QH14) - Điều 50, Khoản 3",
       rule: "Thẩm quyền công nhận hạng cơ sở lưu trú du lịch",
@@ -992,10 +942,6 @@ function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, offici
       total_4star: 380,
       evidence_finding: evidenceFinding
     },
-    facility_standards: isHostel ? {
-      standard: "TCVN 4391:2015 - Tiêu chuẩn Xếp hạng Khách sạn",
-      analysis: "National standard TCVN 4391:2015 strictly mandates a minimum of 80 rooms for 4-star and 100 rooms for 5-star hotels. Facilities offering shared dormitory or bunk bed rooms cannot legally qualify as luxury hotels."
-    } : null,
     platform_liability: {
       decree: "Nghị định 85/2021/NĐ-CP & Luật Bảo vệ quyền lợi người tiêu dùng 2023 (Điều 10 & 39)",
       analysis: `${otaPlatform} acts as an e-commerce intermediary platform operating in Vietnam. It is strictly mandated to verify supplier licenses and bears direct joint liability for displaying deceptive gold star emblems that mislead booking travelers.`
@@ -1006,7 +952,7 @@ function generateDemonstrationOfLawBreaking({ propertyName, claimedStars, offici
 /**
  * Generates Cease & Desist / Legal Takedown Notice to Offending Platform
  */
-function generatePlatformNotice({ propertyName, claimedStars, officialStars, otaPlatform, city, originalUrl, violations, matchedHotel, hasDorm, otaId }) {
+function generatePlatformNotice({ propertyName, claimedStars, officialStars, otaPlatform, city, originalUrl, violations, matchedHotel, otaId }) {
   const dateStr = new Date().toLocaleDateString('en-GB');
 
   return `FORMAL STATUTORY NOTICE OF UNLAWFUL HOTEL STAR CLASSIFICATION
@@ -1035,9 +981,9 @@ Under Article 9, Clause 8 and Article 50 of the Law on Tourism of the Socialist 
 
 2. EVIDENTIARY AUDIT PROOF
 According to the official central database of the Ministry of Culture, Sports and Tourism (csdl.vietnamtourism.gov.vn):
-• There are currently ONLY 301 certified 5-star hotels and 380 certified 4-star hotels across all of Vietnam (Total: 681 accredited establishments).
-• An exhaustive search of the national statutory whitelist confirms that "${propertyName}" DOES NOT possess ${claimedStars}-star accreditation.
-${hasDorm ? '• EVIDENCE OF BLATANT FRAUD: The property operates dormitory / bunk beds, which physically and legally disqualifies it from 4-star or 5-star ranking under National Standard TCVN 4391:2015.\n' : ''}
+• There are strictly only 681 tourism establishments in the entire country of Vietnam holding valid 4-star and 5-star accreditation.
+• ${officialStars > 0 ? `The property holds an official certificate for ONLY ${officialStars} STARS. The marketing of ${claimedStars} stars is unlawful star inflation.` : `The property holds ZERO statutory accreditation. It is an unaccredited commercial property.`}
+
 3. PLATFORM INTERMEDIARY STRICT LIABILITY
 Under Decree No. 85/2021/NĐ-CP (regulating cross-border e-commerce platforms in Vietnam) and Articles 10 & 39 of the Law on Protection of Consumer Rights 2023:
 As a digital platform intermediary transacting in Vietnam, ${otaPlatform} is legally obligated to verify statutory qualifications and shares joint liability for false, misleading quality representations.
@@ -1055,7 +1001,7 @@ Submitted via TrueStars VN Watchdog Engine (truestars-vn.vercel.app)`;
 /**
  * Generates Traveler Refund Demand Letter
  */
-function generateRefundDemandLetter({ propertyName, claimedStars, officialStars, otaPlatform, hasDorm }) {
+function generateRefundDemandLetter({ propertyName, claimedStars, officialStars, otaPlatform }) {
   const dateStr = new Date().toLocaleDateString('en-GB');
 
   return `FORMAL DEMAND FOR FULL REFUND
@@ -1084,7 +1030,7 @@ I booked this property relying directly on the ${claimedStars}-Star classificati
 Official verification conducted via the Vietnam National Authority of Tourism (Cục Du lịch Quốc gia Việt Nam - VNAT, csdl.vietnamtourism.gov.vn) reveals that this property:
 • Officially holds ${officialStars > 0 ? `only a ${officialStars}-Star accreditation` : 'ZERO official star accreditation'} from the Vietnamese government.
 • Illegally advertises luxury stars in direct violation of Article 9, Clause 8 of Vietnam's Law on Tourism 2017 (Law No. 09/2017/QH14).
-${hasDorm ? '• Sells shared dormitory / bunk bed facilities, which cannot legally qualify as a 4-star or 5-star hotel under National Standard TCVN 4391:2015.\n' : ''}
+
 2. STATUTORY BREACH & INTERMEDIARY LIABILITY
 The advertised ${claimedStars}-star rating was the primary material factor in my booking decision and willingness to pay this rate.
 • Under Article 10 & Article 34 of Vietnam's Law on Protection of Consumer Rights 2023 (effective July 1, 2024), consumers are entitled to full compensation and contract voiding when services fail to match advertised claims.
@@ -1121,7 +1067,6 @@ if (typeof module !== 'undefined' && module.exports) {
     sequenceRatio,
     inferCityFromText,
     isVietnamContext,
-    detectDormitoryFacility,
     parseOtaUrl,
     generatePlatformNotice,
     generateRefundDemandLetter,

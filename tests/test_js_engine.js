@@ -10,31 +10,27 @@ const testCases = [
   {
     name: "Sofitel Legend Metropole Hanoi",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE"
   },
   {
     name: "Furama Resort Danang",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE"
   },
   {
     name: "Avani Hai Phong Harbour View",
     stars: 5,
-    dorm: false,
     expected: "STAR_INFLATION"
   },
   {
     name: "Hanoi Central Backpacker Hostel",
     stars: 5,
-    dorm: true,
-    expected: "BLATANT_HOSTEL_FRAUD"
+    expected: "UNACCREDITED_HOTEL",
+    expectViolation: true
   },
   {
     name: "Fake Luxury Penthouse Hanoi",
     stars: 5,
-    dorm: false,
     expected: "UNACCREDITED_HOTEL"
   },
 
@@ -42,65 +38,55 @@ const testCases = [
   {
     url: "https://www.trip.com/hotels/detail/?cityEnName=Hanoi&hotelId=678508",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE"
   },
   {
     url: "https://www.agoda.com/furama-resort-danang/hotel/da-nang-vn.html",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE"
   },
   {
     url: "https://www.booking.com/hotel/vn/caravelle.html",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE"
   },
   {
     url: "https://www.agoda.com/avani-hai-phong-harbour-view-hotel/hotel/hai-phong-vn.html",
     stars: 5,
-    dorm: false,
     expected: "STAR_INFLATION"
   },
   {
     url: "https://www.booking.com/hotel/vn/totally-fake-unregistered-villa.html",
     stars: 5,
-    dorm: false,
     expected: "UNACCREDITED_HOTEL"
   },
   {
     name: "vinpearl",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE",
     expectViolation: false
   },
   {
     name: "diamond beach hotel da nang",
     stars: 5,
-    dorm: false,
     expected: "UNACCREDITED_HOTEL",
     expectViolation: true
   },
   {
     url: "https://www.booking.com/hotel/vn/melia-vinpearl-danang-riverfont.html",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE",
     expectViolation: false
   },
   {
     name: "Melia Vinpearl Danang Riverfront",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE",
     expectViolation: false
   },
   {
     url: "https://www.booking.com/hotel/vn/danang-marriott-resort-spa-non-nuoc-beach-villas.html?aid=8092145",
     stars: 5,
-    dorm: false,
     expected: "VERIFIED_LEGITIMATE",
     expectViolation: false,
     checkTripUrl: "hotelId=7362595"
@@ -108,7 +94,6 @@ const testCases = [
   {
     url: "https://www.booking.com/hotel/vn/jame-bay-residence.html?dest_id=-3712125",
     stars: 0, // Auto-detect should identify 4 stars for residence
-    dorm: false,
     expected: "UNACCREDITED_HOTEL",
     expectViolation: true,
     expectedClaimedStars: 4
@@ -129,7 +114,6 @@ for (const tc of testCases) {
   const res = matcher.classify({
     name: parsed.name,
     claimedStars: tc.stars,
-    hasDorm: tc.dorm,
     otaPlatform: parsed.platform || "Direct Input",
     originalUrl: tc.url || "",
     otaId: parsed.otaId || "",

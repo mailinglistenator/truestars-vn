@@ -16,16 +16,13 @@ const path = require('path');
 const https = require('https');
 
 let inferCityFromText = null;
-let detectDormitoryFacility = null;
 try {
   const engine = require('../public/matching_engine.js');
   inferCityFromText = engine.inferCityFromText;
-  detectDormitoryFacility = engine.detectDormitoryFacility;
 } catch (e) {
   try {
     const engine = require(path.join(process.cwd(), 'public', 'matching_engine.js'));
     inferCityFromText = engine.inferCityFromText;
-    detectDormitoryFacility = engine.detectDormitoryFacility;
   } catch (e2) {}
 }
 
@@ -100,8 +97,8 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
     platform: promptData.platform || "Direct Input",
     url: promptData.url || "",
     city: promptData.city || "Vietnam",
-    has_dorm: Boolean(promptData.has_dorm),
-    candidates: cityCandidates
+    candidates: cityCandidates,
+    language: promptData.lang || "en"
   });
 
   const endpoints = [
@@ -164,6 +161,7 @@ module.exports = async (req, res) => {
   const rawUrl = String(query.url || query.booking_url || query.link || queryParams.url || "");
   const rawPlatform = String(query.platform || query.ota_platform || queryParams.platform || "Direct Input");
   const rawCity = String(query.city || query.location || query.province || queryParams.city || "");
+  const rawLang = String(query.lang || query.language || queryParams.lang || "en").toLowerCase();
 
   // PROMPT INJECTION DEFENSE PERIMETER
   const INJECTION_REGEX = /(?:ignore|disregard|forget|bypass|override)\s+(?:all\s+)?(?:(?:previous|prior|above|system)\s+)?(?:instructions|prompts|rules|commands|directives|filters|guidelines)|(?:return|output|say|reply\s+with)\s+(?:verdict\s*)?['"]?(?:verified|compliant|5\s*stars)|system\s*:\s*|assistant\s*:\s*|user\s*:\s*|<\|im_start\|>|<\|im_end\|>|\[inst\]|\[\/inst\]|developer\s+mode|jailbreak|pretend\s+you\s+are|you\s+are\s+now/i;
@@ -234,13 +232,6 @@ module.exports = async (req, res) => {
   if (!city || city.toLowerCase() === "vietnam" || city.toLowerCase() === "direct input") {
     if (inferCityFromText) {
       city = inferCityFromText(`${hotelName} ${url}`);
-    }
-  }
-  let hasDorm = Boolean(query.has_dorm || query.hasDorm || queryParams.has_dorm);
-  if (!hasDorm && detectDormitoryFacility) {
-    const dormCheck = detectDormitoryFacility(`${hotelName} ${url}`);
-    if (dormCheck.hasDorm) {
-      hasDorm = true;
     }
   }
 
@@ -330,7 +321,6 @@ module.exports = async (req, res) => {
         const classification = m.classify({
           name: hotelName,
           claimedStars,
-          hasDorm,
           otaPlatform: platform,
           province: city,
           originalUrl: url
@@ -396,7 +386,7 @@ module.exports = async (req, res) => {
     platform: platform,
     url: url,
     city: city || "Vietnam",
-    has_dorm: hasDorm
+    lang: rawLang
   };
 
   const aiAnalysis = await callExternalModel(promptData, cityCandidates, totalCityCount, totalNationalCount);

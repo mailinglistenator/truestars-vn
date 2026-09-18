@@ -42,7 +42,6 @@
     const win = document.createElement('div');
     win.className = 'truestars-modal-window';
 
-    const isFraud = audit.verdict === 'BLATANT_HOSTEL_FRAUD';
     const isLegit = audit.verdict === 'VERIFIED_LEGITIMATE' || !audit.is_violation;
     const isInflation = audit.verdict === 'STAR_INFLATION';
 
@@ -51,9 +50,6 @@
     if (isLegit) {
       headerBadgeColor = '#059669';
       headerBadgeText = '🟢 OFFICIAL VNAT CERTIFIED';
-    } else if (isFraud) {
-      headerBadgeColor = '#dc2626';
-      headerBadgeText = '🚨 BLATANT HOSTEL FRAUD';
     } else if (isInflation) {
       headerBadgeColor = '#d97706';
       headerBadgeText = '🟡 STAR INFLATION';
@@ -232,7 +228,7 @@
   }
 
   window.TrueStarsBadge = {
-    async auditAndInject(targetElement, { name, claimedStars = 5, hasDorm = false, province = "" }) {
+    async auditAndInject(targetElement, { name, claimedStars = 5, province = "" }) {
       if (!name || targetElement.querySelector('.truestars-badge-container')) return;
 
       // Strict Vietnam-only scope guard
@@ -247,12 +243,11 @@
       const audit = m.classify({
         name,
         claimedStars,
-        hasDorm,
         province
       });
 
-      // Don't badge low star ratings unless fraudulent
-      if (claimedStars < 4 && !hasDorm) return;
+      // Don't badge low star ratings
+      if (claimedStars < 4) return;
 
       const container = document.createElement('div');
       container.className = 'truestars-badge-container';
@@ -264,10 +259,6 @@
         badge.classList.add('truestars-legit');
         badge.innerHTML = `🛡️ VNAT ${audit.official_stars}★`;
         badge.title = 'Officially certified by Vietnam National Authority of Tourism';
-      } else if (audit.verdict === 'BLATANT_HOSTEL_FRAUD') {
-        badge.classList.add('truestars-hostel-fraud');
-        badge.innerHTML = `🚨 FAKE ${claimedStars}★ (HOSTEL)`;
-        badge.title = 'Violation: Backpacker hostel with dorm beds claiming 4★/5★';
       } else if (audit.verdict === 'STAR_INFLATION') {
         badge.classList.add('truestars-inflation');
         badge.innerHTML = `⚠ INFLATED: VNAT ${audit.official_stars}★`;

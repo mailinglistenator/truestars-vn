@@ -63,17 +63,12 @@
       else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name)) stars = 4;
     }
 
-    // 3. Dorm bed detection
-    const fullText = card.textContent.toLowerCase();
-    const hasDorm = /\b(bunk bed|dormitory|dorm|bed in|shared bathroom|hostel)\b/i.test(fullText);
-
     const defaultStars = /\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name) ? 4 : 5;
 
     if (titleEl && window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(titleEl.parentElement || titleEl, {
         name,
-        claimedStars: stars || defaultStars,
-        hasDorm
+        claimedStars: stars || defaultStars
       });
     }
   }
@@ -112,14 +107,10 @@
       else stars = 5;
     }
 
-    const pageText = document.body.textContent.toLowerCase();
-    const hasDorm = /\b(bunk bed|dormitory|bed in 4-bed|bed in 6-bed|bed in 8-bed|shared dormitory)\b/i.test(pageText);
-
     if (window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(headerTitle.parentElement || headerTitle, {
         name,
-        claimedStars: stars,
-        hasDorm
+        claimedStars: stars
       });
     }
   }

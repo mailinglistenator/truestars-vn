@@ -66,10 +66,6 @@
       else if (/\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name)) stars = 4;
     }
 
-    // 3. Dorm / Bunk Bed detection
-    const cardText = card.textContent.toLowerCase();
-    const hasDorm = /\b(bunk|dorm|dormitory|shared bathroom|capsule|hostel)\b/i.test(cardText);
-
     const defaultStars = /\b(residence|residences|apartment|apartments|condo|condotel|aparthotel|suite|suites|boutique|villa|villas)\b/i.test(name) ? 4 : 5;
 
     // Target injection container
@@ -77,8 +73,7 @@
     if (target && window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(target.parentElement || target, {
         name,
-        claimedStars: stars || defaultStars,
-        hasDorm
+        claimedStars: stars || defaultStars
       });
     }
   }
@@ -107,14 +102,10 @@
       else stars = 5;
     }
 
-    const pageText = document.body.textContent.toLowerCase();
-    const hasDorm = /\b(bunk bed|dormitory|female dorm|mixed dorm|shared dormitory)\b/i.test(pageText);
-
     if (window.TrueStarsBadge) {
       window.TrueStarsBadge.auditAndInject(headerTitle.parentElement || headerTitle, {
         name,
-        claimedStars: stars,
-        hasDorm
+        claimedStars: stars
       });
     }
   }
