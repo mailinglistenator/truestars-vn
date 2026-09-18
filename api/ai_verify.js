@@ -258,6 +258,42 @@ module.exports = async (req, res) => {
           province: city,
           originalUrl: url
         });
+
+        // If the property is ALREADY verified and compliant in the statutory registry:
+        // We do NOT need AI verification! Return official state accreditation directly.
+        if (classification && classification.is_verified && !classification.is_violation) {
+          const matched = classification.matched_hotel;
+          const cert = matched.item_id || matched.decision_code || "AUTH";
+          const verifiedRecord = {
+            listing_key: listingKey,
+            hotel_name: hotelName,
+            claimed_stars: claimedStars,
+            platform: platform,
+            url: url,
+            city: matched.province || city,
+            verified_at: new Date().toISOString(),
+            model: "Official VNAT Statutory Registry (Direct Match)",
+            latency_ms: 0,
+            latency_sec: "0.0",
+            verdict: "VERIFIED_COMPLIANT",
+            confidence: 1.0,
+            concise_summary: `Directly authenticated in official VNAT statutory registry as "${matched.name}" (Cert #${cert}, ${matched.stars}★). AI rebrand investigation is not required.`,
+            refund_advisory: "No refund entitlement under Vietnamese law. The property is legally accredited with official VNAT credentials.",
+            investigation_findings: `Direct statutory match in official VNAT database for ${matched.province || city}.`,
+            statutory_infractions: [],
+            tcvn_deficiencies: [],
+            risk_advisory: "Zero statutory risk: Officially certified luxury accommodation.",
+            reasoning: `Property directly matches official VNAT record: ${matched.name} (${matched.address || matched.province}). Statutory credentials are fully verified without requiring AI rebrand disambiguation.`
+          };
+
+          return res.status(200).json({
+            status: "STATUTORILY_VERIFIED",
+            cached: false,
+            listing_key: listingKey,
+            audit: verifiedRecord
+          });
+        }
+
         if (classification && classification.matched_hotel && (!city || city.toLowerCase() === "vietnam")) {
           city = classification.matched_hotel.province || city;
           const normCity = city.toLowerCase().replace(/[^a-z0-9]/g, "");

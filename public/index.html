@@ -1028,21 +1028,68 @@
         `;
       }
 
-      // 2. Render AI Hotel Verification Button State
+      // 2. Render AI Verification / Rebrand Investigation State
       const aiBtn = document.getElementById('btn-ai-verify');
       const directAiBtn = document.getElementById('btn-run-ai-direct');
+      const aiHint = document.getElementById('ai-verify-hint');
       const logEntry = aiLog[r.ai_verification_key];
-      if (logEntry) {
-        aiBtn.className = "btn-ai-verify btn-ai-verified";
-        aiBtn.innerHTML = `<span>🤖 AI Result: ${logEntry.verdict.replace(/_/g, ' ')} (Click to Re-Audit)</span>`;
-        if (directAiBtn) directAiBtn.innerHTML = `🤖 DeepSeek AI Audit (Re-Run)`;
-        renderInlineAiDossier(logEntry);
-      } else {
-        aiBtn.className = "btn-ai-verify";
-        aiBtn.innerHTML = `<span>🤖 AI Hotel Verification</span>`;
-        if (directAiBtn) directAiBtn.innerHTML = `🤖 DeepSeek AI Audit`;
+
+      if (r.is_verified && !r.is_violation) {
+        // Property is ALREADY verified by statutory registry - NO AI NEEDED!
+        if (aiBtn) {
+          aiBtn.className = "btn-ai-verify";
+          aiBtn.style.background = "rgba(16, 185, 129, 0.2)";
+          aiBtn.style.border = "1px solid #10b981";
+          aiBtn.style.color = "#34d399";
+          aiBtn.style.cursor = "default";
+          aiBtn.disabled = true;
+          aiBtn.innerHTML = `<span>✓ Officially Verified by VNAT</span>`;
+        }
+        if (aiHint) {
+          const cert = r.matched_hotel ? (r.matched_hotel.item_id || r.matched_hotel.decision_code || 'AUTH') : 'AUTH';
+          aiHint.innerHTML = `VNAT Certificate #${cert}<br><span style="color: #34d399;">No AI investigation needed</span>`;
+        }
+        if (directAiBtn) {
+          directAiBtn.style.opacity = '0.6';
+          directAiBtn.innerHTML = `✓ Statutorily Verified`;
+          directAiBtn.disabled = true;
+        }
         const inlineDossier = document.getElementById('inline-ai-dossier');
         if (inlineDossier) inlineDossier.style.display = 'none';
+      } else {
+        // Property is UNKNOWN or UNACCREDITED - This is where AI Rebrand Investigation is needed!
+        if (directAiBtn) {
+          directAiBtn.style.opacity = '1';
+          directAiBtn.disabled = false;
+        }
+        if (logEntry) {
+          aiBtn.disabled = false;
+          aiBtn.className = "btn-ai-verify btn-ai-verified";
+          aiBtn.style.background = "";
+          aiBtn.style.border = "";
+          aiBtn.style.color = "";
+          aiBtn.style.cursor = "pointer";
+          const isRebrandFound = logEntry.verdict === 'VERIFIED_COMPLIANT';
+          const badgeText = isRebrandFound ? '🟢 AI Rebrand Found' : '🔴 AI Confirmed Unaccredited';
+          aiBtn.innerHTML = `<span>🤖 ${badgeText} (Click to Re-Audit)</span>`;
+          if (directAiBtn) directAiBtn.innerHTML = `🤖 DeepSeek AI (${badgeText})`;
+          if (aiHint) aiHint.innerHTML = `Model: ${logEntry.model || 'Nous DeepSeek Flash 4.1'}<br>Latency: ${logEntry.latency_sec || '0'}s`;
+          renderInlineAiDossier(logEntry);
+        } else {
+          aiBtn.disabled = false;
+          aiBtn.className = "btn-ai-verify";
+          aiBtn.style.background = "linear-gradient(135deg, #7c3aed, #4f46e5)";
+          aiBtn.style.border = "1px solid #a78bfa";
+          aiBtn.style.color = "#fff";
+          aiBtn.style.cursor = "pointer";
+          aiBtn.innerHTML = `<span>🤖 Investigate Rebrand with AI</span>`;
+          if (directAiBtn) directAiBtn.innerHTML = `🤖 Investigate Rebrand (AI)`;
+          if (aiHint) {
+            aiHint.innerHTML = `<span style="color: #c4b5fd; font-weight: 600;">Unknown in direct registry</span><br>AI checks if operating under rebrand / contract`;
+          }
+          const inlineDossier = document.getElementById('inline-ai-dossier');
+          if (inlineDossier) inlineDossier.style.display = 'none';
+        }
       }
 
       // 3. Render Demonstration of Infraction vs Compliance Dossier
@@ -1185,6 +1232,12 @@
 
       if (!currentAudit) return;
 
+      // DO NOT run AI verification on already verified hotels
+      if (currentAudit.is_verified && !currentAudit.is_violation) {
+        alert(`✓ "${currentAudit.property_name}" is already directly authenticated in the official VNAT statutory registry as an accredited ${currentAudit.official_stars}★ hotel (Certificate #${currentAudit.matched_hotel?.item_id || 'AUTH'}).\n\nAI Rebrand Investigation is only needed for unknown or unaccredited properties to investigate potential rebranding.`);
+        return;
+      }
+
       const dossier = document.getElementById('inline-ai-dossier');
       if (dossier) {
         dossier.style.display = 'block';
@@ -1205,11 +1258,11 @@
       terminal.style.display = 'block';
       findingsBox.style.display = 'none';
 
-      // Stage 1: Checking listing
+      // Stage 1: Checking listing details
       icon1.innerHTML = '🔄'; step1.style.color = '#38bdf8'; step1.style.fontWeight = '700';
       icon2.innerHTML = '⏳'; step2.style.color = '#94a3b8'; step2.style.fontWeight = 'normal';
       icon3.innerHTML = '⏳'; step3.style.color = '#94a3b8'; step3.style.fontWeight = 'normal';
-      statusTitle.textContent = "AI is inspecting listing claims & OTA metadata...";
+      statusTitle.textContent = "AI is inspecting listing claims & trade name...";
       spinner.style.background = '#a78bfa';
 
       const btn1 = document.getElementById('btn-ai-verify');
@@ -1217,11 +1270,12 @@
       const origText1 = btn1 ? btn1.innerHTML : '';
       const origText2 = btn2 ? btn2.innerHTML : '';
 
-      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>⏳ Auditing via Hermes VPS (DeepSeek Flash 4.1)...</span>`; }
-      if (btn2) { btn2.disabled = true; btn2.innerHTML = `⏳ Hermes VPS Auditing...`; }
+      if (btn1) { btn1.disabled = true; btn1.innerHTML = `<span>⏳ Investigating Rebrand via Hermes VPS...</span>`; }
+      if (btn2) { btn2.disabled = true; btn2.innerHTML = `⏳ AI Investigating Rebrand...`; }
 
       const key = currentAudit.ai_verification_key;
       const startTime = performance.now();
+      const cityName = (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : (currentAudit.matched_hotel ? currentAudit.matched_hotel.province : "") || "";
 
       // Dispatch fetch immediately with force: true to guarantee live Hermes VPS inference
       const fetchPromise = fetch('/api/ai_verify', {
@@ -1232,7 +1286,7 @@
           claimed_stars: currentAudit.claimed_stars,
           platform: currentAudit.ota_platform,
           url: currentAudit.original_url,
-          city: (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : (currentAudit.matched_hotel ? currentAudit.matched_hotel.province : "") || "",
+          city: cityName,
           has_dorm: currentAudit.has_dorm,
           force: true
         })
@@ -1242,13 +1296,13 @@
       const stageTimer1 = setTimeout(() => {
         icon1.innerHTML = '✅'; step1.style.color = '#34d399'; step1.style.fontWeight = 'normal';
         icon2.innerHTML = '🔄'; step2.style.color = '#38bdf8'; step2.style.fontWeight = '700';
-        statusTitle.textContent = "AI is querying official VNAT statutory registry & matching candidates...";
+        statusTitle.textContent = `AI is gathering official VNAT registry candidates in ${cityName || 'destination'}...`;
       }, 700);
 
       const stageTimer2 = setTimeout(() => {
         icon2.innerHTML = '✅'; step2.style.color = '#34d399'; step2.style.fontWeight = 'normal';
         icon3.innerHTML = '🔄'; step3.style.color = '#38bdf8'; step3.style.fontWeight = '700';
-        statusTitle.textContent = "DeepSeek Flash 4.1 reasoning on Law on Tourism 2017 & TCVN 4391:2015 via Hermes VPS...";
+        statusTitle.textContent = "DeepSeek Flash 4.1 investigating commercial rebranding, operator contracts, & statutory compliance...";
       }, 1800);
 
       let auditRecord = null;
@@ -1282,12 +1336,14 @@
       spinner.style.background = '#10b981';
 
       if (auditRecord) {
+        const isRebrandFound = auditRecord.verdict === 'VERIFIED_COMPLIANT';
+        const badgeLabel = isRebrandFound ? '🟢 REBRAND VERIFIED' : '🔴 UNACCREDITED DECEPTIVE';
         if (btn1) {
           btn1.className = "btn-ai-verify btn-ai-verified";
-          btn1.innerHTML = `<span>🤖 AI Result: ${auditRecord.verdict.replace(/_/g, ' ')} (${latencyDisplay}s)</span>`;
+          btn1.innerHTML = `<span>🤖 ${badgeLabel} (${latencyDisplay}s)</span>`;
         }
         if (btn2) {
-          btn2.innerHTML = `🤖 AI Result: ${auditRecord.verdict.replace(/_/g, ' ')}`;
+          btn2.innerHTML = `🤖 ${badgeLabel}`;
         }
         renderInlineAiDossier(auditRecord);
       } else {
@@ -1322,16 +1378,16 @@
         badge.style.display = 'inline-block';
         badge.style.background = '#059669';
         badge.style.color = '#fff';
-        badge.textContent = '🟢 VERIFIED COMPLIANT';
+        badge.textContent = '🟢 REBRAND VERIFIED BY AI';
 
         bullets.innerHTML = `
           <div>
-            <strong>🏛️ State Accreditation Registry:</strong>
-            <span style="color: #34d399; font-weight: 700;">AUTHENTICATED & ACCREDITED</span> — Officially certified in the national VNAT registry. Holds legal statutory authority to display and commercialize ${audit.claimed_stars || 5} Gold Stars.
+            <strong>🏛️ State Accreditation & Rebrand Identification:</strong>
+            <span style="color: #34d399; font-weight: 700;">AUTHENTICATED REBRAND / OPERATOR CONTRACT</span> — The AI cross-referenced destination records and confirmed this property is an officially accredited luxury hotel operating under a commercial rebrand or international operator agreement.
           </div>
           <div>
             <strong>⚖️ Statutory Law Compliance:</strong>
-            <span style="color: #34d399; font-weight: 700;">FULL STATUTORY COMPLIANCE</span> with Article 50 of Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14). No fraudulent advertising under Decree 45/2019/NĐ-CP.
+            <span style="color: #34d399; font-weight: 700;">FULL STATUTORY COMPLIANCE</span> with Article 50 of Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14). No deceptive advertising under Decree 85/2021/NĐ-CP.
           </div>
           <div>
             <strong>🛡️ Traveler Advisory:</strong>

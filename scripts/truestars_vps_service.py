@@ -160,7 +160,11 @@ async def verify(request: Request):
         f"Destination: {city}\n"
         f"Offers Dormitory / Shared Bunk Beds: {'YES' if has_dorm else 'NO'}\n\n"
         f"Official VNAT Accredited Hotels in {city}:\n{cand_text}\n\n"
-        f"Please conduct your independent statutory audit and return your findings in the required JSON format."
+        f"The property '{hotel_name}' is currently UNKNOWN / UNMATCHED in the static registry under this exact title.\n"
+        f"Your task is to investigate whether this property is actually one of the officially accredited VNAT hotels in {city} "
+        f"operating under an international management contract, commercial rebranding, English trade name, or former name "
+        f"(e.g. Vinpearl managed by Marriott/Meliá, Accor, IHG), OR if it is an unaccredited fake luxury listing.\n"
+        f"Return your findings strictly in the required JSON format."
     )
 
     # 1. Try Nous DeepSeek Flash 4.1 first (timeout 35s)

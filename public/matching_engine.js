@@ -509,7 +509,7 @@ class TrueStarsMatcher {
       if (isUrlQuery) {
         summary = `Exhaustive Identity Verification: Out of all 681 statutory 4★ and 5★ hotel accreditations issued by VNAT nationwide, this ${otaPlatform} property (${otaId ? `Hotel ID #${otaId}` : 'unlinked listing'}) does NOT match any accredited certificate. Displaying ${effectiveClaimedStars} stars violates Article 9, Clause 8 of Vietnam's Law on Tourism 2017.`;
       } else {
-        summary = `Commercial property claims ${effectiveClaimedStars} stars on ${otaPlatform} but is NOT present in the official VNAT National Accreditation Registry.`;
+        summary = `Commercial property claims ${effectiveClaimedStars} stars on ${otaPlatform} but was NOT found in the direct VNAT National Accreditation Registry under this exact title. Run AI Rebrand Investigation to determine if it is an officially accredited hotel operating under an international management contract / commercial rebrand (e.g. Marriott, Meliá), or a truly unaccredited listing.`;
       }
 
       violations.push({
