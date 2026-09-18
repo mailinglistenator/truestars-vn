@@ -507,10 +507,10 @@
         <div id="url-hint" style="display:none; font-size: 0.82rem; color: #60a5fa; margin-top: 0.4rem; font-weight: 500;"></div>
       </div>
 
-      <label class="checkbox-group" style="margin-bottom: 1.25rem;">
-        <input type="checkbox" id="audit-dorm">
-        <span>Property sells Dormitory / Bunk Beds (Disqualification under TCVN 4391:2015)</span>
-      </label>
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #94a3b8; margin-bottom: 1.25rem; background: rgba(30, 41, 59, 0.5); padding: 0.5rem 0.85rem; border-radius: 6px; border: 1px solid rgba(148, 163, 184, 0.15);">
+        <span style="color: #60a5fa; font-size: 1rem;">⚡</span>
+        <span><strong>Automated TCVN 4391:2015 Facility Check:</strong> Dormitory, hostel, and shared bunk bed disqualifications are detected automatically by the statutory engine.</span>
+      </div>
 
       <!-- Verdict Display -->
       <div id="verdict-box" class="verdict-box">
@@ -556,6 +556,12 @@
         <!-- Summary -->
         <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 8px; margin-bottom: 1.25rem;">
           <p id="verdict-summary" style="font-size: 0.95rem; font-weight: 500;"></p>
+        </div>
+
+        <!-- Automated Facility Screening Banner (TCVN 4391:2015) -->
+        <div id="verdict-facility-banner" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.86rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div id="verdict-facility-text"></div>
+          <span id="verdict-facility-badge" style="padding: 0.25rem 0.65rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem;"></span>
         </div>
 
         <!-- INLINE AUTONOMOUS AI AUDIT DOSSIER -->
@@ -947,7 +953,6 @@
 
     function executeAudit() {
       const rawInput = document.getElementById('audit-input').value.trim();
-      const hasDorm = document.getElementById('audit-dorm') ? document.getElementById('audit-dorm').checked : false;
 
       if (!rawInput) {
         alert("Please enter a hotel name or booking URL.");
@@ -960,7 +965,7 @@
       currentAudit = matcher.classify({
         name: hotelName,
         claimedStars: 0, // Automatically inferred by engine from official registry / listing cues
-        hasDorm: hasDorm,
+        hasDorm: false,  // Evaluated automatically by engine via detectDormitoryFacility
         otaPlatform: parsed.platform,
         province: parsed.city,
         originalUrl: parsed.originalUrl || "",
@@ -973,27 +978,27 @@
 
     function renderAuditResult(r, parsed) {
       const box = document.getElementById('verdict-box');
-      box.className = `verdict-box verdict-${r.verdict}`;
       box.style.display = 'block';
 
+      // Verdict styling
       const badge = document.getElementById('verdict-badge');
-      const officialLabel = document.getElementById('reality-official-label');
       const officialCard = document.getElementById('reality-official-card');
+      const officialLabel = document.getElementById('reality-official-label');
 
-      if (r.verdict === 'VERIFIED_LEGITIMATE') {
+      if (!r.is_violation) {
         badge.style.background = '#059669';
         badge.style.color = '#fff';
         badge.textContent = '🟢 VERIFIED LEGITIMATE';
-        officialLabel.style.color = '#34d399';
+        officialLabel.style.color = '#10b981';
         document.getElementById('verdict-official-stars').innerHTML = `<span style="color:#34d399;">${'★'.repeat(r.official_stars)} (${r.official_stars}★)</span>`;
-        document.getElementById('verdict-official-sub').textContent = 'Officially Accredited by VNAT';
+        document.getElementById('verdict-official-sub').textContent = `VNAT Certificate #${r.matched_hotel ? r.matched_hotel.item_id : 'AUTH'}`;
       } else if (r.verdict === 'BLATANT_HOSTEL_FRAUD') {
-        badge.style.background = '#dc2626';
-        badge.style.color = '#fff';
-        badge.textContent = '🚨 BLATANT HOSTEL FRAUD';
+        badge.style.background = '#7f1d1d';
+        badge.style.color = '#fca5a5';
+        badge.textContent = '🚨 FAKE 5★ (BACKPACKER HOSTEL)';
         officialLabel.style.color = '#ef4444';
-        document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Hostel)</span>';
-        document.getElementById('verdict-official-sub').textContent = 'Disqualified (Offers Dormitory Beds)';
+        document.getElementById('verdict-official-stars').innerHTML = '<span style="color:#ef4444;">❌ 0★ (Disqualified Hostel)</span>';
+        document.getElementById('verdict-official-sub').textContent = 'Sells Bunk / Dormitory Beds';
       } else if (r.verdict === 'STAR_INFLATION') {
         badge.style.background = '#d97706';
         badge.style.color = '#fff';
@@ -1016,6 +1021,31 @@
       document.getElementById('verdict-claimed-stars').textContent = `${'★'.repeat(r.claimed_stars)} (${r.claimed_stars}★)`;
       document.getElementById('verdict-claimed-sub').textContent = `Displayed on ${r.ota_platform}`;
       document.getElementById('verdict-summary').textContent = r.summary;
+
+      // Automated Facility Inspection Banner (TCVN 4391:2015)
+      const facBanner = document.getElementById('verdict-facility-banner');
+      const facText = document.getElementById('verdict-facility-text');
+      const facBadge = document.getElementById('verdict-facility-badge');
+      if (facBanner && facText && facBadge) {
+        facBanner.style.display = 'flex';
+        if (r.has_dorm) {
+          facBanner.style.background = 'rgba(225, 29, 72, 0.15)';
+          facBanner.style.border = '1px solid #f43f5e';
+          facBanner.style.color = '#ffe4e6';
+          facText.innerHTML = '🚨 <strong>Automated Facility Screening (TCVN 4391:2015):</strong> <span style="color:#f87171;font-weight:700;">Disqualified</span> — Shared dormitory / bunk bed facilities detected in property listing. Under TCVN 4391:2015, luxury 4★ and 5★ hotels must provide 100% private guest rooms.';
+          facBadge.style.background = '#e11d48';
+          facBadge.style.color = '#fff';
+          facBadge.textContent = 'DISQUALIFIED';
+        } else {
+          facBanner.style.background = 'rgba(16, 185, 129, 0.1)';
+          facBanner.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+          facBanner.style.color = '#d1fae5';
+          facText.innerHTML = '✓ <strong>Automated Facility Screening (TCVN 4391:2015):</strong> <span style="color:#34d399;font-weight:700;">Passed</span> — No shared dormitory or bunk bed facilities detected. Meets private luxury accommodation standards.';
+          facBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+          facBadge.style.color = '#34d399';
+          facBadge.textContent = 'PASSED';
+        }
+      }
 
       // 1. Render Outbound Deep Links with Affiliate Tags
       const linksContainer = document.getElementById('verdict-ota-links');

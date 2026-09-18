@@ -151,6 +151,28 @@ function inferCityFromText(text) {
   return "";
 }
 
+const DORM_PATTERNS = [
+  /\b(hostels?|backpackers?|dorm|dorms|dormitory|dormitories)\b/i,
+  /\b(bunks?|bunk\s*beds?|capsules?|capsule\s*hotel|pod\s*hotel|bed\s*in\s*dorm)\b/i,
+  /\b(shared\s*room|shared\s*dorm|mixed\s*dorm|female\s*dorm|male\s*dorm)\b/i,
+  /\b(bed\s*in\s*\d+[- ]bed|bed\s*in\s*dormitory)\b/i,
+  /\b(gi[uư][oờ]ng\s*t[aầ]ng|ph[oò]ng\s*t[aậ]p\s*th[eể]|k[yý]\s*t[uú]c\s*x[aá]|ph[oò]ng\s*dorm)\b/i
+];
+
+function detectDormitoryFacility(text) {
+  if (!text) return { hasDorm: false, reason: "" };
+  for (const pattern of DORM_PATTERNS) {
+    const match = text.match(pattern);
+    if (match) {
+      return {
+        hasDorm: true,
+        reason: `Automated detection: Identified dormitory/bunk bed indicator "${match[0]}"`
+      };
+    }
+  }
+  return { hasDorm: false, reason: "No dormitory or bunk bed indicators detected." };
+}
+
 /**
  * Smart OTA URL Parser: Extracts platform, hotelId, canonical slug, city, and clean display name
  */
@@ -436,16 +458,10 @@ class TrueStarsMatcher {
 
     // 3. AUTO-DETECT CLAIMED STARS & DORM CRITERIA
     let effectiveClaimedStars = parseInt(claimedStars, 10) || 0;
-    let effectiveHasDorm = Boolean(hasDorm);
 
-    const combinedText = `${name} ${originalUrl} ${otaSlug}`.toLowerCase();
-
-    // Auto-detect dormitory cues (hostel / dorm / bunk / pod / capsule / backpacker)
-    if (!effectiveHasDorm) {
-      if (/\b(hostel|dorm|dormitory|bunk|pod|capsule|backpacker|guesthouse)\b/i.test(combinedText)) {
-        effectiveHasDorm = true;
-      }
-    }
+    const combinedText = `${name} ${originalUrl} ${otaSlug} ${province}`.toLowerCase();
+    const dormInspection = detectDormitoryFacility(combinedText);
+    let effectiveHasDorm = Boolean(hasDorm || dormInspection.hasDorm);
 
     // Auto-detect star rating
     if (effectiveClaimedStars === 0) {
@@ -1033,6 +1049,7 @@ if (typeof module !== 'undefined' && module.exports) {
     sequenceRatio,
     inferCityFromText,
     parseOtaUrl,
+    detectDormitoryFacility,
     generatePlatformNotice,
     generateRefundDemandLetter,
     generateDemonstrationOfLawBreaking,

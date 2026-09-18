@@ -91,6 +91,19 @@ def health():
         "timestamp": time.time()
     }
 
+DORM_PATTERNS = [
+    r'\b(hostels?|backpackers?|dorm|dorms|dormitory|dormitories)\b',
+    r'\b(bunks?|bunk\s*beds?|capsules?|capsule\s*hotel|pod\s*hotel|bed\s*in\s*dorm)\b',
+    r'\b(shared\s*room|shared\s*dorm|mixed\s*dorm|female\s*dorm|male\s*dorm)\b',
+    r'\b(bed\s*in\s*\d+[- ]bed|bed\s*in\s*dormitory)\b',
+    r'\b(gi[uư][oờ]ng\s*t[aầ]ng|ph[oò]ng\s*t[aậ]p\s*th[eể]|k[yý]\s*t[uú]c\s*x[aá]|ph[oò]ng\s*dorm)\b'
+]
+
+def check_dorm_indicators(text):
+    if not text:
+        return False
+    return any(re.search(pat, text.lower(), re.I) for pat in DORM_PATTERNS)
+
 @app.post("/api/verify")
 async def verify(request: Request):
     t0 = time.time()
@@ -105,6 +118,8 @@ async def verify(request: Request):
     url = payload.get("url", "").strip()
     city = payload.get("city", "Vietnam").strip()
     has_dorm = bool(payload.get("has_dorm", False))
+    if not has_dorm:
+        has_dorm = check_dorm_indicators(f"{hotel_name} {url}")
     candidates = payload.get("candidates", [])
 
     if not hotel_name and not url:
@@ -133,8 +148,10 @@ async def verify(request: Request):
         "2. Statutory Star Rating Verification:\n"
         "   - If the property corresponds to an accredited hotel, verify whether the claimed star rating matches the official VNAT certificate.\n"
         "   - If an accredited hotel claims higher stars on the OTA than certified (e.g. certified 4★, claiming 5★), verdict is \"STAR_INFLATION\".\n"
-        "3. Physical Facility Disqualifications:\n"
-        "   - If the listing offers shared dormitory / bunk beds, it is structurally and legally disqualified from 4-star or 5-star hotel ranking under TCVN 4391:2015.\n"
+        "3. Automated Physical Facility Inspection (TCVN 4391:2015):\n"
+        "   - Independently examine the listing trade name, property category, description, and room cues for shared dormitory beds, bunk beds, capsule pods, or backpacker hostel arrangements.\n"
+        "   - Under TCVN 4391:2015 Clause 5.1, luxury 4-star and 5-star hotels MUST provide 100% private self-contained guest rooms (minimum 80 rooms for 4★, 100 rooms for 5★).\n"
+        "   - Any establishment offering shared dormitory beds or bunk beds is structurally and legally disqualified from claiming 4★ or 5★ hotel classification.\n"
         "4. Unaccredited Commercial Deception:\n"
         "   - If the property holds no statutory accreditation in the official registry and cannot be reconciled with any certified hotel, the use of star ratings violates Article 9 Clause 8 and Article 50 of the Law on Tourism 2017.\n\n"
         "Verdicts:\n"
@@ -158,7 +175,7 @@ async def verify(request: Request):
         f"Platform: {platform}\n"
         f"URL: {url}\n"
         f"Destination: {city}\n"
-        f"Offers Dormitory / Shared Bunk Beds: {'YES' if has_dorm else 'NO'}\n\n"
+        f"Automated Facility Check: {'DORMITORY / BUNK BEDS DETECTED (Disqualification under TCVN 4391:2015)' if has_dorm else 'No dormitory indicators detected in listing'}\n\n"
         f"Official VNAT Accredited Hotels in {city}:\n{cand_text}\n\n"
         f"The property '{hotel_name}' is currently UNKNOWN / UNMATCHED in the static registry under this exact title.\n"
         f"Your task is to investigate whether this property is actually one of the officially accredited VNAT hotels in {city} "

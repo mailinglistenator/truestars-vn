@@ -16,11 +16,16 @@ const path = require('path');
 const https = require('https');
 
 let inferCityFromText = null;
+let detectDormitoryFacility = null;
 try {
-  inferCityFromText = require('../public/matching_engine.js').inferCityFromText;
+  const engine = require('../public/matching_engine.js');
+  inferCityFromText = engine.inferCityFromText;
+  detectDormitoryFacility = engine.detectDormitoryFacility;
 } catch (e) {
   try {
-    inferCityFromText = require(path.join(process.cwd(), 'public', 'matching_engine.js')).inferCityFromText;
+    const engine = require(path.join(process.cwd(), 'public', 'matching_engine.js'));
+    inferCityFromText = engine.inferCityFromText;
+    detectDormitoryFacility = engine.detectDormitoryFacility;
   } catch (e2) {}
 }
 
@@ -165,7 +170,13 @@ module.exports = async (req, res) => {
       city = inferCityFromText(`${hotelName} ${url}`);
     }
   }
-  const hasDorm = Boolean(query.has_dorm || query.hasDorm || queryParams.has_dorm);
+  let hasDorm = Boolean(query.has_dorm || query.hasDorm || queryParams.has_dorm);
+  if (!hasDorm && detectDormitoryFacility) {
+    const dormCheck = detectDormitoryFacility(`${hotelName} ${url}`);
+    if (dormCheck.hasDorm) {
+      hasDorm = true;
+    }
+  }
 
   if (!hotelName && !url) {
     return res.status(400).json({ error: "Property name or URL is required." });
