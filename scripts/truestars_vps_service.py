@@ -188,6 +188,25 @@ async def verify(request: Request):
         cand_lines.append(f"- {c_name}{eng}{former} [VNAT Cert #{cert}, {stars}★]: {addr}")
     cand_text = "\n".join(cand_lines) if cand_lines else "No certified properties located in this immediate administrative zone."
 
+    target_lang = str(payload.get("language") or payload.get("lang") or "en").lower()
+    lang_names = {
+        "vi": "Vietnamese (Tiếng Việt)",
+        "ko": "Korean (한국어)",
+        "zh": "Chinese (中文)",
+        "ja": "Japanese (日本語)",
+        "es": "Spanish (Español)",
+        "en": "English"
+    }
+    lang_name = lang_names.get(target_lang, "English")
+
+    lang_instruction = ""
+    if target_lang != "en" and target_lang in lang_names:
+        lang_instruction = (
+            f"\n\nMANDATORY LANGUAGE REQUIREMENT: You MUST output all text fields ('concise_summary', 'refund_advisory', "
+            f"'statutory_infractions', 'tcvn_deficiencies', 'risk_advisory', 'reasoning') in {lang_name}. "
+            f"Keep statutory legal article numbers and decree names accurate in their standard legal citation form."
+        )
+
     system_prompt = (
         "You are TrueStars VN, an autonomous statutory compliance auditor evaluating accommodation listings "
         "under Vietnam's Law on Tourism 2017 (Luật Du lịch số 09/2017/QH14) and national hotel classification standards TCVN 4391:2015.\n\n"
@@ -210,6 +229,7 @@ async def verify(request: Request):
         "- tcvn_deficiencies (array of strings: statutory deficiencies, empty if compliant)\n"
         "- risk_advisory (string: consumer protection risk)\n"
         "- reasoning (string: factual analysis explaining rebrand match or absence from registry)"
+        + lang_instruction
     )
 
     user_prompt = (
@@ -227,64 +247,10 @@ async def verify(request: Request):
         "</verified_state_database>\n\n"
         "Cross-examine the property against the official state database to determine whether it corresponds to an officially accredited hotel under an international management contract, franchise rebrand, commercial trade name, or English translation (e.g. Vinpearl managed by Marriott/Meliá/Accor/IHG), OR if it is an unaccredited listing.\n"
         "Return your findings strictly in the required JSON format."
+        + lang_instruction
     )
 
-    # 1. Try Nous DeepSeek Flash 4.1 first (timeout 35s)
-    token = get_nous_token()
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}"
-    }
-    payload = {
-        "model": "deepseek/deepseek-v4.1-flash",
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        "response_format": {"type": "json_object"},
-        "temperature": 0.1,
-        "max_tokens": 3500
-    }
-
-    try:
-        r = requests.post("https://inference-api.nousresearch.com/v1/chat/completions", json=payload, headers=headers, timeout=35)
-        if r.status_code in (401, 403):
-            refresh_token_if_needed()
-            token = get_nous_token()
-            headers["Authorization"] = f"Bearer {token}"
-            r = requests.post("https://inference-api.nousresearch.com/v1/chat/completions", json=payload, headers=headers, timeout=35)
-
-        if r.status_code == 200:
-            res_json = r.json()
-            content = res_json["choices"][0]["message"]["content"]
-            parsed = extract_json(content)
-            if parsed and parsed.get("verdict"):
-                parsed["model"] = "TrueStars Statutory AI Engine"
-                parsed["latency_ms"] = int((time.time() - t0) * 1000)
-                return parsed
-            else:
-                logging.warning("Nous returned invalid/empty JSON, falling back to Groq...")
-        else:
-            logging.warning(f"Nous returned {r.status_code} ({r.text[:200]}), falling back to Groq...")
-    except Exception as e:
-        logging.warning(f"Nous request failed: {e}, attempting token refresh and retry...")
-        try:
-            refresh_token_if_needed()
-            token = get_nous_token()
-            headers["Authorization"] = f"Bearer {token}"
-            r = requests.post("https://inference-api.nousresearch.com/v1/chat/completions", json=payload, headers=headers, timeout=35)
-            if r.status_code == 200:
-                res_json = r.json()
-                content = res_json["choices"][0]["message"]["content"]
-                parsed = extract_json(content)
-                if parsed and parsed.get("verdict"):
-                    parsed["model"] = "TrueStars Statutory AI Engine"
-                    parsed["latency_ms"] = int((time.time() - t0) * 1000)
-                    return parsed
-        except Exception as retry_e:
-            logging.warning(f"Nous retry after refresh failed: {retry_e}, falling back to Groq...")
-
-    # 2. Fast Fallback: Groq on VPS
+    # 1. Primary Engine: Ultra-Fast Groq openai/gpt-oss-120b (1-2s latency)
     try:
         env = get_env_vars()
         groq_key = env.get("GROQ_API_KEY")
@@ -293,27 +259,66 @@ async def verify(request: Request):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {groq_key}"
             }
-            groq_payload = {
-                "model": "openai/gpt-oss-120b",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.1,
-                "max_tokens": 3500
-            }
-            gr = requests.post("https://api.groq.com/openai/v1/chat/completions", json=groq_payload, headers=groq_headers, timeout=20)
-            if gr.status_code == 200:
-                res_json = gr.json()
+            for model_name in ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]:
+                try:
+                    groq_payload = {
+                        "model": model_name,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt}
+                        ],
+                        "response_format": {"type": "json_object"},
+                        "temperature": 0.1,
+                        "max_tokens": 3500
+                    }
+                    gr = requests.post("https://api.groq.com/openai/v1/chat/completions", json=groq_payload, headers=groq_headers, timeout=12)
+                    if gr.status_code == 200:
+                        res_json = gr.json()
+                        content = res_json["choices"][0]["message"]["content"]
+                        parsed = extract_json(content)
+                        if parsed and parsed.get("verdict"):
+                            parsed["model"] = "TrueStars Statutory AI Engine"
+                            parsed["lang"] = target_lang
+                            parsed["latency_ms"] = int((time.time() - t0) * 1000)
+                            return parsed
+                    else:
+                        logging.warning(f"Groq {model_name} returned {gr.status_code}, trying next model...")
+                except Exception as model_e:
+                    logging.warning(f"Groq {model_name} error: {model_e}, trying next...")
+    except Exception as e_groq:
+        logging.warning(f"Groq primary engine error: {e_groq}, falling back to Nous...")
+
+    # 2. Secondary Fallback: Nous DeepSeek Flash 4.1 (tight 8s timeout)
+    token = get_nous_token()
+    if token:
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+        payload = {
+            "model": "deepseek/deepseek-v4.1-flash",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "response_format": {"type": "json_object"},
+            "temperature": 0.1,
+            "max_tokens": 3500
+        }
+
+        try:
+            r = requests.post("https://inference-api.nousresearch.com/v1/chat/completions", json=payload, headers=headers, timeout=8)
+            if r.status_code == 200:
+                res_json = r.json()
                 content = res_json["choices"][0]["message"]["content"]
                 parsed = extract_json(content)
                 if parsed and parsed.get("verdict"):
                     parsed["model"] = "TrueStars Statutory AI Engine"
+                    parsed["lang"] = target_lang
                     parsed["latency_ms"] = int((time.time() - t0) * 1000)
                     return parsed
-    except Exception as e2:
-        logging.error(f"Groq fallback failed: {e2}")
+        except Exception as e_nous:
+            logging.warning(f"Nous fallback failed or timed out: {e_nous}")
 
     raise HTTPException(status_code=502, detail="All Hermes VPS inference backends unavailable")
 

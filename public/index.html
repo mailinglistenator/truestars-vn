@@ -1884,8 +1884,10 @@
         if (data && data.audit) {
           auditRecord = data.audit;
           auditRecord.lang = currentLang;
-          aiLog[key] = auditRecord;
-          if (nameKey) aiLog[nameKey] = auditRecord;
+          if (auditRecord.verdict !== "AI_SERVICE_UNAVAILABLE") {
+            aiLog[key] = auditRecord;
+            if (nameKey) aiLog[nameKey] = auditRecord;
+          }
           window.latestAiAudit = auditRecord;
         }
       } catch (err) {
@@ -1899,12 +1901,19 @@
       }
 
       const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
-
-      // Stage 3 complete
-      icon3.innerHTML = "✅"; step3.style.color = "#34d399"; step3.style.fontWeight = "normal";
       const latencyDisplay = auditRecord && auditRecord.latency_sec ? auditRecord.latency_sec : elapsedSec;
-      statusTitle.textContent = (dict.ai_complete_status || "✅ Statutory AI Audit Complete ({sec}s • Statutory AI Engine)").replace("{sec}", latencyDisplay);
-      spinner.style.background = "#10b981";
+
+      if (auditRecord && auditRecord.verdict === "AI_SERVICE_UNAVAILABLE") {
+        icon2.innerHTML = "⚪"; step2.style.color = "#94a3b8"; step2.style.fontWeight = "normal";
+        icon3.innerHTML = "⚪"; step3.style.color = "#94a3b8"; step3.style.fontWeight = "normal";
+        statusTitle.textContent = (dict.ai_unavailable_status || "⚪ Statutory AI Audit Inconclusive ({sec}s • Statutory AI Engine)").replace("{sec}", latencyDisplay);
+        spinner.style.background = "#64748b";
+      } else {
+        // Stage 3 complete
+        icon3.innerHTML = "✅"; step3.style.color = "#34d399"; step3.style.fontWeight = "normal";
+        statusTitle.textContent = (dict.ai_complete_status || "✅ Statutory AI Audit Complete ({sec}s • Statutory AI Engine)").replace("{sec}", latencyDisplay);
+        spinner.style.background = "#10b981";
+      }
 
       if (auditRecord) {
         updateAiButtonsDisplay(currentAudit, currentLang);
@@ -1932,11 +1941,14 @@
       const reasoning = document.getElementById("inline-ai-reasoning");
       const infractions = document.getElementById("inline-ai-infractions");
 
-      const confPercent = Math.round((audit.confidence || 0.95) * 100);
+      const isUnavailable = audit.verdict === "AI_SERVICE_UNAVAILABLE";
+      const confPercent = isUnavailable ? 0 : Math.round((audit.confidence !== undefined ? audit.confidence : 0.95) * 100);
       const latencySec = audit.latency_sec ? `${audit.latency_sec}s` : (audit.latency_ms ? `${(audit.latency_ms/1000).toFixed(1)}s` : "");
       const modelLabel = dict.ai_engine_name || "TrueStars Statutory AI Engine";
-      const confText = dict.statutory_confidence || "Statutory Confidence";
-      confidence.innerHTML = `<span>🛡️ ${confPercent}% ${confText}</span> &bull; <span style="color: #c4b5fd;">⚡ ${modelLabel}${latencySec ? ` (${latencySec})` : ""}</span>`;
+      const confText = isUnavailable 
+        ? (dict.ai_confidence_unav || "0% Confidence (Audit Inconclusive)")
+        : `${confPercent}% ${dict.statutory_confidence || "Statutory Confidence"}`;
+      confidence.innerHTML = `<span>🛡️ ${confText}</span> &bull; <span style="color: #c4b5fd;">⚡ ${modelLabel}${latencySec ? ` (${latencySec})` : ""}</span>`;
 
       // Badge & 3 Key Bullets
       let bulletsHtml = "";
@@ -2009,7 +2021,7 @@
       let reasoningText = "";
 
       const auditLang = audit.lang || (audit.model && audit.model.includes("Korean") ? "ko" : "en");
-      const isTargetLang = (auditLang === lang) && (lang !== "en" || !audit.lang);
+      const isTargetLang = (auditLang === lang);
 
       if (isTargetLang && audit.concise_summary) {
         conciseSummary = audit.concise_summary;
@@ -2082,7 +2094,7 @@
       if (isCompliant) {
         infHtml = `<div style="color: #34d399; font-size: 0.85rem; padding: 0.5rem 0.8rem;">${dict.ai_modal_none_infractions || "✓ None — Property strictly adheres to all statutory tourism mandates."}</div>`;
       } else if (isUnavailable) {
-        infHtml = `<div style="color: #94a3b8; font-size: 0.85rem; padding: 0.5rem 0.8rem;">${dict.ai_modal_none_infractions || "✓ No adverse infractions assessed."}</div>`;
+        infHtml = `<div style="color: #94a3b8; font-size: 0.85rem; padding: 0.5rem 0.8rem;">${dict.ai_infractions_unavailable || "⚪ Inconclusive — Statutory criteria not evaluated (Audit Unavailable)"}</div>`;
       } else {
         if (lang === "ko") {
           infHtml = `
@@ -2246,7 +2258,12 @@
 
       const parsedCity = audit.city || (currentAudit && currentAudit.province) || "Vietnam";
       document.getElementById("ai-modal-location").textContent = parsedCity;
-      document.getElementById("ai-modal-confidence").textContent = `${Math.round((audit.confidence || 0.95) * 100)}% ${dict.statutory_confidence || "Statutory Confidence"}`;
+      if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
+        document.getElementById("ai-modal-confidence").textContent = dict.ai_confidence_unav || "0% Confidence (Audit Inconclusive)";
+      } else {
+        const modalConf = Math.round((audit.confidence !== undefined ? audit.confidence : 0.95) * 100);
+        document.getElementById("ai-modal-confidence").textContent = `${modalConf}% ${dict.statutory_confidence || "Statutory Confidence"}`;
+      }
       document.getElementById("ai-modal-timestamp").textContent = new Date(audit.verified_at).toLocaleString();
 
       // Risk advisory & reasoning
@@ -2273,7 +2290,7 @@
       if (audit.verdict === "VERIFIED_COMPLIANT") {
         infContainer.innerHTML = `<div style="color: #34d399; font-size: 0.85rem;">${dict.ai_modal_none_infractions || "✓ None — Property strictly adheres to all statutory tourism mandates."}</div>`;
       } else if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
-        infContainer.innerHTML = `<div style="color: #94a3b8; font-size: 0.85rem;">${dict.ai_modal_none_infractions || "✓ No adverse infractions assessed."}</div>`;
+        infContainer.innerHTML = `<div style="color: #94a3b8; font-size: 0.85rem;">${dict.ai_modal_unav_infractions || "⚪ Inconclusive — Statutory compliance could not be evaluated due to temporary audit unavailability."}</div>`;
       } else {
         const infractionsList = (currentLang === "ko") ? [
           "베트남 관광법 2017 제50조 제3항: 4성 및 5성 호텔 성급 공인 권한은 베트남 관광국(VNAT)의 국가 전속 권한입니다.",
@@ -2313,7 +2330,7 @@
       if (audit.verdict === "VERIFIED_COMPLIANT") {
         defContainer.innerHTML = `<div style="color: #34d399; font-size: 0.85rem;">${dict.ai_modal_none_deficiencies || "✓ None — Full compliance with TCVN 4391:2015 national physical criteria."}</div>`;
       } else if (audit.verdict === "AI_SERVICE_UNAVAILABLE") {
-        defContainer.innerHTML = `<div style="color: #94a3b8; font-size: 0.85rem;">${dict.ai_modal_none_deficiencies || "✓ No physical criteria assessed."}</div>`;
+        defContainer.innerHTML = `<div style="color: #94a3b8; font-size: 0.85rem;">${dict.ai_modal_unav_deficiencies || "⚪ Inconclusive — Physical standards could not be evaluated due to temporary audit unavailability."}</div>`;
       } else {
         const defsList = (currentLang === "ko") ? [
           "베트남 국가 관광 데이터베이스(csdl.vietnamtourism.gov.vn) 내 공식 VNAT 법정 등급 결정 누락.",

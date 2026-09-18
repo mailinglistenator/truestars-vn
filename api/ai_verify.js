@@ -103,12 +103,11 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
 
   const endpoints = [
     process.env.HERMES_TUNNEL_URL,
-    "https://imposed-named-external-equipped.trycloudflare.com/api/verify",
     "https://204-168-160-204.sslip.io/api/verify"
   ].filter(Boolean);
 
   try {
-    const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 50000)));
+    const result = await Promise.any(endpoints.map(url => requestEndpoint(url, postData, 12000)));
     if (result && result.verdict) {
       return result;
     }
@@ -120,13 +119,13 @@ async function callExternalModel(promptData, cityCandidates = [], totalCityCount
   return {
     verdict: "AI_SERVICE_UNAVAILABLE",
     confidence: 0,
-    concise_summary: "Live statutory AI verification service is temporarily busy. Please try again shortly.",
-    refund_advisory: "Live statutory AI verification could not be completed. Please refer to the official VNAT registry lookup.",
-    investigation_findings: "The statutory AI reasoning engine could not be contacted at this moment.",
+    concise_summary: "Statutory AI reasoning engine is temporarily busy or unreachable. Please consult the official VNAT registry lookup.",
+    refund_advisory: "Automated AI audit could not be completed at this moment. Please refer to the official VNAT registry lookup.",
+    investigation_findings: "Autonomous AI engine could not connect to the statutory reasoning backend at this moment.",
     statutory_infractions: [],
     tcvn_deficiencies: [],
-    risk_advisory: "AI service connection temporarily unavailable.",
-    reasoning: "Connection to statutory AI audit engine timed out or failed. No AI inference was performed."
+    risk_advisory: "No adverse determination assessed. Connection to statutory AI audit engine was temporarily unavailable.",
+    reasoning: "The connection to the statutory AI audit engine timed out or was temporarily unavailable. No adverse determination is made against this establishment."
   };
 }
 
@@ -257,21 +256,25 @@ module.exports = async (req, res) => {
 
     if (memoryCache.has(listingKey)) {
       const cached = memoryCache.get(listingKey);
-      return res.status(200).json({
-        status: "ALREADY_LOGGED",
-        cached: true,
-        listing_key: listingKey,
-        audit: cached
-      });
+      if (cached && cached.verdict !== "AI_SERVICE_UNAVAILABLE") {
+        return res.status(200).json({
+          status: "ALREADY_LOGGED",
+          cached: true,
+          listing_key: listingKey,
+          audit: cached
+        });
+      }
     }
     if (nameKey && memoryCache.has(nameKey)) {
       const cached = memoryCache.get(nameKey);
-      return res.status(200).json({
-        status: "ALREADY_LOGGED",
-        cached: true,
-        listing_key: nameKey,
-        audit: cached
-      });
+      if (cached && cached.verdict !== "AI_SERVICE_UNAVAILABLE") {
+        return res.status(200).json({
+          status: "ALREADY_LOGGED",
+          cached: true,
+          listing_key: nameKey,
+          audit: cached
+        });
+      }
     }
 
     const diskLog = loadLog();
@@ -431,28 +434,32 @@ module.exports = async (req, res) => {
     statutory_infractions: aiAnalysis.statutory_infractions || [],
     tcvn_deficiencies: aiAnalysis.tcvn_deficiencies || [],
     risk_advisory: aiAnalysis.risk_advisory,
-    reasoning: (aiAnalysis.reasoning || "").replace(/\s*(?:via\s+)?Hermes\s+VPS/gi, "")
+    reasoning: (aiAnalysis.reasoning || "").replace(/\s*(?:via\s+)?Hermes\s+VPS/gi, ""),
+    lang: rawLang
   };
 
-  // Cache permanently in memory
-  memoryCache.set(listingKey, finalRecord);
+  // Only cache and persist valid verdicts; do not cache temporary service unavailability
+  if (finalRecord.verdict !== "AI_SERVICE_UNAVAILABLE") {
+    // Cache permanently in memory
+    memoryCache.set(listingKey, finalRecord);
 
-  // Attempt local disk write to all copies if writable
-  const targetLogs = [
-    path.join(process.cwd(), 'public', 'ai_verification_log.json'),
-    path.join(process.cwd(), 'data', 'ai_verification_log.json'),
-    path.join(process.cwd(), 'extension', 'data', 'ai_verification_log.json')
-  ];
+    // Attempt local disk write to all copies if writable
+    const targetLogs = [
+      path.join(process.cwd(), 'public', 'ai_verification_log.json'),
+      path.join(process.cwd(), 'data', 'ai_verification_log.json'),
+      path.join(process.cwd(), 'extension', 'data', 'ai_verification_log.json')
+    ];
 
-  for (const logPath of targetLogs) {
-    try {
-      if (fs.existsSync(logPath)) {
-        const current = JSON.parse(fs.readFileSync(logPath, 'utf8'));
-        current[listingKey] = finalRecord;
-        fs.writeFileSync(logPath, JSON.stringify(current, null, 2), 'utf8');
+    for (const logPath of targetLogs) {
+      try {
+        if (fs.existsSync(logPath)) {
+          const current = JSON.parse(fs.readFileSync(logPath, 'utf8'));
+          current[listingKey] = finalRecord;
+          fs.writeFileSync(logPath, JSON.stringify(current, null, 2), 'utf8');
+        }
+      } catch (err) {
+        // Non-fatal in read-only serverless lambdas
       }
-    } catch (err) {
-      // Non-fatal in read-only serverless lambdas
     }
   }
 

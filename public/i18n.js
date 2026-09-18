@@ -1,9 +1,5 @@
-/**
- * TrueStars VN - Multilingual i18n Dictionary
- * Supported Languages: English (en), Vietnamese (vi), Chinese (zh), Korean (ko), Japanese (ja), Spanish (es)
- */
-
-let currentLang = "en";
+// TrueStars VN — Internationalization Dictionary
+// 6 Language Parity: English (en), Vietnamese (vi), Traditional Chinese (zh), Korean (ko), Japanese (ja), Spanish (es)
 
 const I18N = {
   "en": {
@@ -163,7 +159,7 @@ const I18N = {
     "ai_findings_infl": "State records show valid accreditation for a lower star rank than marketed on the booking platform.",
     "ai_risk_infl": "Rate premium paid for unverified star tier. Protection claim applies under Vietnamese law.",
     "ai_reasoning_infl": "Property identity maps to official accreditation records, but commercial aggregator marketing advertises a higher tier than certified by VNAT.",
-    "ai_bullet_unav_registry": "<div><strong>ℹ️ Automated Verification Notice:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">AUDIT UNAVAILABLE FOR THIS QUERY</span> — The automated AI audit is unavailable for this query format. In accordance with consumer protection standards, no adverse determination or penalty is assessed against this property.</div>",
+    "ai_bullet_unav_registry": "<div><strong>ℹ️ Automated Verification Notice:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">AI AUDIT TEMPORARILY UNAVAILABLE</span> — The automated AI audit is temporarily unavailable at this moment. In accordance with consumer protection standards, no adverse determination or penalty is assessed against this property.</div>",
     "ai_bullet_unav_law": "<div><strong>🏛️ National Registry Recommendation:</strong> Please search using the establishment's standard trade or legal name to consult the official 681-hotel National VNAT Registry directly.</div>",
     "ai_summary_unav": "AI verification is temporarily unavailable. Please consult the official VNAT registry.",
     "ai_refund_unav": "Consult official national registry directly for accreditation status.",
@@ -188,7 +184,13 @@ const I18N = {
     "ai_modal_none_deficiencies": "✓ None — Full compliance with TCVN 4391:2015 national physical criteria.",
     "verified_alt_heading": "🛡️ Officially Certified 5★ Alternatives in {city}",
     "ai_stage2_status": "AI is gathering official VNAT registry candidates in {city}...",
-    "ai_complete_status": "✅ Statutory AI Audit Complete ({sec}s • Statutory AI Engine)"
+    "ai_complete_status": "✅ Statutory AI Audit Complete ({sec}s • Statutory AI Engine)",
+    "ai_confidence_unav": "0% Confidence (Audit Inconclusive)",
+    "ai_inconclusive": "Inconclusive",
+    "ai_unavailable_status": "⚪ Statutory AI Audit Inconclusive ({sec}s • Statutory AI Engine)",
+    "ai_infractions_unavailable": "⚪ Inconclusive — Statutory criteria not evaluated (Audit Unavailable)",
+    "ai_modal_unav_infractions": "⚪ Inconclusive — Statutory compliance could not be evaluated due to temporary audit unavailability.",
+    "ai_modal_unav_deficiencies": "⚪ Inconclusive — Physical standards could not be evaluated due to temporary audit unavailability."
   },
   "vi": {
     "badge_gov": "🛡️ CƠ QUAN GIÁM SÁT TIÊU CHUẨN SAO DU LỊCH",
@@ -347,7 +349,7 @@ const I18N = {
     "ai_findings_infl": "Hồ sơ lưu trữ cho thấy cơ sở chỉ được công nhận ở mức sao thấp hơn so với quảng cáo trên sàn.",
     "ai_risk_infl": "Khách hàng phải trả thêm tiền cho thứ hạng chưa được kiểm chứng. Có quyền yêu cầu bồi thường theo luật Việt Nam.",
     "ai_reasoning_infl": "Cơ sở khớp với quyết định công nhận của nhà nước nhưng việc quảng bá trên sàn vượt mức hạng sao do VNAT cấp phép.",
-    "ai_bullet_unav_registry": "<div><strong>ℹ️ Thông báo thẩm định tự động:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">CHƯA THỂ THỰC HIỆN VỚI TRUY VẤN NÀY</span> — Hệ thống AI tự động không thể thẩm định định dạng truy vấn này. Theo chuẩn bảo vệ người tiêu dùng, cơ sở không bị xử lý bất lợi.</div>",
+    "ai_bullet_unav_registry": "<div><strong>ℹ️ Thông Báo Thẩm Tra Tự Động:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">DỊCH VỤ AI TẠM THỜI GIÁN ĐOẠN</span> — Hệ thống AI tự động tạm thời chưa thể phản hồi tại thời điểm này. Theo chuẩn bảo vệ người tiêu dùng, cơ sở không bị xử lý bất lợi.</div>",
     "ai_bullet_unav_law": "<div><strong>🏛️ Khuyến nghị tra cứu danh bạ:</strong> Vui lòng tìm kiếm bằng tên thương mại hoặc tên pháp nhân chính thức để tra cứu trực tiếp trong Danh bạ Quốc gia 681 khách sạn của VNAT.</div>",
     "ai_summary_unav": "Dịch vụ AI tạm thời không khả dụng. Vui lòng tra cứu trực tiếp danh bạ VNAT.",
     "ai_refund_unav": "Vui lòng tra cứu danh bạ quốc gia chính thức để biết tình trạng công nhận.",
@@ -372,7 +374,13 @@ const I18N = {
     "ai_modal_none_deficiencies": "✓ Không có — Đáp ứng đầy đủ tiêu chuẩn cơ sở vật chất quốc gia TCVN 4391:2015.",
     "verified_alt_heading": "🛡️ Khách sạn 5★ được nhà nước công nhận tại {city}",
     "ai_stage2_status": "AI đang thu thập danh sách ứng viên VNAT chính thức tại {city}...",
-    "ai_complete_status": "✅ Đã hoàn thành thẩm định AI Pháp lý ({sec}s • TrueStars Statutory AI Engine)"
+    "ai_complete_status": "✅ Đã hoàn thành thẩm định AI Pháp lý ({sec}s • TrueStars Statutory AI Engine)",
+    "ai_confidence_unav": "0% Độ tin cậy (Kết quả chưa xác định)",
+    "ai_inconclusive": "Chưa xác định",
+    "ai_unavailable_status": "⚪ Thẩm tra AI chưa có kết luận ({sec}s • Động cơ AI Pháp lý)",
+    "ai_infractions_unavailable": "⚪ Chưa xác định — Chưa thể thẩm định tiêu chuẩn pháp lý (Dịch vụ AI tạm gián đoạn)",
+    "ai_modal_unav_infractions": "⚪ Chưa xác định — Chưa thể thẩm định việc tuân thủ pháp luật do dịch vụ AI tạm thời gián đoạn.",
+    "ai_modal_unav_deficiencies": "⚪ Chưa xác định — Chưa thể thẩm định quy chuẩn cơ sở vật chất TCVN 4391:2015 do dịch vụ AI tạm thời gián đoạn."
   },
   "zh": {
     "badge_gov": "🛡️ 越南国家旅游法定星级监管中心",
@@ -531,7 +539,7 @@ const I18N = {
     "ai_findings_infl": "官方档案显示该住宿取得的认证星级低于预订平台上宣传的星级级别。",
     "ai_risk_infl": "为未经核验的虚高星级支付了额外溢价。受越南法律保护享有追索权。",
     "ai_reasoning_infl": "物业身份与官方认证档案相符，但商业中介平台展示之星级高于 VNAT 实际核发级别。",
-    "ai_bullet_unav_registry": "<div><strong>ℹ️ 自动化审查提示：</strong><span style=\"color: #94a3b8; font-weight: 700;\">当前输入暂不可用 AI 审查</span> — 自动化 AI 审查暂无法处理此查询格式。按照消费者保护准则，该住宿不受任何负面推定。</div>",
+    "ai_bullet_unav_registry": "<div><strong>ℹ️ 自动审查提示：</strong> <span style=\"color: #94a3b8; font-weight: 700;\">AI审查服务暂时不可用</span> — 自动化 AI 审查系统当前暂无法响应。按照消费者保护准则，该住宿不受任何负面推定。</div>",
     "ai_bullet_unav_law": "<div><strong>🏛️ 国家名录查询建议：</strong>请使用该机构的标准商业名称或法定注册名称，直接查阅官方 681 家酒店 VNAT 国家名录。</div>",
     "ai_summary_unav": "AI 验证服务暂时繁忙。请直接查阅 VNAT 官方名录。",
     "ai_refund_unav": "请直接查阅国家官方名录以获取认证资质。",
@@ -556,7 +564,13 @@ const I18N = {
     "ai_modal_none_deficiencies": "✓ 无缺陷 — 完全符合 TCVN 4391:2015 国家硬件标准规范。",
     "verified_alt_heading": "🛡️ 越南官方认证的 {city} 5★ 替代合规酒店",
     "ai_stage2_status": "AI 正在汇总 {city} 的官方 VNAT 候选名录...",
-    "ai_complete_status": "✅ 法定 AI 深度审查完成 ({sec}秒 • TrueStars 法定 AI 引擎)"
+    "ai_complete_status": "✅ 法定 AI 深度审查完成 ({sec}秒 • TrueStars 法定 AI 引擎)",
+    "ai_confidence_unav": "0% 置信度（审核暂无结论）",
+    "ai_inconclusive": "暂无结论",
+    "ai_unavailable_status": "⚪ 法定 AI 审核未得出结论 ({sec}秒 • TrueStars 法定 AI 引擎)",
+    "ai_infractions_unavailable": "⚪ 暂无结论 — 未评估法定合规标准（AI审核暂不可用）",
+    "ai_modal_unav_infractions": "⚪ 暂无结论 — 因AI服务暂时不可用，无法评估法定旅游业合规情况。",
+    "ai_modal_unav_deficiencies": "⚪ 暂无结论 — 因AI服务暂时不可用，无法评估国家标准 TCVN 4391:2015 设施指标。"
   },
   "ko": {
     "badge_gov": "🛡️ 베트남 관광청 공식 성급 법정 감사 기구",
@@ -715,7 +729,7 @@ const I18N = {
     "ai_findings_infl": "정부 기록상 예약 플랫폼에 광고된 등급보다 낮은 성급으로 공인되어 있습니다.",
     "ai_risk_infl": "검증되지 않은 성급 등급에 대해 부당한 프리미엄을 지불했습니다. 베트남 법률에 따른 보호 대상입니다.",
     "ai_reasoning_infl": "숙소 식별은 공식 인가 기록과 일치하나, 예약 플랫폼의 상업적 광고가 VNAT 공인 등급보다 높게 표기되어 있습니다.",
-    "ai_bullet_unav_registry": "<div><strong>ℹ️ 자동 감사 안내:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">본 입력 형식에 대한 AI 감사 이용 불가</span> — 본 검색어 형식에 대해 자동 AI 감사를 진행할 수 없습니다. 소비자 보호 원칙에 따라 본 숙소에 대해 어떠한 불이익도 부과되지 않습니다.</div>",
+    "ai_bullet_unav_registry": "<div><strong>ℹ️ 자동 심사 안내:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">AI 심사 일시 이용 불가</span> — 자동 AI 심사 엔진에 일시적으로 연결할 수 없습니다. 소비자 보호 원칙에 따라 본 숙소에 대해 어떠한 불이익도 부과되지 않습니다.</div>",
     "ai_bullet_unav_law": "<div><strong>🏛️ 국가 등록부 조회 권장:</strong> 숙소의 공식 상호 또는 법인명을 사용하여 공식 681개 호텔 국가 VNAT 등록부를 직접 검색해 주십시오.</div>",
     "ai_summary_unav": "AI 검증 서비스를 일시적으로 이용할 수 없습니다. VNAT 공식 등록부를 직접 확인해 주십시오.",
     "ai_refund_unav": "공식 국가 등록부에서 인증 상태를 직접 확인하시기 바랍니다.",
@@ -740,7 +754,13 @@ const I18N = {
     "ai_modal_none_deficiencies": "✓ 미달 없음 — TCVN 4391:2015 국가 물리적 시설 기준을 전면 충족합니다.",
     "verified_alt_heading": "🛡️ 베트남 국가 공인 {city} 5★ 대체 호텔",
     "ai_stage2_status": "AI가 {city}의 공식 VNAT 등록 후보를 수집 중입니다...",
-    "ai_complete_status": "✅ 법정 AI 심사 완료 ({sec}초 • TrueStars 법정 AI 엔진)"
+    "ai_complete_status": "✅ 법정 AI 심사 완료 ({sec}초 • TrueStars 법정 AI 엔진)",
+    "ai_confidence_unav": "0% 신뢰도 (심사 판정 보류)",
+    "ai_inconclusive": "판정 보류",
+    "ai_unavailable_status": "⚪ 법정 AI 심사 판정 보류 ({sec}초 • TrueStars 법정 AI 엔진)",
+    "ai_infractions_unavailable": "⚪ 판정 보류 — 법정 심사 기준 미평가 (AI 심사 일시 중단)",
+    "ai_modal_unav_infractions": "⚪ 판정 보류 — AI 서비스 일시 미제공으로 인해 법정 관광 규정 준수 여부를 평가할 수 없습니다.",
+    "ai_modal_unav_deficiencies": "⚪ 판정 보류 — AI 서비스 일시 미제공으로 인해 TCVN 4391:2015 국가 시설 기준을 평가할 수 없습니다."
   },
   "ja": {
     "badge_gov": "🛡️ ベトナム国家観光総局 法定星評価監査機関",
@@ -899,7 +919,7 @@ const I18N = {
     "ai_findings_infl": "公的記録によると、予約サイトで宣伝されている星ランクよりも低い星数で認可されています。",
     "ai_risk_infl": "未検証の星ランクに対して不当なプレミアムが請求されています。ベトナム法の下で保護されます。",
     "ai_reasoning_infl": "施設自体は公式認定記録と合致しますが、予約サイト上の宣伝表示がVNAT公式認定ランクを超えて高く表示されています。",
-    "ai_bullet_unav_registry": "<div><strong>ℹ️ 自動検証通知：</strong><span style=\"color: #94a3b8; font-weight: 700;\">この入力形式ではAI監査を利用できません</span> — この検索フォーマットでは自動AI監査を実行できません。消費者保護基準に基づき、当施設にいかなる不利益も課されません。</div>",
+    "ai_bullet_unav_registry": "<div><strong>ℹ️ 自動検証通知：</strong> <span style=\"color: #94a3b8; font-weight: 700;\">AI監査サービス一時利用不可</span> — 自動AI監査エンジンに現在一時的に接続できません。消費者保護基準に基づき、当施設にいかなる不利益も課されません。</div>",
     "ai_bullet_unav_law": "<div><strong>🏛️ 国家名簿参照のお願い：</strong>施設の正式な商号または法人名を使用して、公式の681軒VNAT国家登録簿を直接ご確認ください。</div>",
     "ai_summary_unav": "AI監査は一時的に利用できません。公式のVNAT登録簿を直接ご確認ください。",
     "ai_refund_unav": "公認状況については公式国家登録簿を直接ご参照ください。",
@@ -924,7 +944,13 @@ const I18N = {
     "ai_modal_none_deficiencies": "✓ 欠落なし — 国家物理施設基準 TCVN 4391:2015 を完全に満たしています。",
     "verified_alt_heading": "🛡️ 国家公認済みの {city} 5★ 代替ホテル",
     "ai_stage2_status": "AIが{city}の公式VNAT登録候補を収集しています...",
-    "ai_complete_status": "✅ 法定AI審査完了 ({sec}秒 • TrueStars 法定AIエンジン)"
+    "ai_complete_status": "✅ 法定AI審査完了 ({sec}秒 • TrueStars 法定AIエンジン)",
+    "ai_confidence_unav": "0% 信頼度（判定保留）",
+    "ai_inconclusive": "判定保留",
+    "ai_unavailable_status": "⚪ 法定AI監査 判定保留 ({sec}秒 • TrueStars 法定AIエンジン)",
+    "ai_infractions_unavailable": "⚪ 判定保留 — 法定基準未評価（AI監査一時利用不可）",
+    "ai_modal_unav_infractions": "⚪ 判定保留 — AIサービスの一時的な停止のため、法定観光基準の遵守状況を評価できませんでした。",
+    "ai_modal_unav_deficiencies": "⚪ 判定保留 — AIサービスの一時的な停止のため、TCVN 4391:2015の物理的施設基準を評価できませんでした。"
   },
   "es": {
     "badge_gov": "🛡️ ORGANISMO DE AUDITORÍA TURÍSTICA LEGAL",
@@ -1083,7 +1109,7 @@ const I18N = {
     "ai_findings_infl": "Los registros oficiales muestran acreditación válida para una categoría inferior a la anunciada en la plataforma.",
     "ai_risk_infl": "Tarifa inflada pagada por una categoría no verificada. Reclamo de protección aplicable bajo la ley vietnamita.",
     "ai_reasoning_infl": "El establecimiento corresponde a los registros de acreditación oficiales, pero la plataforma anuncia una categoría superior a la certificada por VNAT.",
-    "ai_bullet_unav_registry": "<div><strong>ℹ️ Aviso de Verificación Automática:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">AUDITORÍA NO DISPONIBLE PARA ESTA CONSULTA</span> — La auditoría automatizada no está disponible para este formato. Conforme a las normas de protección al consumidor, no se aplica ninguna sanción.</div>",
+    "ai_bullet_unav_registry": "<div><strong>ℹ️ Aviso de Verificación Automática:</strong> <span style=\"color: #94a3b8; font-weight: 700;\">AUDITORÍA IA TEMPORALMENTE NO DISPONIBLE</span> — La auditoría automatizada por IA no está disponible temporalmente. Conforme a las normas de protección al consumidor, no se aplica ninguna sanción.</div>",
     "ai_bullet_unav_law": "<div><strong>🏛️ Recomendación de Registro Nacional:</strong> Busque utilizando el nombre legal o comercial estándar para consultar el registro oficial de 681 hoteles de VNAT directamente.</div>",
     "ai_summary_unav": "La verificación por IA no está disponible temporalmente. Consulte el registro oficial de VNAT.",
     "ai_refund_unav": "Consulte directamente el registro nacional oficial para verificar el estado de acreditación.",
@@ -1108,15 +1134,32 @@ const I18N = {
     "ai_modal_none_deficiencies": "✓ Ninguna — Cumplimiento total de los criterios físicos nacionales de TCVN 4391:2015.",
     "verified_alt_heading": "🛡️ Alternativas 5★ Certificadas Oficialmente en {city}",
     "ai_stage2_status": "La IA está recopilando candidatos oficiales de VNAT en {city}...",
-    "ai_complete_status": "✅ Auditoría de IA Legal Completa ({sec}s • TrueStars Statutory AI Engine)"
+    "ai_complete_status": "✅ Auditoría de IA Legal Completa ({sec}s • TrueStars Statutory AI Engine)",
+    "ai_confidence_unav": "0% Confianza (Auditoría no concluyente)",
+    "ai_inconclusive": "No concluyente",
+    "ai_unavailable_status": "⚪ Auditoría de IA legal no concluyente ({sec}s • TrueStars Statutory AI Engine)",
+    "ai_infractions_unavailable": "⚪ No concluyente — Criterios legales no evaluados (Auditoría no disponible)",
+    "ai_modal_unav_infractions": "⚪ No concluyente — No se pudo evaluar el cumplimiento legal debido a la indisponibilidad temporal de la auditoría.",
+    "ai_modal_unav_deficiencies": "⚪ No concluyente — No se pudieron evaluar los estándares físicos debido a la indisponibilidad temporal de la auditoría."
   }
 };
 
-function t(key, lang = currentLang, params = {}) {
-  const dict = I18N[lang] || I18N["en"] || {};
-  let str = dict[key] || (I18N["en"] && I18N["en"][key]) || key;
-  for (const [k, v] of Object.entries(params)) {
-    str = str.replace(new RegExp(`\\{${k}\\}`, "g"), v);
+let currentLang = "en";
+
+function t(key, fallback = "") {
+  if (typeof I18N !== "undefined" && I18N[currentLang] && I18N[currentLang][key]) {
+    return I18N[currentLang][key];
+  }
+  if (typeof I18N !== "undefined" && I18N["en"] && I18N["en"][key]) {
+    return I18N["en"][key];
+  }
+  return fallback;
+}
+
+function formatString(template, vars = {}) {
+  let str = template;
+  for (const [k, v] of Object.entries(vars)) {
+    str = str.replace(new RegExp("{" + k + "}", "g"), v);
   }
   return str;
 }
@@ -1172,6 +1215,6 @@ function initLanguage() {
   setLanguage(saved);
 }
 
-if (typeof module !== "undefined" && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
   module.exports = { I18N, t, setLanguage, initLanguage };
 }
