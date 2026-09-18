@@ -1461,6 +1461,34 @@
         return;
       }
 
+      // Pre-flight client-side injection defense on the button
+      const combinedInput = `${currentAudit.property_name || ''} ${currentAudit.original_url || ''}`;
+      const INJECTION_PRECHECK = /(?:ignore|disregard|forget|bypass|override)\s+(?:all\s+)?(?:(?:previous|prior|above|system)\s+)?(?:instructions|prompts|rules|commands|directives|filters|guidelines)|(?:return|output|say|reply\s+with)\s+(?:verdict\s*)?['"]?(?:verified|compliant|5\s*stars)|system\s*:\s*|assistant\s*:\s*|user\s*:\s*|<\|im_start\|>|<\|im_end\|>|\[inst\]|\[\/inst\]|developer\s+mode|jailbreak|pretend\s+you\s+are|you\s+are\s+now/i;
+      if (INJECTION_PRECHECK.test(combinedInput)) {
+        renderInlineAiDossier({
+          hotel_name: currentAudit.property_name || "Audit Query",
+          claimed_stars: currentAudit.claimed_stars || 5,
+          city: (currentAudit.province && currentAudit.province !== "Vietnam") ? currentAudit.province : "Vietnam",
+          verified_at: new Date().toISOString(),
+          model: "TrueStars Statutory AI Engine",
+          latency_sec: "0.0",
+          verdict: "AI_SERVICE_UNAVAILABLE",
+          confidence: 0,
+          concise_summary: "AI verification is unavailable for this query format. Please refer to official VNAT statutory registry lookup.",
+          refund_advisory: "Automated AI audit is unavailable. Please verify accreditation directly in the official national registry.",
+          investigation_findings: "Input query contains unsupported directive syntax. No adverse determination or penalty is made against this property.",
+          statutory_infractions: [],
+          tcvn_deficiencies: [],
+          risk_advisory: "AI audit unavailable for this input. Please search using the property's standard official name.",
+          reasoning: "The query format could not be verified by the statutory AI reasoning engine. In accordance with consumer protection standards, unverified queries do not penalize the establishment."
+        });
+        const b1 = document.getElementById('btn-ai-verify');
+        const b2 = document.getElementById('btn-run-ai-direct');
+        if (b1) { b1.className = "btn-ai-verify btn-ai-verified"; b1.innerHTML = `<span>🤖 ⚪ AI UNAVAILABLE (0.0s)</span>`; }
+        if (b2) { b2.innerHTML = `🤖 ⚪ AI UNAVAILABLE`; }
+        return;
+      }
+
       const dossier = document.getElementById('inline-ai-dossier');
       if (dossier) {
         dossier.style.display = 'block';
