@@ -261,7 +261,7 @@ module.exports = async (req, res) => {
 
         // If the property is ALREADY verified and compliant in the statutory registry:
         // We do NOT need AI verification! Return official state accreditation directly.
-        if (classification && classification.is_verified && !classification.is_violation) {
+        if (classification && (!classification.is_violation || classification.verdict === "VERIFIED_LEGITIMATE" || classification.is_verified) && classification.matched_hotel) {
           const matched = classification.matched_hotel;
           const cert = matched.item_id || matched.decision_code || "AUTH";
           const verifiedRecord = {

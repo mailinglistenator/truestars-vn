@@ -590,6 +590,7 @@ class TrueStarsMatcher {
       verdict: verdict,
       severity: severity,
       is_violation: isViolation,
+      is_verified: isLegitimate,
       summary: summary,
       match_type: matchType,
       matched_hotel: matchedHotel ? {
